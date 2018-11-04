@@ -1,0 +1,14 @@
+name: xgcm
+dependencies:
+  - python=3.6
+  - xarray
+  - dask
+  - numpy
+  - pytest
+  - numpydoc
+  - sphinx
+  - ipython
+  - matplotlib
+  - pip:
+    - docrep
+    - nbsphinx

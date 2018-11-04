@@ -32,7 +32,7 @@ install:
 - python setup.py install --record installed_files.txt
 
 script:
-- py.test xbatcher --cov=xrft --cov-config .coveragerc --cov-report term-missing -v
+- py.test xbatcher --cov=xbatcher --cov-config .coveragerc --cov-report term-missing -v
 
 after_success:
 - codecov

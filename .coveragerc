@@ -1,0 +1,10 @@
+[run]
+branch = True
+source = xbatcher/*
+include = xbatcher/*
+omit = */setup.py
+       */version.py
+       xbatcher/tests/*
+       */__init__.py
+[report]
+include = xbatcher/*
