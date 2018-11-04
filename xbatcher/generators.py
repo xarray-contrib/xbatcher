@@ -1,3 +1,5 @@
+"""Classes for iterating through xarray datarrays / datasets in batches."""
+
 import xarray as xr
 from collections import OrderedDict
 import itertools
@@ -26,6 +28,7 @@ class BatchGenerator:
         for slices in itertools.product(*[self._iterate_dim(dim)
                                           for dim in self.batch_dims]):
             selector = {key: slice for key, slice in zip(self.batch_dims, slices)}
+            #print(selector)
             yield self.ds.isel(**selector)
 
 
