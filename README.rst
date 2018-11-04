@@ -18,7 +18,7 @@ such as Keras_. View the |docs| for more info.
    :target: https://codecov.io/gh/rabernat/xbatcher
    :alt: code coverage
 .. |docs| image:: http://readthedocs.org/projects/xbatcher/badge/?version=latest
-   :target: http://xbatcher.readthedocs.org/en/stable/?badge=latest
+   :target: http://xbatcher.readthedocs.org/en/latest/?badge=latest
 .. |license| image:: https://img.shields.io/github/license/mashape/apistatus.svg
    :target: https://github.com/rabernat/xbatcher
    :alt: license
