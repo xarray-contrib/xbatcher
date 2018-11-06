@@ -42,35 +42,57 @@ def test_batch_1d_overlap(sample_ds_1d, olap):
 
 
 @pytest.fixture(scope='module')
-def sample_ds_2d():
-    shape = (50, 100)
-    ds = xr.Dataset({'foo': (['y', 'x'], np.random.rand(*shape)),
-                     'bar': (['y', 'x'], np.random.randint(0, 10, shape))},
+def sample_ds_3d():
+    shape = (10, 50, 100)
+    ds = xr.Dataset({'foo': (['time', 'y', 'x'], np.random.rand(*shape)),
+                     'bar': (['time', 'y', 'x'], np.random.randint(0, 10, shape))},
                     {'x': (['x'], np.arange(shape[-1])),
                      'y': (['y'], np.arange(shape[-2]))})
     return ds
 
 
 @pytest.mark.parametrize("bsize", [5, 10])
-def test_batch_2d(sample_ds_2d, bsize):
+def test_batch_3d_1d_input(sample_ds_3d, bsize):
 
     # first do the iteration over just one dimension
-    bg = BatchGenerator(sample_ds_2d, input_dims={'x': bsize})
+    bg = BatchGenerator(sample_ds_3d, input_dims={'x': bsize})
     for n, ds_batch in enumerate(bg):
         assert isinstance(ds_batch, xr.Dataset)
         assert ds_batch.dims['x'] == bsize
-        assert ds_batch.dims['y'] == sample_ds_2d.dims['y']
+        # time and y should be collapsed into batch dimension
+        assert ds_batch.dims['batch'] == sample_ds_3d.dims['y'] * sample_ds_3d.dims['time']
         expected_slice = slice(bsize*n, bsize*(n+1))
-        ds_batch_expected = sample_ds_2d.isel(x=expected_slice)
+        ds_batch_expected = (sample_ds_3d.isel(x=expected_slice)
+                                         .stack(batch=['y', 'time'])
+                                         .transpose('batch', 'x'))
+        print(ds_batch)
+        print(ds_batch_expected)
         assert ds_batch.equals(ds_batch_expected)
 
+@pytest.mark.parametrize("bsize", [5, 10])
+def test_batch_3d_2d_input(sample_ds_3d, bsize):
     # now iterate over both
     xbsize = 20
-    bg = BatchGenerator(sample_ds_2d, input_dims={'y': bsize, 'x': xbsize})
+    bg = BatchGenerator(sample_ds_3d, input_dims={'y': bsize, 'x': xbsize})
     for n, ds_batch in enumerate(bg):
         assert isinstance(ds_batch, xr.Dataset)
         assert ds_batch.dims['x'] == xbsize
         assert ds_batch.dims['y'] == bsize
         # TODO? Is it worth it to try to reproduce the internal logic of the
         # generator and verify that the slices are correct?
-    assert (n+1)==((sample_ds_2d.dims['x']//xbsize) * (sample_ds_2d.dims['y']//bsize))
+    assert (n+1)==((sample_ds_3d.dims['x']//xbsize) * (sample_ds_3d.dims['y']//bsize))
+
+
+@pytest.mark.parametrize("bsize", [5, 10])
+def test_batch_3d_2d_input_concat(sample_ds_3d, bsize):
+    # now iterate over both
+    xbsize = 20
+    bg = BatchGenerator(sample_ds_3d, input_dims={'y': bsize, 'x': xbsize},
+                        concat_input_dims=True)
+    for n, ds_batch in enumerate(bg):
+        assert isinstance(ds_batch, xr.Dataset)
+        assert ds_batch.dims['x_input'] == xbsize
+        assert ds_batch.dims['y_input'] == bsize
+        assert ds_batch.dims['batch'] == ((sample_ds_3d.dims['x']//xbsize) *
+                                          (sample_ds_3d.dims['y']//bsize) *
+                                          sample_ds_3d.dims['time'])

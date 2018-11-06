@@ -109,10 +109,13 @@ class BatchGenerator:
                 ds_batch.load()
             input_generator = self._iterate_input_dims(ds_batch)
             if self.concat_input_dims:
-                all_dsets = [_drop_input_dims(ds_input, list(self.input_dims))
+                new_dim_suffix = '_input'
+                all_dsets = [_drop_input_dims(ds_input, list(self.input_dims),
+                                              suffix=new_dim_suffix)
                              for ds_input in input_generator]
-                dsc = xr.concat(all_batches, dim='input_batch')
-                yield _maybe_stack_batch_dims(dsc, list(self.input_dims))
+                dsc = xr.concat(all_dsets, dim='input_batch')
+                new_input_dims = [dim + new_dim_suffix for dim in self.input_dims]
+                yield _maybe_stack_batch_dims(dsc, new_input_dims)
             else:
                 for ds_input in input_generator:
                     yield _maybe_stack_batch_dims(ds_input, list(self.input_dims))
