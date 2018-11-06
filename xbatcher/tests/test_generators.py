@@ -60,11 +60,11 @@ def test_batch_3d_1d_input(sample_ds_3d, bsize):
         assert isinstance(ds_batch, xr.Dataset)
         assert ds_batch.dims['x'] == bsize
         # time and y should be collapsed into batch dimension
-        assert ds_batch.dims['batch'] == sample_ds_3d.dims['y'] * sample_ds_3d.dims['time']
+        assert ds_batch.dims['sample'] == sample_ds_3d.dims['y'] * sample_ds_3d.dims['time']
         expected_slice = slice(bsize*n, bsize*(n+1))
         ds_batch_expected = (sample_ds_3d.isel(x=expected_slice)
-                                         .stack(batch=['y', 'time'])
-                                         .transpose('batch', 'x'))
+                                         .stack(sample=['time', 'y'])
+                                         .transpose('sample', 'x'))
         print(ds_batch)
         print(ds_batch_expected)
         assert ds_batch.equals(ds_batch_expected)
@@ -93,6 +93,6 @@ def test_batch_3d_2d_input_concat(sample_ds_3d, bsize):
         assert isinstance(ds_batch, xr.Dataset)
         assert ds_batch.dims['x_input'] == xbsize
         assert ds_batch.dims['y_input'] == bsize
-        assert ds_batch.dims['batch'] == ((sample_ds_3d.dims['x']//xbsize) *
+        assert ds_batch.dims['sample'] == ((sample_ds_3d.dims['x']//xbsize) *
                                           (sample_ds_3d.dims['y']//bsize) *
                                           sample_ds_3d.dims['time'])
