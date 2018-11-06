@@ -17,7 +17,7 @@ def sample_ds_1d():
 # Should we enforce that each batch size always has to be the same
 @pytest.mark.parametrize("bsize", [5, 10])
 def test_batch_1d(sample_ds_1d, bsize):
-    bg = BatchGenerator(sample_ds_1d, batch_sizes={'x': bsize})
+    bg = BatchGenerator(sample_ds_1d, input_dims={'x': bsize})
     for n, ds_batch in enumerate(bg):
         assert isinstance(ds_batch, xr.Dataset)
         # TODO: maybe relax this? see comment above
@@ -30,8 +30,8 @@ def test_batch_1d(sample_ds_1d, bsize):
 @pytest.mark.parametrize("olap", [1, 4])
 def test_batch_1d_overlap(sample_ds_1d, olap):
     bsize = 10
-    bg = BatchGenerator(sample_ds_1d, batch_sizes={'x': bsize},
-                        overlap={'x': olap})
+    bg = BatchGenerator(sample_ds_1d, input_dims={'x': bsize},
+                        input_overlap={'x': olap})
     stride = bsize-olap
     for n, ds_batch in enumerate(bg):
         assert isinstance(ds_batch, xr.Dataset)
@@ -55,7 +55,7 @@ def sample_ds_2d():
 def test_batch_2d(sample_ds_2d, bsize):
 
     # first do the iteration over just one dimension
-    bg = BatchGenerator(sample_ds_2d, batch_sizes={'x': bsize})
+    bg = BatchGenerator(sample_ds_2d, input_dims={'x': bsize})
     for n, ds_batch in enumerate(bg):
         assert isinstance(ds_batch, xr.Dataset)
         assert ds_batch.dims['x'] == bsize
@@ -66,7 +66,7 @@ def test_batch_2d(sample_ds_2d, bsize):
 
     # now iterate over both
     xbsize = 20
-    bg = BatchGenerator(sample_ds_2d, batch_sizes={'y': bsize, 'x': xbsize})
+    bg = BatchGenerator(sample_ds_2d, input_dims={'y': bsize, 'x': xbsize})
     for n, ds_batch in enumerate(bg):
         assert isinstance(ds_batch, xr.Dataset)
         assert ds_batch.dims['x'] == xbsize
