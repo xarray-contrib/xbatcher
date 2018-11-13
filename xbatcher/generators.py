@@ -48,13 +48,13 @@ def _drop_input_dims(ds, input_dims, suffix='_input'):
     return out
 
 
-def _maybe_stack_batch_dims(ds, input_dims):
+def _maybe_stack_batch_dims(ds, input_dims, stacked_dim_name='sample'):
     batch_dims = list(set(ds.dims) - set(input_dims))
     if len(batch_dims) < 2:
         return ds
-    ds_stack = ds.stack(batch=batch_dims)
+    ds_stack = ds.stack(**{stacked_dim_name: batch_dims})
     # ensure correct order
-    dim_order = ('batch',) + tuple(input_dims)
+    dim_order = (stacked_dim_name,) + tuple(input_dims)
     return ds_stack.transpose(*dim_order)
 
 
