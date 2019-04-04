@@ -63,7 +63,7 @@ def test_batch_3d_1d_input(sample_ds_3d, bsize):
         assert ds_batch.dims['sample'] == sample_ds_3d.dims['y'] * sample_ds_3d.dims['time']
         expected_slice = slice(bsize*n, bsize*(n+1))
         ds_batch_expected = (sample_ds_3d.isel(x=expected_slice)
-                                         .stack(sample=['time', 'y'])
+                                         .stack(sample=['y', 'time'])
                                          .transpose('sample', 'x'))
         print(ds_batch)
         print(ds_batch_expected)
