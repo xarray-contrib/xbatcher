@@ -41,10 +41,13 @@ def _drop_input_dims(ds, input_dims, suffix='_input'):
     # remove input_dims coordinates from datasets, rename the dimensions
     # then put intput_dims back in as coordinates
     out = ds.copy()
-    out = (out.drop(input_dims)
-              .rename({dim: dim + suffix for dim in input_dims}))
     for dim in input_dims:
-        out.coords[dim] = dim + suffix, ds[dim].values
+        newdim = dim + suffix
+        out = out.rename({dim: newdim})
+        # extra steps needed if there is a coordinate
+        if newdim in out:
+            out = out.drop(newdim)
+            out.coords[dim] = newdim, ds[dim].data, ds[dim].attrs
     return out
 
 

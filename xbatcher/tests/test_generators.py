@@ -50,7 +50,7 @@ def test_batch_1d_no_coordinate(sample_ds_1d, bsize):
 
 @pytest.mark.parametrize("bsize", [5, 10])
 def test_batch_1d_concat_no_coordinate(sample_ds_1d, bsize):
-    # fix for #3
+    # test for #3
     ds_dropped = sample_ds_1d.drop('x')
     bg = BatchGenerator(ds_dropped, input_dims={'x': bsize},
                         concat_input_dims=True)
@@ -59,7 +59,6 @@ def test_batch_1d_concat_no_coordinate(sample_ds_1d, bsize):
         assert ds_batch.dims['x_input'] == bsize
         assert ds_batch.dims['input_batch'] == sample_ds_1d.dims['x']//bsize
         assert 'x' not in ds_batch.coords
-
 
 @pytest.mark.parametrize("olap", [1, 4])
 def test_batch_1d_overlap(sample_ds_1d, olap):
