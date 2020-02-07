@@ -48,7 +48,7 @@ Shuffle and Sampling APIs
 
 When training machine-learning models in batches, it is often necessary to
 selectively or randomly sample from your training data. Xbatcher can help
-facilitate seemless shuffling and sampling by providing APIs that opperate on
+facilitate seamless shuffling and sampling by providing APIs that operate on
 batches and/or full datasets. This may require working with Xarray and Dask to
 facilitate fast, distributed shuffles of Dask arrays.
 
