@@ -1,1 +1,2 @@
-from . generators import BatchGenerator
+from .generators import BatchGenerator
+from .accessors import BatchAccessor
