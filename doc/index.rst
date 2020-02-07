@@ -39,8 +39,9 @@ and we want to create batches along the time dimension. We can do it like this
         # actually feed to machine learning library
     batch
 
-API
----
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
 
-.. autoclass:: xbatcher.BatchGenerator
-   :members:
+   roadmap
+   api
