@@ -11,7 +11,7 @@ DISTNAME = 'xbatcher'
 LICENSE = 'Apache'
 AUTHOR = 'xbatcher Developers'
 AUTHOR_EMAIL = 'rpa@ldeo.columbia.edu'
-URL = 'https://github.com/xgcm/xbatcher'
+URL = 'https://github.com/pangeo/xbatcher'
 CLASSIFIERS = [
     'Development Status :: 4 - Beta',
     'License :: OSI Approved :: Apache Software License',
@@ -24,15 +24,19 @@ CLASSIFIERS = [
     'Topic :: Scientific/Engineering',
 ]
 
-INSTALL_REQUIRES = ['xarray', 'dask', 'numpy']
-SETUP_REQUIRES = []
-TESTS_REQUIRE = ['pytest >= 2.8', 'coverage']
-
 DESCRIPTION = "Batch generation from xarray dataset"
-def readme():
-    return "TODO"
-    #with open('README.rst') as f:
-    #    return f.read()
+
+with open('requirements.txt') as f:
+    install_requires = f.read().strip().split('\n')
+
+with open('dev-requirements.txt') as f:
+    test_requires = f.read().strip().split('\n')
+
+if os.path.exists('README.rst'):
+    with open('README.rst') as f:
+        long_description = f.read()
+else:
+    long_description = ''
 
 
 setup(name=DISTNAME,
@@ -42,9 +46,8 @@ setup(name=DISTNAME,
       author_email=AUTHOR_EMAIL,
       classifiers=CLASSIFIERS,
       description=DESCRIPTION,
-      long_description=readme(),
-      install_requires=INSTALL_REQUIRES,
-      setup_requires=SETUP_REQUIRES,
-      tests_require=TESTS_REQUIRE,
+      long_description=long_description,
+      python_requires='>=3.7',
+      install_requires=install_requires,
       url=URL,
       packages=find_packages())
