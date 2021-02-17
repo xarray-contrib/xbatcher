@@ -8,7 +8,7 @@ DISTNAME = 'xbatcher'
 LICENSE = 'Apache'
 AUTHOR = 'xbatcher Developers'
 AUTHOR_EMAIL = 'rpa@ldeo.columbia.edu'
-URL = 'https://github.com/pangeo/xbatcher'
+URL = 'https://github.com/pangeo-data/xbatcher'
 CLASSIFIERS = [
     'Development Status :: 4 - Beta',
     'License :: OSI Approved :: Apache Software License',

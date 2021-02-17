@@ -41,13 +41,7 @@ jobs:
           python -m pip list
       - name: Running Tests
         run: |
-          python -m pytest --cov=./ --cov-report=xml --verbose
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
-        if: ${{ matrix.python-version }} == 3.7
-        with:
-          file: ./coverage.xml
-          fail_ci_if_error: false
+          python -m pytest --verbose
 
   test-upstream:
     name: ${{ matrix.python-version }}-dev-build
