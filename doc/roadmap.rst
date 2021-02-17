@@ -32,7 +32,7 @@ We are currently envisioning the project growing to support more complex
 extract-transform-load components commonly found in machine learning workflows
 that use multidimensional data. We note that many of the concepts in Xbatcher
 have been developed through colaborations in the `Pangeo Project Machine
-Learning Working Group <https://pangeo.io/meeting-notes.html>`_. 
+Learning Working Group <https://pangeo.io/meeting-notes.html>`_.
 
 Batch generation
 ~~~~~~~~~~~~~~~~

@@ -1,8 +1,10 @@
 """Classes for iterating through xarray datarrays / datasets in batches."""
 
-import xarray as xr
-from collections import OrderedDict
 import itertools
+from collections import OrderedDict
+
+import xarray as xr
+
 
 def _as_xarray_dataset(ds):
     # maybe coerce to xarray dataset
@@ -11,6 +13,7 @@ def _as_xarray_dataset(ds):
     else:
         return ds.to_dataset()
 
+
 def _slices(dimsize, size, overlap=0):
     # return a list of slices to chop up a single dimension
     slices = []
@@ -18,7 +21,7 @@ def _slices(dimsize, size, overlap=0):
     assert stride > 0
     assert stride < dimsize
     for start in range(0, dimsize, stride):
-        end = start+size
+        end = start + size
         if end <= dimsize:
             slices.append(slice(start, end))
     return slices
@@ -94,8 +97,15 @@ class BatchGenerator:
         Slices of the array matching the given batch size specification.
     """
 
-    def __init__(self, ds, input_dims, input_overlap={}, batch_dims={},
-                 concat_input_dims=False, preload_batch=True):
+    def __init__(
+        self,
+        ds,
+        input_dims,
+        input_overlap={},
+        batch_dims={},
+        concat_input_dims=False,
+        preload_batch=True,
+    ):
 
         self.ds = _as_xarray_dataset(ds)
         # should be a dict
@@ -105,7 +115,6 @@ class BatchGenerator:
         self.concat_input_dims = concat_input_dims
         self.preload_batch = preload_batch
 
-
     def __iter__(self):
         for ds_batch in self._iterate_batch_dims(self.ds):
             if self.preload_batch:
@@ -113,15 +122,22 @@ class BatchGenerator:
             input_generator = self._iterate_input_dims(ds_batch)
             if self.concat_input_dims:
                 new_dim_suffix = '_input'
-                all_dsets = [_drop_input_dims(ds_input, list(self.input_dims),
-                                              suffix=new_dim_suffix)
-                             for ds_input in input_generator]
+                all_dsets = [
+                    _drop_input_dims(
+                        ds_input, list(self.input_dims), suffix=new_dim_suffix
+                    )
+                    for ds_input in input_generator
+                ]
                 dsc = xr.concat(all_dsets, dim='input_batch')
-                new_input_dims = [dim + new_dim_suffix for dim in self.input_dims]
+                new_input_dims = [
+                    dim + new_dim_suffix for dim in self.input_dims
+                ]
                 yield _maybe_stack_batch_dims(dsc, new_input_dims)
             else:
                 for ds_input in input_generator:
-                    yield _maybe_stack_batch_dims(ds_input, list(self.input_dims))
+                    yield _maybe_stack_batch_dims(
+                        ds_input, list(self.input_dims)
+                    )
 
     def _iterate_batch_dims(self, ds):
         return _iterate_through_dataset(ds, self.batch_dims)

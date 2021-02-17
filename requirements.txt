@@ -1,0 +1,3 @@
+dask
+numpy>=1.17
+xarray>=0.16
