@@ -1,10 +1,7 @@
- #!/usr/bin/env python
+#!/usr/bin/env python
 import os
-import re
-import sys
-import warnings
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 VERSION = '0.1.0'
 DISTNAME = 'xbatcher'
@@ -24,7 +21,7 @@ CLASSIFIERS = [
     'Topic :: Scientific/Engineering',
 ]
 
-DESCRIPTION = "Batch generation from xarray dataset"
+DESCRIPTION = 'Batch generation from xarray dataset'
 
 with open('requirements.txt') as f:
     install_requires = f.read().strip().split('\n')
@@ -39,15 +36,17 @@ else:
     long_description = ''
 
 
-setup(name=DISTNAME,
-      version=VERSION,
-      license=LICENSE,
-      author=AUTHOR,
-      author_email=AUTHOR_EMAIL,
-      classifiers=CLASSIFIERS,
-      description=DESCRIPTION,
-      long_description=long_description,
-      python_requires='>=3.7',
-      install_requires=install_requires,
-      url=URL,
-      packages=find_packages())
+setup(
+    name=DISTNAME,
+    version=VERSION,
+    license=LICENSE,
+    author=AUTHOR,
+    author_email=AUTHOR_EMAIL,
+    classifiers=CLASSIFIERS,
+    description=DESCRIPTION,
+    long_description=long_description,
+    python_requires='>=3.7',
+    install_requires=install_requires,
+    url=URL,
+    packages=find_packages(),
+)

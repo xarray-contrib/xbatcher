@@ -1,1 +1,1 @@
-from . generators import BatchGenerator
+from .generators import BatchGenerator  # noqa: F401
