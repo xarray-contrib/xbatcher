@@ -47,7 +47,7 @@ def test_batch_1d_concat(sample_ds_1d, bsize):
 @pytest.mark.parametrize('bsize', [5, 10])
 def test_batch_1d_no_coordinate(sample_ds_1d, bsize):
     # fix for #3
-    ds_dropped = sample_ds_1d.drop('x')
+    ds_dropped = sample_ds_1d.drop_vars('x')
     bg = BatchGenerator(ds_dropped, input_dims={'x': bsize})
     for n, ds_batch in enumerate(bg):
         assert isinstance(ds_batch, xr.Dataset)
@@ -60,7 +60,7 @@ def test_batch_1d_no_coordinate(sample_ds_1d, bsize):
 @pytest.mark.parametrize('bsize', [5, 10])
 def test_batch_1d_concat_no_coordinate(sample_ds_1d, bsize):
     # test for #3
-    ds_dropped = sample_ds_1d.drop('x')
+    ds_dropped = sample_ds_1d.drop_vars('x')
     bg = BatchGenerator(
         ds_dropped, input_dims={'x': bsize}, concat_input_dims=True
     )
@@ -118,7 +118,7 @@ def test_batch_3d_1d_input(sample_ds_3d, bsize):
         expected_slice = slice(bsize * n, bsize * (n + 1))
         ds_batch_expected = (
             sample_ds_3d.isel(x=expected_slice)
-            .stack(sample=['y', 'time'])
+            .stack(sample=['time', 'y'])
             .transpose('sample', 'x')
         )
         print(ds_batch)

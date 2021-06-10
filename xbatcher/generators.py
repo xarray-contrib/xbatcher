@@ -49,7 +49,7 @@ def _drop_input_dims(ds, input_dims, suffix='_input'):
         out = out.rename({dim: newdim})
         # extra steps needed if there is a coordinate
         if newdim in out:
-            out = out.drop(newdim)
+            out = out.drop_vars(newdim)
             out.coords[dim] = newdim, ds[dim].data, ds[dim].attrs
     return out
 
