@@ -49,13 +49,13 @@ def _drop_input_dims(ds, input_dims, suffix='_input'):
         out = out.rename({dim: newdim})
         # extra steps needed if there is a coordinate
         if newdim in out:
-            out = out.drop(newdim)
+            out = out.drop_vars(newdim)
             out.coords[dim] = newdim, ds[dim].data, ds[dim].attrs
     return out
 
 
 def _maybe_stack_batch_dims(ds, input_dims, stacked_dim_name='sample'):
-    batch_dims = list(set(ds.dims) - set(input_dims))
+    batch_dims = [d for d in ds.dims if d not in input_dims]
     if len(batch_dims) < 2:
         return ds
     ds_stack = ds.stack(**{stacked_dim_name: batch_dims})
