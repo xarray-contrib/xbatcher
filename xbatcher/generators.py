@@ -19,7 +19,7 @@ def _slices(dimsize, size, overlap=0):
     slices = []
     stride = size - overlap
     assert stride > 0
-    assert stride < dimsize
+    assert stride <= dimsize
     for start in range(0, dimsize, stride):
         end = start + size
         if end <= dimsize:
