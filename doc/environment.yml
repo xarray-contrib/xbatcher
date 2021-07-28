@@ -11,4 +11,5 @@ dependencies:
   - pytest
   - sphinx
   - sphinx-autosummary-accessors
+  - sphinx-copybutton
   - xarray

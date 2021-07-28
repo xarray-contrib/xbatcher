@@ -3,7 +3,6 @@ import os
 
 from setuptools import find_packages, setup
 
-VERSION = '0.1.0'
 DISTNAME = 'xbatcher'
 LICENSE = 'Apache'
 AUTHOR = 'xbatcher Developers'
@@ -39,7 +38,6 @@ else:
 
 setup(
     name=DISTNAME,
-    version=VERSION,
     license=LICENSE,
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
@@ -50,4 +48,9 @@ setup(
     install_requires=install_requires,
     url=URL,
     packages=find_packages(),
+    use_scm_version={
+        'version_scheme': 'post-release',
+        'local_scheme': 'dirty-tag',
+    },
+    setup_requires=['setuptools_scm', 'setuptools>=30.3.0'],
 )
