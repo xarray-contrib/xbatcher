@@ -39,6 +39,17 @@ and we want to create batches along the time dimension. We can do it like this
         # actually feed to machine learning library
     batch
 
+or via a built-in `Xarray accessor <http://xarray.pydata.org/en/stable/internals/extending-xarray.html#extending-xarray>`_:
+
+.. ipython:: python
+
+    import xbatcher
+
+    for batch in da.batch.generator({'time': 10}):
+        pass
+        # actually feed to machine learning library
+    batch
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

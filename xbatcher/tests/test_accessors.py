@@ -1,18 +1,24 @@
-import xarray as xr
 import numpy as np
 import pytest
+import xarray as xr
 
+import xbatcher  # noqa: F401
 from xbatcher import BatchGenerator
-import xbatcher
 
 
 @pytest.fixture(scope='module')
 def sample_ds_3d():
     shape = (10, 50, 100)
-    ds = xr.Dataset({'foo': (['time', 'y', 'x'], np.random.rand(*shape)),
-                     'bar': (['time', 'y', 'x'], np.random.randint(0, 10, shape))},
-                    {'x': (['x'], np.arange(shape[-1])),
-                     'y': (['y'], np.arange(shape[-2]))})
+    ds = xr.Dataset(
+        {
+            'foo': (['time', 'y', 'x'], np.random.rand(*shape)),
+            'bar': (['time', 'y', 'x'], np.random.randint(0, 10, shape)),
+        },
+        {
+            'x': (['x'], np.arange(shape[-1])),
+            'y': (['y'], np.arange(shape[-2])),
+        },
+    )
     return ds
 
 

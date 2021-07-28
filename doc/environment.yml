@@ -1,14 +1,14 @@
 name: xbatcher
 dependencies:
-  - python=3.6
-  - xarray
+  - python=3.7
   - dask
-  - numpy
-  - pytest
-  - numpydoc
-  - sphinx
+  - docrep
   - ipython
   - matplotlib
-  - pip:
-      - docrep
-      - nbsphinx
+  - nbsphinx
+  - numpy
+  - numpydoc
+  - pytest
+  - sphinx
+  - sphinx-autosummary-accessors
+  - xarray
