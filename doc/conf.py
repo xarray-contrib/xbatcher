@@ -15,6 +15,8 @@
 import os
 import sys
 
+import sphinx_autosummary_accessors
+
 import xbatcher
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -47,6 +49,7 @@ extensions = [
     'nbsphinx',
     'IPython.sphinxext.ipython_directive',
     'IPython.sphinxext.ipython_console_highlighting',
+    'sphinx_autosummary_accessors',
 ]
 
 # never execute notebooks: avoids lots of expensive imports on rtd
@@ -66,14 +69,16 @@ def setup(app):
 
 
 # link to github issues
-extlinks = {'issue': ('https://github.com/xbatcher/xbatcher/issues/%s', 'GH')}
+extlinks = {
+    'issue': ('https://github.com/pangeo-data/xbatcher/issues/%s', 'GH')
+}
 
 autosummary_generate = True
 numpydoc_class_members_toctree = False
 numpydoc_show_class_members = False
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ['_templates', sphinx_autosummary_accessors.templates_path]
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -86,7 +91,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'xbatcher'
-copyright = u'2016, xbatcher developers'
+copyright = u'2021, xbatcher developers'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
