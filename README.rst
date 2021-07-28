@@ -11,14 +11,14 @@ such as Keras_. View the |docs| for more info.
 .. _Keras: https://keras.io/
 
 
-.. |Build Status| image:: https://travis-ci.com/rabernat/xbatcher.svg?branch=master
-   :target: https://travis-ci.com/rabernat/xbatcher
-   :alt: travis-ci build status
-.. |codecov| image:: https://codecov.io/gh/rabernat/xbatcher/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/rabernat/xbatcher
+.. |Build Status| image:: https://github.com/pangeo-data/xbatcher/workflows/CI/badge.svg
+   :target: https://github.com/pangeo-data/xbatcher/actions
+   :alt: github actions build status
+.. |codecov| image:: https://codecov.io/gh/pangeo-data/xbatcher/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/pangeo-data/xbatcher
    :alt: code coverage
 .. |docs| image:: http://readthedocs.org/projects/xbatcher/badge/?version=latest
    :target: http://xbatcher.readthedocs.org/en/latest/?badge=latest
 .. |license| image:: https://img.shields.io/github/license/mashape/apistatus.svg
-   :target: https://github.com/rabernat/xbatcher
+   :target: https://github.com/pangeo-data/xbatcher
    :alt: license
