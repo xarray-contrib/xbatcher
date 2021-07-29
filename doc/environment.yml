@@ -1,4 +1,7 @@
 name: xbatcher
+channels:
+  - conda-forge
+  - nodefaults
 dependencies:
   - python=3.7
   - dask
