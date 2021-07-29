@@ -1,4 +1,7 @@
 name: xbatcher
+channels:
+  - conda-forge
+  - nodefaults
 dependencies:
   - python=3.7
   - dask
@@ -11,4 +14,6 @@ dependencies:
   - pytest
   - sphinx
   - sphinx-autosummary-accessors
+  - sphinx-copybutton
   - xarray
+  - pip

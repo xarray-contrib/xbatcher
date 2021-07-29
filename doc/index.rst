@@ -10,10 +10,17 @@ such as Keras_.
 Installation
 ------------
 
-No package yet. Install from git:
+Xbatcher can be installed from PyPI as::
 
-    pip install git+https://github.com/rabernat/xbatcher.git
+    pip install xbatcher
 
+Or via Conda as::
+
+    conda install -c conda-forge xbatcher
+
+Or from source as::
+
+    pip install git+https://github.com/pangeo-data/xbatcher.git
 
 Basic Usage
 -----------
