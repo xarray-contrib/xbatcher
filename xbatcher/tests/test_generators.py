@@ -18,6 +18,28 @@ def sample_ds_1d():
     return ds
 
 
+@pytest.mark.parametrize('bsize', [5, 6])
+def test_batcher_lenth(sample_ds_1d, bsize):
+    bg = BatchGenerator(sample_ds_1d, input_dims={'x': bsize})
+    assert len(bg) == sample_ds_1d.dims['x'] // bsize
+
+
+def test_batcher_getitem(sample_ds_1d):
+    bg = BatchGenerator(sample_ds_1d, input_dims={'x': 10})
+
+    # first batch
+    assert bg[0].dims['x'] == 10
+    # last batch
+    assert bg[-1].dims['x'] == 10
+    # raises IndexError for out of range index
+    with pytest.raises(IndexError, match=r'list index out of range'):
+        bg[9999999]
+
+    # raises NotImplementedError for iterable index
+    with pytest.raises(NotImplementedError):
+        bg[[1, 2, 3]]
+
+
 # TODO: decide how to handle bsizes like 15 that don't evenly divide the dimension
 # Should we enforce that each batch size always has to be the same
 @pytest.mark.parametrize('bsize', [5, 10])

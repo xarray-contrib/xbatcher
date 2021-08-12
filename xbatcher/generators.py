@@ -2,6 +2,8 @@
 
 import itertools
 from collections import OrderedDict
+from collections.abc import Iterator
+from typing import Any, Dict, Hashable
 
 import xarray as xr
 
@@ -99,12 +101,12 @@ class BatchGenerator:
 
     def __init__(
         self,
-        ds,
-        input_dims,
-        input_overlap={},
-        batch_dims={},
-        concat_input_dims=False,
-        preload_batch=True,
+        ds: xr.Dataset,
+        input_dims: Dict[Hashable, int],
+        input_overlap: Dict[Hashable, int] = {},
+        batch_dims: Dict[Hashable, int] = {},
+        concat_input_dims: bool = False,
+        preload_batch: bool = True,
     ):
 
         self.ds = _as_xarray_dataset(ds)
@@ -115,7 +117,38 @@ class BatchGenerator:
         self.concat_input_dims = concat_input_dims
         self.preload_batch = preload_batch
 
-    def __iter__(self):
+        self._batches: Dict[
+            int, Any
+        ] = self._gen_batches()  # dict cache for batches
+        # in the future, we can make this a lru cache or similar thing (cachey?)
+
+    def __iter__(self) -> Iterator[xr.Dataset]:
+        for batch in self._batches.values():
+            yield batch
+
+    def __len__(self) -> int:
+        return len(self._batches)
+
+    def __getitem__(self, idx: int) -> xr.Dataset:
+
+        if not isinstance(idx, int):
+            raise NotImplementedError(
+                f'{type(self).__name__}.__getitem__ currently requires a single integer key'
+            )
+
+        if idx < 0:
+            idx = list(self._batches)[idx]
+
+        if idx in self._batches:
+            return self._batches[idx]
+        else:
+            raise IndexError('list index out of range')
+
+    def _gen_batches(self) -> dict:
+        # in the future, we will want to do the batch generation lazily
+        # going the eager route for now is allowing me to fill out the loader api
+        # but it is likely to perform poorly.
+        batches = []
         for ds_batch in self._iterate_batch_dims(self.ds):
             if self.preload_batch:
                 ds_batch.load()
@@ -132,12 +165,14 @@ class BatchGenerator:
                 new_input_dims = [
                     dim + new_dim_suffix for dim in self.input_dims
                 ]
-                yield _maybe_stack_batch_dims(dsc, new_input_dims)
+                batches.append(_maybe_stack_batch_dims(dsc, new_input_dims))
             else:
                 for ds_input in input_generator:
-                    yield _maybe_stack_batch_dims(
-                        ds_input, list(self.input_dims)
+                    batches.append(
+                        _maybe_stack_batch_dims(ds_input, list(self.input_dims))
                     )
+
+        return dict(zip(range(len(batches)), batches))
 
     def _iterate_batch_dims(self, ds):
         return _iterate_through_dataset(ds, self.batch_dims)
