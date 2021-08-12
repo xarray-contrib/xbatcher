@@ -1,3 +1,4 @@
 pytest
+torch
 coverage
 -r requirements.txt
