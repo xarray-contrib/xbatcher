@@ -2,8 +2,7 @@
 
 import itertools
 from collections import OrderedDict
-from collections.abc import Iterator
-from typing import Any, Dict, Hashable
+from typing import Any, Dict, Hashable, Iterator
 
 import xarray as xr
 
@@ -163,7 +162,7 @@ class BatchGenerator:
                 ]
                 dsc = xr.concat(all_dsets, dim='input_batch')
                 new_input_dims = [
-                    dim + new_dim_suffix for dim in self.input_dims
+                    str(dim) + new_dim_suffix for dim in self.input_dims
                 ]
                 batches.append(_maybe_stack_batch_dims(dsc, new_input_dims))
             else:

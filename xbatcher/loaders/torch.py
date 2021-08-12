@@ -57,7 +57,6 @@ class MapDataset(torch.utils.data.Dataset):
 
         if self.target_transform:
             y_batch = self.target_transform(y_batch)
-        print('x_batch.shape', X_batch.shape)
         return X_batch, y_batch
 
 
