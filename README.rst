@@ -19,6 +19,8 @@ such as Keras_. View the |docs| for more info.
    :alt: code coverage
 .. |docs| image:: http://readthedocs.org/projects/xbatcher/badge/?version=latest
    :target: http://xbatcher.readthedocs.org/en/latest/?badge=latest
+.. |pypi| image:: https://img.shields.io/pypi/v/xbatcher.svg
+   :target: https://pypi.python.org/pypi/xbatcher/
 .. |license| image:: https://img.shields.io/github/license/mashape/apistatus.svg
    :target: https://github.com/pangeo-data/xbatcher
    :alt: license
