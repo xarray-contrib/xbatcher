@@ -21,7 +21,7 @@ such as Keras_. View the |docs| for more info.
    :target: http://xbatcher.readthedocs.org/en/latest/?badge=latest
    :alt: docs
 .. |pypi| image:: https://img.shields.io/pypi/v/xbatcher.svg
-   :target: https://pypi.python.org/pypi/xbatcher/
+   :target: https://pypi.python.org/pypi/xbatcher
    :alt: pypi
 .. |license| image:: https://img.shields.io/github/license/mashape/apistatus.svg
    :target: https://github.com/pangeo-data/xbatcher
