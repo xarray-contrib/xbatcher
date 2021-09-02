@@ -1,7 +1,7 @@
 xbatcher: Batch Generation from Xarray Datasets
 ===============================================
 
-|Build Status| |codecov| |docs| |license|
+|Build Status| |codecov| |docs| |pypi| |license|
 
 
 Xbatcher is a small library for iterating xarray DataArrays in batches. The
