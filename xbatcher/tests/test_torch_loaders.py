@@ -37,7 +37,7 @@ def test_map_dataset(ds_xy):
     # test __getitem__
     x_batch, y_batch = dataset[0]
     assert len(x_batch) == len(y_batch)
-    assert isinstance(x_batch, np.ndarray)
+    assert isinstance(x_batch, torch.Tensor)
 
     # test __len__
     assert len(dataset) == len(x_gen)
