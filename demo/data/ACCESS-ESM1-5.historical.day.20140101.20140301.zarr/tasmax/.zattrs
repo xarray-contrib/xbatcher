@@ -1,0 +1,15 @@
+{
+    "_ARRAY_DIMENSIONS": [
+        "time",
+        "lat",
+        "lon"
+    ],
+    "cell_measures": "area: areacella",
+    "cell_methods": "area: mean time: maximum",
+    "comment": "maximum near-surface (usually, 2 meter) air temperature (add cell_method attribute 'time: max')",
+    "coordinates": "height",
+    "history": "2019-11-15T17:28:16Z altered by CMOR: Treated scalar dimension: 'height'. 2019-11-15T17:28:16Z altered by CMOR: replaced missing value flag (-1.07374e+09) with standard missing value (1e+20).",
+    "long_name": "Daily Maximum Near-Surface Air Temperature",
+    "standard_name": "air_temperature",
+    "units": "K"
+}

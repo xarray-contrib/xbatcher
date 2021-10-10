@@ -1,0 +1,15 @@
+{
+    "_ARRAY_DIMENSIONS": [
+        "time",
+        "lat",
+        "lon"
+    ],
+    "cell_measures": "area: areacella",
+    "cell_methods": "area: mean time: minimum",
+    "comment": "minimum near-surface (usually, 2 meter) air temperature (add cell_method attribute 'time: min')",
+    "coordinates": "height",
+    "history": "2019-11-15T17:28:12Z altered by CMOR: Treated scalar dimension: 'height'. 2019-11-15T17:28:12Z altered by CMOR: replaced missing value flag (-1.07374e+09) with standard missing value (1e+20).",
+    "long_name": "Daily Minimum Near-Surface Air Temperature",
+    "standard_name": "air_temperature",
+    "units": "K"
+}
