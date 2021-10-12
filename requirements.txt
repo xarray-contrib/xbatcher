@@ -1,3 +1,4 @@
 dask
 numpy
 xarray
+zarr
