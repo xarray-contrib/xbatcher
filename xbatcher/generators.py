@@ -34,7 +34,7 @@ def _iterate_through_dataset(ds, dims, overlap={}):
         size = dims[dim]
         olap = overlap.get(dim, 0)
         dim_slices.append(_slices(dimsize, size, olap))
-
+        
     for slices in itertools.product(*dim_slices):
         selector = {key: slice for key, slice in zip(dims, slices)}
         yield ds.isel(**selector)
@@ -53,11 +53,10 @@ def _drop_input_dims(ds, input_dims, suffix='_input'):
             out.coords[dim] = newdim, ds[dim].data, ds[dim].attrs
     return out
 
-
 def _maybe_stack_batch_dims(ds, input_dims, stacked_dim_name='sample'):
     batch_dims = [d for d in ds.dims if d not in input_dims]
     if len(batch_dims) < 2:
-        return ds
+        return ds.expand_dims(stacked_dim_name, 0)
     ds_stack = ds.stack(**{stacked_dim_name: batch_dims})
     # ensure correct order
     dim_order = (stacked_dim_name,) + tuple(input_dims)
