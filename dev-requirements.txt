@@ -1,4 +1,4 @@
 pytest
 coverage
-zarr
+adlfs
 -r requirements.txt
