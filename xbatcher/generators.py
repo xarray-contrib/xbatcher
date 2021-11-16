@@ -34,7 +34,7 @@ def _iterate_through_dataset(ds, dims, overlap={}):
         size = dims[dim]
         olap = overlap.get(dim, 0)
         dim_slices.append(_slices(dimsize, size, olap))
-        
+
     for slices in itertools.product(*dim_slices):
         selector = {key: slice for key, slice in zip(dims, slices)}
         yield ds.isel(**selector)
