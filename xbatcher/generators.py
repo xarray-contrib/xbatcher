@@ -145,7 +145,7 @@ class BatchGenerator:
     def _iterate_input_dims(self, ds):
         return _iterate_through_dataset(ds, self.input_dims, self.input_overlap)
 
-    def to_zarr(self, path, chunks={"batch": "1Gb"}):
+    def to_zarr(self, path, chunks={'batch': '1Gb'}):
         """
         Store batches into a zarr datastore in `path`. To speed up loading of
         batches it is recommended that the chunking across batches is set close
@@ -155,9 +155,11 @@ class BatchGenerator:
         batch_datasets = list(self)
         # can't call the batch dimension `batch` because Dataset.batch is used
         # for the batch acccessor. Instead we'll call it `batch_number`
-        ds_all = xr.concat(batch_datasets, dim="batch_number").reset_index("sample")
-        if "batch" in chunks:
-            chunks["batch_number"] = chunks.pop("batch")
+        ds_all = xr.concat(batch_datasets, dim='batch_number').reset_index(
+            'sample'
+        )
+        if 'batch' in chunks:
+            chunks['batch_number'] = chunks.pop('batch')
 
         if len(chunks) > 0:
             ds_all = ds_all.chunk(chunks)
@@ -177,6 +179,7 @@ class StoredBatchesGenerator:
     the batches from a zarr store that was previously created with
     `BatchGenerator.to_zarr`
     """
+
     def __init__(self, path):
         self.ds_batches = xr.open_zarr(path)
         self.path = path
@@ -186,7 +189,9 @@ class StoredBatchesGenerator:
             ds_batch = self.ds_batches.sel(batch_number=batch_id)
             # create a MultiIndex like we had before storing the batches
             stacked_coords = [
-                d for d in ds_batch.coords if d not in ["sample", "batch_number"]
+                d
+                for d in ds_batch.coords
+                if d not in ['sample', 'batch_number']
             ]
             ds_batch = ds_batch.set_index(sample=stacked_coords)
             yield ds_batch

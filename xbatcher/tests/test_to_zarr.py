@@ -1,15 +1,17 @@
-import xarray as xr
-import numpy as np
 import tempfile
+
+import numpy as np
+import xarray as xr
+
 import xbatcher
 
 
 def test_to_zarr():
     da = xr.DataArray(
-        np.random.rand(1000, 100, 100), name="foo", dims=["time", "y", "x"]
-    ).chunk({"time": 1})
+        np.random.rand(1000, 100, 100), name='foo', dims=['time', 'y', 'x']
+    ).chunk({'time': 1})
 
-    bgen = xbatcher.BatchGenerator(da, {"time": 10}, preload_batch=False)
+    bgen = xbatcher.BatchGenerator(da, {'time': 10}, preload_batch=False)
 
     for ds_batch in bgen:
         ds_first_batch = ds_batch
