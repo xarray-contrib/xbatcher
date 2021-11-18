@@ -181,7 +181,10 @@ def test_preload_batch_false(sample_ds_1d):
 
 
 def test_preload_batch_true(sample_ds_1d):
-    bg = BatchGenerator(sample_ds_1d, input_dims={'x': 2}, preload_batch=True)
+    sample_ds_1d_dask = sample_ds_1d.chunk({'x': 2})
+    bg = BatchGenerator(
+        sample_ds_1d_dask, input_dims={'x': 2}, preload_batch=True
+    )
     assert bg.preload_batch is True
     for ds_batch in bg:
         assert isinstance(ds_batch, xr.Dataset)
