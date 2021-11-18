@@ -56,7 +56,7 @@ def _drop_input_dims(ds, input_dims, suffix='_input'):
 def _maybe_stack_batch_dims(ds, input_dims, squeeze_batch_dim, stacked_dim_name='sample'):
     batch_dims = [d for d in ds.dims if d not in input_dims]
     if len(batch_dims) < 2:
-        if(squeeze_batch_dim):
+        if squeeze_batch_dim:
             return ds
         else:
             return ds.expand_dims(stacked_dim_name, 0)
@@ -111,7 +111,7 @@ class BatchGenerator:
         batch_dims={},
         concat_input_dims=False,
         preload_batch=True,
-        squeeze_batch_dim=True
+        squeeze_batch_dim=True,
     ):
 
         self.ds = _as_xarray_dataset(ds)
@@ -140,7 +140,9 @@ class BatchGenerator:
                 new_input_dims = [
                     dim + new_dim_suffix for dim in self.input_dims
                 ]
-                yield _maybe_stack_batch_dims(dsc, new_input_dims, self.squeeze_batch_dim)
+                yield _maybe_stack_batch_dims(
+                    dsc, new_input_dims, self.squeeze_batch_dim
+                )
             else:
                 for ds_input in input_generator:
                     yield _maybe_stack_batch_dims(
