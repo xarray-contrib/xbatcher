@@ -53,7 +53,9 @@ def _drop_input_dims(ds, input_dims, suffix='_input'):
             out.coords[dim] = newdim, ds[dim].data, ds[dim].attrs
     return out
 
-def _maybe_stack_batch_dims(ds, input_dims, squeeze_batch_dim, stacked_dim_name='sample'):
+def _maybe_stack_batch_dims(
+    ds, input_dims, squeeze_batch_dim, stacked_dim_name='sample'
+):
     batch_dims = [d for d in ds.dims if d not in input_dims]
     if len(batch_dims) < 2:
         if squeeze_batch_dim:
