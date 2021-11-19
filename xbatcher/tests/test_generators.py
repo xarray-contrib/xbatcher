@@ -163,20 +163,20 @@ def test_batch_3d_2d_input_concat(sample_ds_3d, bsize):
 
 
 @pytest.mark.parametrize('bsize', [5, 10])
-def test_batch_3d_squeeze_batch_dim(sample_ds_3d, bsize):
+def test_batch_1d_squeeze_batch_dim(sample_ds_1d, bsize):
     xbsize = 20
     bg = BatchGenerator(
-        sample_ds_3d,
-        input_dims={'time': 1, 'y': bsize, 'x': xbsize},
+        sample_ds_1d,
+        input_dims={'x': xbsize},
         squeeze_batch_dim=False,
     )
     for ds_batch in bg:
-        assert ds_batch['x'].shape == [1, bsize, xbsize]
+        assert list(ds_batch['foo'].shape) == [1, xbsize]
 
     bg2 = BatchGenerator(
-        sample_ds_3d,
-        input_dims={'time': 1, 'y': bsize, 'x': xbsize},
+        sample_ds_1d,
+        input_dims={'x': xbsize},
         squeeze_batch_dim=True,
     )
-    for ds_batch in bg:
-        assert ds_batch['x'].shape == [bsize, xbsize]
+    for ds_batch in bg2:
+        assert list(ds_batch['foo'].shape) == [xbsize]
