@@ -58,15 +58,18 @@ def _maybe_stack_batch_dims(
     ds, input_dims, squeeze_batch_dim, stacked_dim_name='sample'
 ):
     batch_dims = [d for d in ds.dims if d not in input_dims]
-    if len(batch_dims) < 2:
+    if len(batch_dims) == 0:
         if squeeze_batch_dim:
             return ds
         else:
             return ds.expand_dims(stacked_dim_name, 0)
-    ds_stack = ds.stack(**{stacked_dim_name: batch_dims})
-    # ensure correct order
-    dim_order = (stacked_dim_name,) + tuple(input_dims)
-    return ds_stack.transpose(*dim_order)
+    elif len(batch_dims) == 1:
+        return ds
+    else:
+        ds_stack = ds.stack(**{stacked_dim_name: batch_dims})
+        # ensure correct order
+        dim_order = (stacked_dim_name,) + tuple(input_dims)
+        return ds_stack.transpose(*dim_order)
 
 
 class BatchGenerator:

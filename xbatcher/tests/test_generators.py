@@ -189,6 +189,46 @@ def test_batch_1d_squeeze_batch_dim(sample_ds_1d, bsize):
         assert list(ds_batch['foo'].shape) == [xbsize]
 
 
+@pytest.mark.parametrize('bsize', [5, 10])
+def test_batch_3d_squeeze_batch_dim(sample_ds_3d, bsize):
+    xbsize = 20
+    bg = BatchGenerator(
+        sample_ds_3d,
+        input_dims={'y': bsize, 'x': xbsize},
+        squeeze_batch_dim=False,
+    )
+    for ds_batch in bg:
+        assert list(ds_batch['foo'].shape) == [10, bsize, xbsize]
+
+    bg2 = BatchGenerator(
+        sample_ds_3d,
+        input_dims={'y': bsize, 'x': xbsize},
+        squeeze_batch_dim=True,
+    )
+    for ds_batch in bg2:
+        assert list(ds_batch['foo'].shape) == [10, bsize, xbsize]
+
+
+@pytest.mark.parametrize('bsize', [5, 10])
+def test_batch_3d_squeeze_batch_dim2(sample_ds_3d, bsize):
+    xbsize = 20
+    bg = BatchGenerator(
+        sample_ds_3d,
+        input_dims={'x': xbsize},
+        squeeze_batch_dim=False,
+    )
+    for ds_batch in bg:
+        assert list(ds_batch['foo'].shape) == [500, xbsize]
+
+    bg2 = BatchGenerator(
+        sample_ds_3d,
+        input_dims={'x': xbsize},
+        squeeze_batch_dim=True,
+    )
+    for ds_batch in bg2:
+        assert list(ds_batch['foo'].shape) == [500, xbsize]
+
+
 def test_preload_batch_false(sample_ds_1d):
     sample_ds_1d_dask = sample_ds_1d.chunk({'x': 2})
     bg = BatchGenerator(
