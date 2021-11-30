@@ -99,7 +99,7 @@ class BatchGenerator:
         If ``True``, each batch will be loaded into memory before reshaping /
         processing, triggering any dask arrays to be computed.
     squeeze_batch_dim : bool, optional
-        If ``False" and all dims are input dims, each batch's dataset will have a
+        If ``False`` and all dims are input dims, each batch's dataset will have a
         "batch" dimension of size 1 prepended to the array. This functionality is
         useful for interoperability with Keras / Tensorflow.
 
