@@ -1,5 +1,6 @@
 pytest
 coverage
 zarr
+pytest-cov
 adlfs
 -r requirements.txt
