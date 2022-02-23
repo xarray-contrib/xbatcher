@@ -61,7 +61,7 @@ def test_batcher_getitem(sample_ds_1d):
     # raises NotImplementedError for iterable index
     with pytest.raises(NotImplementedError):
         bg[[1, 2, 3]]
-    
+
 
 # TODO: decide how to handle bsizes like 15 that don't evenly divide the dimension
 # Should we enforce that each batch size always has to be the same
