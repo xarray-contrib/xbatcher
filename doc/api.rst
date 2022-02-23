@@ -5,12 +5,6 @@ API reference
 
 This page provides an auto-generated summary of Xbatcher's API.
 
-Core
-====
-
-.. autoclass:: xbatcher.BatchGenerator
-   :members:
-
 Dataset.batch and DataArray.batch
 =================================
 
@@ -22,3 +16,17 @@ Dataset.batch and DataArray.batch
 
    Dataset.batch.generator
    DataArray.batch.generator
+
+Core
+====
+
+.. autoclass:: xbatcher.BatchGenerator
+   :members:
+
+Dataloaders
+===========
+.. autoclass:: xbatcher.loaders.torch.MapDataset
+   :members:
+
+.. autoclass:: xbatcher.loaders.torch.IterableDataset
+   :members:

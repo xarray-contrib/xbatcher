@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# type: ignore
 import os
 
 from setuptools import find_packages, setup

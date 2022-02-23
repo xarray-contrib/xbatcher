@@ -1,4 +1,6 @@
 pytest
+torch
+coverage
 pytest-cov
 adlfs
 -r requirements.txt
