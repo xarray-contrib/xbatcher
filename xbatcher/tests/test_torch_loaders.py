@@ -39,6 +39,15 @@ def test_map_dataset(ds_xy):
     assert len(x_batch) == len(y_batch)
     assert isinstance(x_batch, torch.Tensor)
 
+    idx = torch.tensor([0])
+    x_batch, y_batch = dataset[idx]
+    assert len(x_batch) == len(y_batch)
+    assert isinstance(x_batch, torch.Tensor)
+
+    with pytest.raises(NotImplementedError):
+        idx = torch.tensor([0, 1])
+        x_batch, y_batch = dataset[idx]
+
     # test __len__
     assert len(dataset) == len(x_gen)
 
@@ -53,6 +62,30 @@ def test_map_dataset(ds_xy):
     assert x_gen[-1]['x'].shape == x_batch.shape[1:]
     # TODO: also need to revisit the variable extraction bits here
     assert np.array_equal(x_gen[-1]['x'], x_batch[0, :, :])
+
+
+def test_map_dataset_with_transform(ds_xy):
+
+    x = ds_xy['x']
+    y = ds_xy['y']
+
+    x_gen = BatchGenerator(x, {'sample': 10})
+    y_gen = BatchGenerator(y, {'sample': 10})
+
+    def x_transform(batch):
+        return batch * 0 + 1
+
+    def y_transform(batch):
+        return batch * 0 - 1
+
+    dataset = MapDataset(
+        x_gen, y_gen, transform=x_transform, target_transform=y_transform
+    )
+    x_batch, y_batch = dataset[0]
+    assert len(x_batch) == len(y_batch)
+    assert isinstance(x_batch, torch.Tensor)
+    assert (x_batch == 1).all()
+    assert (y_batch == -1).all()
 
 
 def test_iterable_dataset(ds_xy):

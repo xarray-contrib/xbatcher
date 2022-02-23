@@ -45,7 +45,12 @@ class MapDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx) -> Tuple[Any, Any]:
         if torch.is_tensor(idx):
             idx = idx.tolist()
-            assert len(idx) == 1
+            if len(idx) == 1:
+                idx = idx[0]
+            else:
+                raise NotImplementedError(
+                    f'{type(self).__name__}.__getitem__ currently requires a single integer key'
+                )
 
         # TODO: figure out the dataset -> array workflow
         # currently hardcoding a variable name
