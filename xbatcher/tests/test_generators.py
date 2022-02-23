@@ -18,6 +18,29 @@ def sample_ds_1d():
     return ds
 
 
+@pytest.fixture(scope='module')
+def sample_ds_3d():
+    shape = (10, 50, 100)
+    ds = xr.Dataset(
+        {
+            'foo': (['time', 'y', 'x'], np.random.rand(*shape)),
+            'bar': (['time', 'y', 'x'], np.random.randint(0, 10, shape)),
+        },
+        {
+            'x': (['x'], np.arange(shape[-1])),
+            'y': (['y'], np.arange(shape[-2])),
+        },
+    )
+    return ds
+
+
+def test_constructor_coerces_to_dataset():
+    da = xr.DataArray(np.random.rand(10), dims='x', name='foo')
+    bg = BatchGenerator(da, input_dims={'x': 2})
+    assert isinstance(bg.ds, xr.Dataset)
+    assert bg.ds.equals(da.to_dataset())
+
+
 @pytest.mark.parametrize('bsize', [5, 6])
 def test_batcher_lenth(sample_ds_1d, bsize):
     bg = BatchGenerator(sample_ds_1d, input_dims={'x': bsize})
@@ -38,7 +61,7 @@ def test_batcher_getitem(sample_ds_1d):
     # raises NotImplementedError for iterable index
     with pytest.raises(NotImplementedError):
         bg[[1, 2, 3]]
-
+    
 
 # TODO: decide how to handle bsizes like 15 that don't evenly divide the dimension
 # Should we enforce that each batch size always has to be the same
@@ -108,22 +131,6 @@ def test_batch_1d_overlap(sample_ds_1d, olap):
         assert ds_batch.equals(ds_batch_expected)
 
 
-@pytest.fixture(scope='module')
-def sample_ds_3d():
-    shape = (10, 50, 100)
-    ds = xr.Dataset(
-        {
-            'foo': (['time', 'y', 'x'], np.random.rand(*shape)),
-            'bar': (['time', 'y', 'x'], np.random.randint(0, 10, shape)),
-        },
-        {
-            'x': (['x'], np.arange(shape[-1])),
-            'y': (['y'], np.arange(shape[-2])),
-        },
-    )
-    return ds
-
-
 @pytest.mark.parametrize('bsize', [5, 10])
 def test_batch_3d_1d_input(sample_ds_3d, bsize):
 
@@ -182,3 +189,25 @@ def test_batch_3d_2d_input_concat(sample_ds_3d, bsize):
             * (sample_ds_3d.dims['y'] // bsize)
             * sample_ds_3d.dims['time']
         )
+
+
+def test_preload_batch_false(sample_ds_1d):
+    sample_ds_1d_dask = sample_ds_1d.chunk({'x': 2})
+    bg = BatchGenerator(
+        sample_ds_1d_dask, input_dims={'x': 2}, preload_batch=False
+    )
+    assert bg.preload_batch is False
+    for ds_batch in bg:
+        assert isinstance(ds_batch, xr.Dataset)
+        assert ds_batch.chunks
+
+
+def test_preload_batch_true(sample_ds_1d):
+    sample_ds_1d_dask = sample_ds_1d.chunk({'x': 2})
+    bg = BatchGenerator(
+        sample_ds_1d_dask, input_dims={'x': 2}, preload_batch=True
+    )
+    assert bg.preload_batch is True
+    for ds_batch in bg:
+        assert isinstance(ds_batch, xr.Dataset)
+        assert not ds_batch.chunks
