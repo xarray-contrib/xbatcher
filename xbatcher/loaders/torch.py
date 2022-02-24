@@ -8,7 +8,7 @@ import torch
 #  - The IterableDataset provides a simple iterable interface
 # Both can be provided as arguments to the the Torch DataLoader
 # Assumptions made:
-#  - Each dataset takes pre-configured X/y xbatcher generators (may not always want two generators ina dataset)
+#  - Each dataset takes pre-configured X/y xbatcher generators (may not always want two generators in a dataset)
 # TODOs:
 #  - sort out xarray -> numpy pattern. Currently there is a hardcoded variable name for x/y
 #  - need to test with additional dataset parameters (e.g. transforms)
