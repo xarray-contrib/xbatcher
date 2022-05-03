@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - python=3.7
+  - python=3.8
   - dask
   - docrep
   - ipython
@@ -12,8 +12,10 @@ dependencies:
   - numpy
   - numpydoc
   - pytest
+  - pytorch
   - sphinx
   - sphinx-autosummary-accessors
   - sphinx-copybutton
+  - sphinx_rtd_theme
   - xarray
   - pip
