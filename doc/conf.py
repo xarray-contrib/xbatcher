@@ -70,7 +70,8 @@ def skip(app, what, name, obj, skip, options):
 def setup(app):
     app.connect('autodoc-skip-member', skip)
 
-autodoc_mock_imports = ["torch"]
+
+autodoc_mock_imports = ['torch']
 
 # link to github issues
 extlinks = {
