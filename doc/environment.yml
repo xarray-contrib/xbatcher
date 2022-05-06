@@ -6,6 +6,7 @@ dependencies:
   - python=3.8
   - dask
   - docrep
+  - furo
   - ipython
   - matplotlib
   - nbsphinx
@@ -15,6 +16,5 @@ dependencies:
   - sphinx
   - sphinx-autosummary-accessors
   - sphinx-copybutton
-  - sphinx_rtd_theme
   - xarray
   - pip
