@@ -15,6 +15,7 @@ dependencies:
   - sphinx
   - sphinx-autosummary-accessors
   - sphinx-copybutton
-  - sphinx_rtd_theme
   - xarray
   - pip
+  - pip:
+      - pangeo-sphinx-book-theme
