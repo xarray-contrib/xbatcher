@@ -18,7 +18,7 @@ def test_to_zarr():
         break
 
     tempdir = tempfile.TemporaryDirectory().name
-    bgen.to_zarr(tempdir)
+    bgen.to_zarr(tempdir, chunks={})
 
     bgen_loaded = xbatcher.BatchGenerator.from_zarr(tempdir)
 
