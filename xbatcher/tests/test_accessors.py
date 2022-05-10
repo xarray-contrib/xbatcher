@@ -38,3 +38,25 @@ def test_batch_accessor_da(sample_ds_3d):
     assert isinstance(bg_acc, BatchGenerator)
     for batch_class, batch_acc in zip(bg_class, bg_acc):
         assert batch_class.equals(batch_acc)
+
+
+def test_torch_to_tensor(sample_ds_3d):
+    torch = pytest.importorskip('torch')
+
+    da = sample_ds_3d['foo']
+    t = da.torch.to_tensor()
+    assert isinstance(t, torch.Tensor)
+    assert t.names == (None, None, None)
+    assert t.shape == da.shape
+    np.testing.assert_array_equal(t, da.values)
+
+
+def test_torch_to_named_tensor(sample_ds_3d):
+    torch = pytest.importorskip('torch')
+
+    da = sample_ds_3d['foo']
+    t = da.torch.to_named_tensor()
+    assert isinstance(t, torch.Tensor)
+    assert t.names == da.dims
+    assert t.shape == da.shape
+    np.testing.assert_array_equal(t, da.values)

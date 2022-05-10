@@ -1,6 +1,8 @@
 pytest
 coverage
-zarr
+torch
+coverage
 pytest-cov
 adlfs
+zarr
 -r requirements.txt
