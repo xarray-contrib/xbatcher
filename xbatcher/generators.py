@@ -17,10 +17,13 @@ def _as_xarray_dataset(ds):
 
 def _slices(dimsize, size, overlap=0):
     # return a list of slices to chop up a single dimension
+    if overlap >= size:
+        raise ValueError(
+            'input overlap must be less than the input sample length, but '
+            f'the input sample length is {size} and the overlap is {overlap}'
+        )
     slices = []
     stride = size - overlap
-    assert stride > 0
-    assert stride <= dimsize
     for start in range(0, dimsize, stride):
         end = start + size
         if end <= dimsize:
@@ -34,6 +37,13 @@ def _iterate_through_dataset(ds, dims, overlap={}):
         dimsize = ds.dims[dim]
         size = dims[dim]
         olap = overlap.get(dim, 0)
+        if size > dimsize:
+            raise ValueError(
+                'input sample length must be less than or equal to the '
+                f'dimension length, but the sample length of {size} '
+                f'is greater than the dimension length of {dimsize} '
+                f'for {dim}'
+            )
         dim_slices.append(_slices(dimsize, size, olap))
 
     for slices in itertools.product(*dim_slices):
