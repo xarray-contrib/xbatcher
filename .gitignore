@@ -44,6 +44,9 @@ nosetests.xml
 coverage.xml
 *,cover
 
+# asv environments
+.asv
+
 # Translations
 *.mo
 *.pot
