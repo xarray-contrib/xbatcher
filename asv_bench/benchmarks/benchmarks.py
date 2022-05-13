@@ -21,6 +21,18 @@ class Base:
             },
         )
 
+        shape = (10, 50, 100, 3)
+        self.ds_4d = xr.Dataset(
+            {
+                'foo': (['time', 'y', 'x', 'b'], np.random.rand(*shape)),
+            },
+            {
+                'x': (['x'], np.arange(shape[-2])),
+                'y': (['y'], np.arange(shape[-3])),
+                'b': (['b'], np.arange(shape[-1])),
+            },
+        )
+
         self.ds_xy = xr.Dataset(
             {
                 'x': (
@@ -75,6 +87,26 @@ class Generator(Base):
         BatchGenerator(
             self.ds_3d,
             input_dims=input_dims,
+            concat_input_dims=concat_input_dims,
+        )
+
+    @parameterized(
+        ['input_dims', 'batch_dims', 'concat_input_dims'],
+        (
+            [{'x': 5}, {'x': 5, 'y': 5}],
+            [{}, {'x': 10}, {'x': 10, 'y': 10}],
+            [True, False],
+        ),
+    )
+    def time_batch_concat_4d(self, input_dims, batch_dims, concat_input_dims):
+        """
+        Construct a generator on a DataSet with and without concatenating
+        chunks specified by ``input_dims`` into the batch dimension.
+        """
+        BatchGenerator(
+            self.ds_4d,
+            input_dims=input_dims,
+            batch_dims=batch_dims,
             concat_input_dims=concat_input_dims,
         )
 
