@@ -54,13 +54,28 @@ class Generator(Base):
     )
     def time_batch_input(self, input_dims, batch_dims, input_overlap):
         """
-        Benchmark simple batch generation case
+        Benchmark simple batch generation case.
         """
         BatchGenerator(
             self.ds_3d,
             input_dims=input_dims,
             batch_dims=batch_dims,
             input_overlap=input_overlap,
+        )
+
+    @parameterized(
+        ['input_dims', 'concat_input_dims'],
+        ([{'x': 5}, {'x': 10}, {'x': 5, 'y': 5}], [True, False]),
+    )
+    def time_batch_concat(self, input_dims, concat_input_dims):
+        """
+        Construct a generator on a DataSet with and without concatenating
+        chunks specified by ``input_dims`` into the batch dimension.
+        """
+        BatchGenerator(
+            self.ds_3d,
+            input_dims=input_dims,
+            concat_input_dims=concat_input_dims,
         )
 
 
@@ -72,7 +87,7 @@ class Accessor(Base):
     def time_accessor_input_dim(self, input_dims):
         """
         Benchmark simple batch generation case using xarray accessor
-        Equivalent to subset of ``time_batch_input()``
+        Equivalent to subset of ``time_batch_input()``.
         """
         self.ds_3d.batch.generator(input_dims=input_dims)
 
@@ -85,7 +100,7 @@ class TorchLoader(Base):
 
     def time_map_dataset(self):
         """
-        Benchmark MapDataset integration with torch DataLoader
+        Benchmark MapDataset integration with torch DataLoader.
         """
         dataset = MapDataset(self.x_gen, self.y_gen)
         loader = torch.utils.data.DataLoader(dataset)
@@ -93,7 +108,7 @@ class TorchLoader(Base):
 
     def time_iterable_dataset(self):
         """
-        Benchmark IterableDataset integration with torch DataLoader
+        Benchmark IterableDataset integration with torch DataLoader.
         """
         dataset = IterableDataset(self.x_gen, self.y_gen)
         loader = torch.utils.data.DataLoader(dataset)
