@@ -21,15 +21,15 @@ class Base:
             },
         )
 
-        shape = (10, 50, 100, 3)
+        shape_4d = (10, 50, 100, 3)
         self.ds_4d = xr.Dataset(
             {
-                'foo': (['time', 'y', 'x', 'b'], np.random.rand(*shape)),
+                'foo': (['time', 'y', 'x', 'b'], np.random.rand(*shape_4d)),
             },
             {
-                'x': (['x'], np.arange(shape[-2])),
-                'y': (['y'], np.arange(shape[-3])),
-                'b': (['b'], np.arange(shape[-1])),
+                'x': (['x'], np.arange(shape_4d[-2])),
+                'y': (['y'], np.arange(shape_4d[-3])),
+                'b': (['b'], np.arange(shape_4d[-1])),
             },
         )
 
