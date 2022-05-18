@@ -211,3 +211,16 @@ def test_preload_batch_true(sample_ds_1d):
     for ds_batch in bg:
         assert isinstance(ds_batch, xr.Dataset)
         assert not ds_batch.chunks
+
+
+def test_batch_exceptions(sample_ds_1d):
+    # ValueError when input_dim[dim] > ds.sizes[dim]
+    with pytest.raises(ValueError) as e:
+        BatchGenerator(sample_ds_1d, input_dims={'x': 110})
+        assert len(e) == 1
+    # ValueError when input_overlap[dim] > input_dim[dim]
+    with pytest.raises(ValueError) as e:
+        BatchGenerator(
+            sample_ds_1d, input_dims={'x': 10}, input_overlap={'x': 20}
+        )
+        assert len(e) == 1
