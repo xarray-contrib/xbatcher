@@ -77,6 +77,12 @@ extlinks = {
     'issue': ('https://github.com/pangeo-data/xbatcher/issues/%s', 'GH')
 }
 
+# sphinx-copybutton configurations (from https://github.com/pydata/xarray/blob/main/doc/conf.py)
+copybutton_prompt_text = (
+    r'>>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: '
+)
+copybutton_prompt_is_regexp = True
+
 autosummary_generate = True
 numpydoc_class_members_toctree = False
 numpydoc_show_class_members = False
