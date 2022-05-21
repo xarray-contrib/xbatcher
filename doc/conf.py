@@ -70,7 +70,7 @@ def setup(app):
     app.connect('autodoc-skip-member', skip)
 
 
-autodoc_mock_imports = ['torch']
+autodoc_mock_imports = ['torch', 'tensorflow']
 
 # link to github issues
 extlinks = {

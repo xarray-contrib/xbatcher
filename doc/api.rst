@@ -30,3 +30,6 @@ Dataloaders
 
 .. autoclass:: xbatcher.loaders.torch.IterableDataset
    :members:
+
+.. autoclass:: xbatcher.loaders.keras.CustomTFDataset
+   :members:
