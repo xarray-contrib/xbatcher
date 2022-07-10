@@ -35,8 +35,8 @@ def sample_ds_3d():
 
 
 def test_constructor_coerces_to_dataarray():
-    da = xr.DataArray(np.random.rand(10), dims="x", name="foo")
-    bg = BatchGenerator(da, input_dims={"x": 2})
+    da = xr.DataArray(np.random.rand(10), dims='x', name='foo')
+    bg = BatchGenerator(da, input_dims={'x': 2})
     assert isinstance(bg.ds, xr.DataArray)
     assert bg.ds.equals(da)
 
