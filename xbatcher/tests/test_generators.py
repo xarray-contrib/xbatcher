@@ -34,11 +34,11 @@ def sample_ds_3d():
     return ds
 
 
-def test_constructor_coerces_to_dataset():
-    da = xr.DataArray(np.random.rand(10), dims='x', name='foo')
-    bg = BatchGenerator(da, input_dims={'x': 2})
-    assert isinstance(bg.ds, xr.Dataset)
-    assert bg.ds.equals(da.to_dataset())
+def test_constructor_coerces_to_dataarray():
+    da = xr.DataArray(np.random.rand(10), dims="x", name="foo")
+    bg = BatchGenerator(da, input_dims={"x": 2})
+    assert isinstance(bg.ds, xr.DataArray)
+    assert bg.ds.equals(da)
 
 
 @pytest.mark.parametrize('bsize', [5, 6])

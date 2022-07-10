@@ -41,4 +41,4 @@ class TorchAccessor:
         """Convert this DataArray to a torch.Tensor with named dimensions"""
         import torch
 
-        return torch.tensor(self._obj.data, names=self._obj.dims)
+        return torch.tensor(self._obj.data, names=self._obj.sizes)
