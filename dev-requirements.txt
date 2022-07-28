@@ -1,4 +1,5 @@
 pytest
+tensorflow
 torch
 coverage
 pytest-cov
