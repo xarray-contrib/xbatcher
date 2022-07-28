@@ -7,14 +7,6 @@ from typing import Any, Dict, Hashable, Iterator
 import xarray as xr
 
 
-def _as_xarray_dataset(ds):
-    # maybe coerce to xarray dataset
-    if isinstance(ds, xr.Dataset):
-        return ds
-    else:
-        return ds.to_dataset()
-
-
 def _slices(dimsize, size, overlap=0):
     # return a list of slices to chop up a single dimension
     if overlap >= size:
