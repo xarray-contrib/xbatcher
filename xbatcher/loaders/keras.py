@@ -8,8 +8,6 @@ import xarray as xr
 #  - The CustomTFDataset provides an indexable interface
 # Assumptions made:
 #  - The dataset takes pre-configured X/y xbatcher generators (may not always want two generators in a dataset)
-# TODOs:
-#  - need to test with additional dataset parameters (e.g. transforms)
 
 
 class CustomTFDataset(tf.keras.utils.Sequence):
