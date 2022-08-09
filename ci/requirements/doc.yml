@@ -19,3 +19,5 @@ dependencies:
   - pip
   - pip:
       - pangeo-sphinx-book-theme
+      # relative to this file. Needs to be editable to be accepted.
+      - -e ../..
