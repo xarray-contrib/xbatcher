@@ -1,6 +1,7 @@
 """Classes for iterating through xarray datarrays / datasets in batches."""
 
 import itertools
+import json
 from collections import OrderedDict
 from typing import Any, Dict, Hashable, Iterator
 
@@ -75,7 +76,21 @@ def _maybe_stack_batch_dims(ds, input_dims, stacked_dim_name='sample'):
     return ds_stack.transpose(*dim_order)
 
 
-class BatchGenerator:
+class BatchGeneratorBase:
+    def __init__(
+        self,
+        input_dims: Dict[Hashable, int],
+        input_overlap: Dict[Hashable, int] = {},
+        batch_dims: Dict[Hashable, int] = {},
+        concat_input_dims: bool = False,
+    ):
+        self.input_dims = OrderedDict(input_dims)
+        self.input_overlap = input_overlap
+        self.batch_dims = OrderedDict(batch_dims)
+        self.concat_input_dims = concat_input_dims
+
+
+class BatchGenerator(BatchGeneratorBase):
     """Create generator for iterating through xarray datarrays / datasets in
     batches.
 
@@ -120,13 +135,15 @@ class BatchGenerator:
         concat_input_dims: bool = False,
         preload_batch: bool = True,
     ):
+        super().__init__(
+            input_dims=input_dims,
+            input_overlap=input_overlap,
+            batch_dims=batch_dims,
+            concat_input_dims=concat_input_dims,
+        )
 
         self.ds = _as_xarray_dataset(ds)
         # should be a dict
-        self.input_dims = OrderedDict(input_dims)
-        self.input_overlap = input_overlap
-        self.batch_dims = OrderedDict(batch_dims)
-        self.concat_input_dims = concat_input_dims
         self.preload_batch = preload_batch
 
         self._batches: Dict[
@@ -191,3 +208,72 @@ class BatchGenerator:
 
     def _iterate_input_dims(self, ds):
         return _iterate_through_dataset(ds, self.input_dims, self.input_overlap)
+
+    def to_zarr(self, path, chunks={'batch': '1Gb'}):
+        """
+        Store batches into a zarr datastore in `path`. To speed up loading of
+        batches it is recommended that the chunking across batches is set close
+        to the available RAM on the computere where you are doing ML model
+        training
+        """
+        batch_datasets = list(self)
+        # can't call the batch dimension `batch` because Dataset.batch is used
+        # for the batch acccessor. Instead we'll call it `batch_number`
+        ds_all = xr.concat(batch_datasets, dim='batch_number').reset_index(
+            'sample'
+        )
+        if 'batch' in chunks:
+            chunks['batch_number'] = chunks.pop('batch')
+
+        if len(chunks) > 0:
+            ds_all = ds_all.chunk(chunks)
+
+        for v in StoredBatchesGenerator.INIT_ARGS_TO_SERIALIZE:
+            ds_all.attrs[v] = json.dumps(getattr(self, v))
+        ds_all.to_zarr(path)
+
+    @staticmethod
+    def from_zarr(path):
+        """
+        Load a batch generator from the zarr datastore at a given `path`
+        """
+        return StoredBatchesGenerator(path=path)
+
+
+class StoredBatchesGenerator(BatchGeneratorBase):
+    """
+    Create a generator which mimicks the behaviour of BatchGenerator but loads
+    the batches from a zarr store that was previously created with
+    `BatchGenerator.to_zarr`. Arguments which the original BatchGenerator was
+    created with are serialized using json and saved as attributes in the
+    zarr-store
+    """
+
+    INIT_ARGS_TO_SERIALIZE = [
+        'input_dims',
+        'input_overlap',
+        'batch_dims',
+        'concat_input_dims',
+    ]
+
+    def __init__(self, path):
+        self.ds_batches = xr.open_zarr(path)
+        self.path = path
+
+        init_kws = {
+            v: json.loads(self.ds_batches.attrs[v])
+            for v in self.INIT_ARGS_TO_SERIALIZE
+        }
+        super().__init__(**init_kws)
+
+    def __iter__(self):
+        for batch_id in self.ds_batches.batch_number.values:
+            ds_batch = self.ds_batches.sel(batch_number=batch_id)
+            # create a MultiIndex like we had before storing the batches
+            stacked_coords = [
+                d
+                for d in ds_batch.coords
+                if d not in ['sample', 'batch_number']
+            ]
+            ds_batch = ds_batch.set_index(sample=stacked_coords)
+            yield ds_batch
