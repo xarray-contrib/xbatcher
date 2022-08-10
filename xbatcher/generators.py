@@ -87,17 +87,20 @@ class BatchGenerator:
         A dictionary specifying the size of the inputs in each dimension,
         e.g. ``{'lat': 30, 'lon': 30}``
         These are the dimensions the ML library will see. All other dimensions
-        will be stacked into one dimension called ``batch``.
+        will be stacked into one dimension called ``sample``.
     input_overlap : dict, optional
         A dictionary specifying the overlap along each dimension
         e.g. ``{'lat': 3, 'lon': 3}``
     batch_dims : dict, optional
         A dictionary specifying the size of the batch along each dimension
-        e.g. ``{'time': 10}``. These will always be interated over.
+        e.g. ``{'time': 10}``. These will always be iterated over.
     concat_input_dims : bool, optional
         If ``True``, the dimension chunks specified in ``input_dims`` will be
-        concatenated and stacked into the batch dimension. If ``False``, they
-        will be iterated over.
+        concatenated and stacked into the ``sample`` dimension. The batch index
+        will be included as a new level ``input_batch`` in the ``sample``
+        coordinate.
+        If ``False``, the dimension chunks specified in ``input_dims`` will be
+        iterated over.
     preload_batch : bool, optional
         If ``True``, each batch will be loaded into memory before reshaping /
         processing, triggering any dask arrays to be computed.
