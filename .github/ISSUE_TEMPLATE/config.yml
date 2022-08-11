@@ -1,0 +1,6 @@
+blank_issues_enabled: false
+contact_links:
+  - name: ❓ Usage question
+    url: https://github.com/pangeo-data/xbatcher/discussions
+    about: |
+      Ask questions and discuss with other community members here.
