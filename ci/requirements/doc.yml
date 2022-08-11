@@ -1,4 +1,4 @@
-name: xbatcher
+name: xbatcher-docs
 channels:
   - conda-forge
   - nodefaults
