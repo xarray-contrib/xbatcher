@@ -39,7 +39,21 @@ def show_versions(file=sys.stdout):
         'machine': platform.platform(),
     }
 
-    deps = ['dask', 'numpy', 'xarray']
+    deps = [
+        # Required
+        'dask',
+        'numpy',
+        'xarray',
+        # Optional
+        'torch',
+        # Setup/test
+        'pip',
+        'conda',
+        'pytest',
+        # Misc.
+        'IPython',
+        'sphinx',
+    ]
     __version__ = f'v{importlib.metadata.version("xbatcher")}'
 
     print('xbatcher information:', file=file)
