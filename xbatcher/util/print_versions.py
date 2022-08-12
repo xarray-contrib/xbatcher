@@ -26,10 +26,7 @@ def show_versions(file=sys.stdout):
             else:
                 module = importlib.import_module(modname)
 
-            try:
-                return module.__version__
-            except AttributeError:
-                return module.version
+            return getattr(module, '__version__', 'installed')
         except ImportError:
             return None
 
