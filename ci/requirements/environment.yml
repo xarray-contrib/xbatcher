@@ -1,0 +1,31 @@
+name: xbatcher-tests
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  # Required dependencies
+  - python=3.9
+  - dask
+  - numpy
+  - xarray
+  # Dev dependencies
+  - adlfs
+  - asv
+  - pre-commit
+  - pytest
+  - pytest-cov
+  - pytorch
+  - tensorflow
+  - zarr
+  # Style checks
+  - black
+  - blackdoc
+  - docformatter
+  - flake8
+  - isort>=5
+  - pylint
+  # Xbatcher installation
+  - pip
+  - pip:
+      # relative to this file. Needs to be editable to be accepted.
+      - -e ../..
