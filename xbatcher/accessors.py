@@ -38,7 +38,11 @@ class TorchAccessor:
         return torch.tensor(self._obj.data)
 
     def to_named_tensor(self):
-        """Convert this DataArray to a torch.Tensor with named dimensions"""
+        """
+        Convert this DataArray to a torch.Tensor with named dimensions.
+
+        See https://pytorch.org/docs/stable/named_tensor.html
+        """
         import torch
 
-        return torch.tensor(self._obj.data, names=self._obj.sizes)
+        return torch.tensor(self._obj.data, names=tuple(self._obj.sizes))
