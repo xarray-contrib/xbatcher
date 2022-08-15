@@ -54,8 +54,8 @@ class MapDataset(torch.utils.data.Dataset):
 
         # TODO: figure out the dataset -> array workflow
         # currently hardcoding a variable name
-        X_batch = self.X_generator[idx]['x'].torch.to_tensor()
-        y_batch = self.y_generator[idx]['y'].torch.to_tensor()
+        X_batch = self.X_generator[idx].torch.to_tensor()
+        y_batch = self.y_generator[idx].torch.to_tensor()
 
         if self.transform:
             X_batch = self.transform(X_batch)
@@ -85,4 +85,4 @@ class IterableDataset(torch.utils.data.IterableDataset):
 
     def __iter__(self):
         for xb, yb in zip(self.X_generator, self.y_generator):
-            yield (xb['x'].torch.to_tensor(), yb['y'].torch.to_tensor())
+            yield (xb.torch.to_tensor(), yb.torch.to_tensor())

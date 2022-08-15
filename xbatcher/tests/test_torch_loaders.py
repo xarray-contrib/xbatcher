@@ -59,9 +59,9 @@ def test_map_dataset(ds_xy):
         assert isinstance(x_batch, torch.Tensor)
 
     # TODO: why does pytorch add an extra dimension (length 1) to x_batch
-    assert x_gen[-1]['x'].shape == x_batch.shape[1:]
+    assert x_gen[-1].shape == x_batch.shape[1:]
     # TODO: also need to revisit the variable extraction bits here
-    assert np.array_equal(x_gen[-1]['x'], x_batch[0, :, :])
+    assert np.array_equal(x_gen[-1], x_batch[0, :, :])
 
 
 def test_map_dataset_with_transform(ds_xy):
@@ -106,6 +106,6 @@ def test_iterable_dataset(ds_xy):
         assert isinstance(x_batch, torch.Tensor)
 
     # TODO: why does pytorch add an extra dimension (length 1) to x_batch
-    assert x_gen[-1]['x'].shape == x_batch.shape[1:]
+    assert x_gen[-1].shape == x_batch.shape[1:]
     # TODO: also need to revisit the variable extraction bits here
-    assert np.array_equal(x_gen[-1]['x'], x_batch[0, :, :])
+    assert np.array_equal(x_gen[-1], x_batch[0, :, :])
