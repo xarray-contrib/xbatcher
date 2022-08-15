@@ -49,7 +49,7 @@ class CustomTFDataset(tf.keras.utils.Sequence):
             xr.concat(
                 (
                     self.X_generator[idx][key]
-                    for key in list(self.X_generator[idx].keys())
+                    for key in list(self.X_generator.input_dims)
                 ),
                 self.concat_dim,
             ).data
@@ -58,7 +58,7 @@ class CustomTFDataset(tf.keras.utils.Sequence):
             xr.concat(
                 (
                     self.y_generator[idx][key]
-                    for key in list(self.y_generator[idx].keys())
+                    for key in list(self.y_generator.input_dims)
                 ),
                 self.concat_dim,
             ).data
