@@ -36,12 +36,14 @@ def test_map_dataset(ds_xy):
 
     # test __getitem__
     x_batch, y_batch = dataset[0]
-    assert len(x_batch) == len(y_batch)
+    assert x_batch.shape == (10, 5)
+    assert y_batch.shape == (10,)
     assert isinstance(x_batch, torch.Tensor)
 
     idx = torch.tensor([0])
     x_batch, y_batch = dataset[idx]
-    assert len(x_batch) == len(y_batch)
+    assert x_batch.shape == (10, 5)
+    assert y_batch.shape == (10,)
     assert isinstance(x_batch, torch.Tensor)
 
     with pytest.raises(NotImplementedError):
@@ -55,7 +57,8 @@ def test_map_dataset(ds_xy):
     loader = torch.utils.data.DataLoader(dataset)
 
     for x_batch, y_batch in loader:
-        assert len(x_batch) == len(y_batch)
+        assert x_batch.shape == (1, 10, 5)
+        assert y_batch.shape == (1, 10)
         assert isinstance(x_batch, torch.Tensor)
 
     # TODO: why does pytorch add an extra dimension (length 1) to x_batch
@@ -82,7 +85,8 @@ def test_map_dataset_with_transform(ds_xy):
         x_gen, y_gen, transform=x_transform, target_transform=y_transform
     )
     x_batch, y_batch = dataset[0]
-    assert len(x_batch) == len(y_batch)
+    assert x_batch.shape == (10, 5)
+    assert y_batch.shape == (10,)
     assert isinstance(x_batch, torch.Tensor)
     assert (x_batch == 1).all()
     assert (y_batch == -1).all()
@@ -102,7 +106,8 @@ def test_iterable_dataset(ds_xy):
     loader = torch.utils.data.DataLoader(dataset)
 
     for x_batch, y_batch in loader:
-        assert len(x_batch) == len(y_batch)
+        assert x_batch.shape == (1, 10, 5)
+        assert y_batch.shape == (1, 10)
         assert isinstance(x_batch, torch.Tensor)
 
     # TODO: why does pytorch add an extra dimension (length 1) to x_batch
