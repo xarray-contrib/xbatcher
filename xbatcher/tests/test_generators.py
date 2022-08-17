@@ -34,7 +34,7 @@ def sample_ds_3d():
     return ds
 
 
-def test_constructor_coerces_to_dataarray():
+def test_constructor_dataarray():
     da = xr.DataArray(np.random.rand(10), dims='x', name='foo')
     bg = BatchGenerator(da, input_dims={'x': 2})
     assert isinstance(bg.ds, xr.DataArray)

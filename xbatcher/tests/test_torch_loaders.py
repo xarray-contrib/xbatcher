@@ -60,7 +60,7 @@ def test_map_dataset(ds_xy):
 
     # TODO: why does pytorch add an extra dimension (length 1) to x_batch
     assert x_gen[-1].shape == x_batch.shape[1:]
-    # TODO: also need to revisit the variable extraction bits here
+    # TODO: add test for xarray.Dataset
     assert np.array_equal(x_gen[-1], x_batch[0, :, :])
 
 
@@ -107,5 +107,5 @@ def test_iterable_dataset(ds_xy):
 
     # TODO: why does pytorch add an extra dimension (length 1) to x_batch
     assert x_gen[-1].shape == x_batch.shape[1:]
-    # TODO: also need to revisit the variable extraction bits here
+    # TODO: add test for xarray.Dataset
     assert np.array_equal(x_gen[-1], x_batch[0, :, :])
