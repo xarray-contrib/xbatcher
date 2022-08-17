@@ -24,7 +24,7 @@ def ds_xy():
     return ds
 
 
-def test_custom_dataset(ds_xy):
+def test_custom_dataarray(ds_xy):
 
     x = ds_xy['x']
     y = ds_xy['y']
@@ -36,7 +36,8 @@ def test_custom_dataset(ds_xy):
 
     # test __getitem__
     x_batch, y_batch = dataset[0]
-    assert len(x_batch) == len(y_batch)
+    assert x_batch.shape == (10, 5)
+    assert y_batch.shape == (10,)
     assert tf.is_tensor(x_batch)
     assert tf.is_tensor(y_batch)
 
@@ -44,7 +45,7 @@ def test_custom_dataset(ds_xy):
     assert len(dataset) == len(x_gen)
 
 
-def test_custom_dataset_with_transform(ds_xy):
+def test_custom_dataarray_with_transform(ds_xy):
 
     x = ds_xy['x']
     y = ds_xy['y']
@@ -62,7 +63,8 @@ def test_custom_dataset_with_transform(ds_xy):
         x_gen, y_gen, transform=x_transform, target_transform=y_transform
     )
     x_batch, y_batch = dataset[0]
-    assert len(x_batch) == len(y_batch)
+    assert x_batch.shape == (10, 5)
+    assert y_batch.shape == (10,)
     assert tf.is_tensor(x_batch)
     assert tf.is_tensor(y_batch)
     assert tf.experimental.numpy.all(x_batch == 1)
