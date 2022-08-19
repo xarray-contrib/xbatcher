@@ -40,23 +40,41 @@ def test_batch_accessor_da(sample_ds_3d):
         assert batch_class.equals(batch_acc)
 
 
-def test_torch_to_tensor(sample_ds_3d):
+@pytest.mark.parametrize(
+    'foo_var',
+    [
+        'foo',  # xr.DataArray
+        ['foo'],  # xr.Dataset
+    ],
+)
+def test_torch_to_tensor(sample_ds_3d, foo_var):
     torch = pytest.importorskip('torch')
 
-    da = sample_ds_3d['foo']
-    t = da.torch.to_tensor()
+    foo = sample_ds_3d[foo_var]
+    t = foo.torch.to_tensor()
     assert isinstance(t, torch.Tensor)
     assert t.names == (None, None, None)
-    assert t.shape == da.shape
-    np.testing.assert_array_equal(t, da.values)
+    assert t.shape == tuple(foo.sizes.values())
+
+    foo_array = foo.to_array().squeeze() if hasattr(foo, 'to_array') else foo
+    np.testing.assert_array_equal(t, foo_array.values)
 
 
-def test_torch_to_named_tensor(sample_ds_3d):
+@pytest.mark.parametrize(
+    'foo_var',
+    [
+        'foo',  # xr.DataArray
+        ['foo'],  # xr.Dataset
+    ],
+)
+def test_torch_to_named_tensor(sample_ds_3d, foo_var):
     torch = pytest.importorskip('torch')
 
-    da = sample_ds_3d['foo']
-    t = da.torch.to_named_tensor()
+    foo = sample_ds_3d[foo_var]
+    t = foo.torch.to_named_tensor()
     assert isinstance(t, torch.Tensor)
-    assert t.names == da.dims
-    assert t.shape == da.shape
-    np.testing.assert_array_equal(t, da.values)
+    assert t.names == tuple(foo.dims)
+    assert t.shape == tuple(foo.sizes.values())
+
+    foo_array = foo.to_array().squeeze() if hasattr(foo, 'to_array') else foo
+    np.testing.assert_array_equal(t, foo_array.values)
