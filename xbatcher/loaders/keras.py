@@ -1,7 +1,6 @@
 from typing import Any, Callable, Optional, Tuple
 
 import tensorflow as tf
-import xarray as xr
 
 # Notes:
 # This module includes one Keras dataset, which can be provided to model.fit().
@@ -18,9 +17,8 @@ class CustomTFDataset(tf.keras.utils.Sequence):
         *,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
-        dim: str = 'new_dim',
     ) -> None:
-        '''
+        """
         Keras Dataset adapter for Xbatcher
 
         Parameters
@@ -31,38 +29,18 @@ class CustomTFDataset(tf.keras.utils.Sequence):
             A function/transform that takes in an array and returns a transformed version.
         target_transform : callable, optional
             A function/transform that takes in the target and transforms it.
-        dim : str, 'new_dim'
-            Name of dim to pass to :func:`xarray.concat` as the dimension
-            to concatenate all variables along.
-        '''
+        """
         self.X_generator = X_generator
         self.y_generator = y_generator
         self.transform = transform
         self.target_transform = target_transform
-        self.concat_dim = dim
 
     def __len__(self) -> int:
         return len(self.X_generator)
 
     def __getitem__(self, idx: int) -> Tuple[Any, Any]:
-        X_batch = tf.convert_to_tensor(
-            xr.concat(
-                (
-                    self.X_generator[idx][key]
-                    for key in list(self.X_generator[idx].keys())
-                ),
-                self.concat_dim,
-            ).data
-        )
-        y_batch = tf.convert_to_tensor(
-            xr.concat(
-                (
-                    self.y_generator[idx][key]
-                    for key in list(self.y_generator[idx].keys())
-                ),
-                self.concat_dim,
-            ).data
-        )
+        X_batch = tf.convert_to_tensor(self.X_generator[idx].data)
+        y_batch = tf.convert_to_tensor(self.y_generator[idx].data)
 
         # TODO: Should the transformations be applied before tensor conversion?
         if self.transform:

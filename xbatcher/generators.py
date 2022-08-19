@@ -7,14 +7,6 @@ from typing import Any, Dict, Hashable, Iterator
 import xarray as xr
 
 
-def _as_xarray_dataset(ds):
-    # maybe coerce to xarray dataset
-    if isinstance(ds, xr.Dataset):
-        return ds
-    else:
-        return ds.to_dataset()
-
-
 def _slices(dimsize, size, overlap=0):
     # return a list of slices to chop up a single dimension
     if overlap >= size:
@@ -34,7 +26,7 @@ def _slices(dimsize, size, overlap=0):
 def _iterate_through_dataset(ds, dims, overlap={}):
     dim_slices = []
     for dim in dims:
-        dimsize = ds.dims[dim]
+        dimsize = ds.sizes[dim]
         size = dims[dim]
         olap = overlap.get(dim, 0)
         if size > dimsize:
@@ -66,7 +58,7 @@ def _drop_input_dims(ds, input_dims, suffix='_input'):
 
 
 def _maybe_stack_batch_dims(ds, input_dims, stacked_dim_name='sample'):
-    batch_dims = [d for d in ds.dims if d not in input_dims]
+    batch_dims = [d for d in ds.sizes if d not in input_dims]
     if len(batch_dims) < 2:
         return ds
     ds_stack = ds.stack(**{stacked_dim_name: batch_dims})
@@ -121,7 +113,7 @@ class BatchGenerator:
         preload_batch: bool = True,
     ):
 
-        self.ds = _as_xarray_dataset(ds)
+        self.ds = ds
         # should be a dict
         self.input_dims = OrderedDict(input_dims)
         self.input_overlap = input_overlap
