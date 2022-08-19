@@ -24,10 +24,17 @@ def ds_xy():
     return ds
 
 
-def test_map_dataset(ds_xy):
+@pytest.mark.parametrize(
+    ('x_var', 'y_var'),
+    [
+        ('x', 'y'),  # xr.DataArray
+        (['x'], ['y']),  # xr.Dataset
+    ],
+)
+def test_map_dataset(ds_xy, x_var, y_var):
 
-    x = ds_xy['x']
-    y = ds_xy['y']
+    x = ds_xy[x_var]
+    y = ds_xy[y_var]
 
     x_gen = BatchGenerator(x, {'sample': 10})
     y_gen = BatchGenerator(y, {'sample': 10})
@@ -62,15 +69,27 @@ def test_map_dataset(ds_xy):
         assert isinstance(x_batch, torch.Tensor)
 
     # TODO: why does pytorch add an extra dimension (length 1) to x_batch
-    assert x_gen[-1].shape == x_batch.shape[1:]
-    # TODO: add test for xarray.Dataset
-    assert np.array_equal(x_gen[-1], x_batch[0, :, :])
+    assert tuple(x_gen[-1].sizes.values()) == x_batch.shape[1:]
+    # Check that array values from last item in generator and batch are the same
+    gen_array = (
+        x_gen[-1].to_array().squeeze()
+        if hasattr(x_gen[-1], 'to_array')
+        else x_gen[-1]
+    )
+    np.testing.assert_array_equal(gen_array, x_batch[0, :, :])
 
 
-def test_map_dataset_with_transform(ds_xy):
+@pytest.mark.parametrize(
+    ('x_var', 'y_var'),
+    [
+        ('x', 'y'),  # xr.DataArray
+        (['x'], ['y']),  # xr.Dataset
+    ],
+)
+def test_map_dataset_with_transform(ds_xy, x_var, y_var):
 
-    x = ds_xy['x']
-    y = ds_xy['y']
+    x = ds_xy[x_var]
+    y = ds_xy[y_var]
 
     x_gen = BatchGenerator(x, {'sample': 10})
     y_gen = BatchGenerator(y, {'sample': 10})
@@ -92,10 +111,17 @@ def test_map_dataset_with_transform(ds_xy):
     assert (y_batch == -1).all()
 
 
-def test_iterable_dataset(ds_xy):
+@pytest.mark.parametrize(
+    ('x_var', 'y_var'),
+    [
+        ('x', 'y'),  # xr.DataArray
+        (['x'], ['y']),  # xr.Dataset
+    ],
+)
+def test_iterable_dataset(ds_xy, x_var, y_var):
 
-    x = ds_xy['x']
-    y = ds_xy['y']
+    x = ds_xy[x_var]
+    y = ds_xy[y_var]
 
     x_gen = BatchGenerator(x, {'sample': 10})
     y_gen = BatchGenerator(y, {'sample': 10})
@@ -111,6 +137,11 @@ def test_iterable_dataset(ds_xy):
         assert isinstance(x_batch, torch.Tensor)
 
     # TODO: why does pytorch add an extra dimension (length 1) to x_batch
-    assert x_gen[-1].shape == x_batch.shape[1:]
-    # TODO: add test for xarray.Dataset
-    assert np.array_equal(x_gen[-1], x_batch[0, :, :])
+    assert tuple(x_gen[-1].sizes.values()) == x_batch.shape[1:]
+    # Check that array values from last item in generator and batch are the same
+    gen_array = (
+        x_gen[-1].to_array().squeeze()
+        if hasattr(x_gen[-1], 'to_array')
+        else x_gen[-1]
+    )
+    np.testing.assert_array_equal(gen_array, x_batch[0, :, :])
