@@ -61,22 +61,22 @@ def test_map_dataset(ds_xy, x_var, y_var):
     assert len(dataset) == len(x_gen)
 
     # test integration with torch DataLoader
-    loader = torch.utils.data.DataLoader(dataset)
+    loader = torch.utils.data.DataLoader(dataset, batch_size=None)
 
     for x_batch, y_batch in loader:
-        assert x_batch.shape == (1, 10, 5)
-        assert y_batch.shape == (1, 10)
+        assert x_batch.shape == (10, 5)
+        assert y_batch.shape == (10,)
         assert isinstance(x_batch, torch.Tensor)
 
-    # TODO: why does pytorch add an extra dimension (length 1) to x_batch
-    assert tuple(x_gen[-1].sizes.values()) == x_batch.shape[1:]
+    # Check that array shape of last item in generator is same as the batch image
+    assert tuple(x_gen[-1].sizes.values()) == x_batch.shape
     # Check that array values from last item in generator and batch are the same
     gen_array = (
         x_gen[-1].to_array().squeeze()
         if hasattr(x_gen[-1], 'to_array')
         else x_gen[-1]
     )
-    np.testing.assert_array_equal(gen_array, x_batch[0, :, :])
+    np.testing.assert_array_equal(gen_array, x_batch)
 
 
 @pytest.mark.parametrize(
@@ -129,19 +129,19 @@ def test_iterable_dataset(ds_xy, x_var, y_var):
     dataset = IterableDataset(x_gen, y_gen)
 
     # test integration with torch DataLoader
-    loader = torch.utils.data.DataLoader(dataset)
+    loader = torch.utils.data.DataLoader(dataset, batch_size=None)
 
     for x_batch, y_batch in loader:
-        assert x_batch.shape == (1, 10, 5)
-        assert y_batch.shape == (1, 10)
+        assert x_batch.shape == (10, 5)
+        assert y_batch.shape == (10,)
         assert isinstance(x_batch, torch.Tensor)
 
-    # TODO: why does pytorch add an extra dimension (length 1) to x_batch
-    assert tuple(x_gen[-1].sizes.values()) == x_batch.shape[1:]
+    # Check that array shape of last item in generator is same as the batch image
+    assert tuple(x_gen[-1].sizes.values()) == x_batch.shape
     # Check that array values from last item in generator and batch are the same
     gen_array = (
         x_gen[-1].to_array().squeeze()
         if hasattr(x_gen[-1], 'to_array')
         else x_gen[-1]
     )
-    np.testing.assert_array_equal(gen_array, x_batch[0, :, :])
+    np.testing.assert_array_equal(gen_array, x_batch)
