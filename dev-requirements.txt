@@ -1,6 +1,8 @@
 pytest
+tensorflow
 torch
 coverage
 pytest-cov
 adlfs
+asv
 -r requirements.txt

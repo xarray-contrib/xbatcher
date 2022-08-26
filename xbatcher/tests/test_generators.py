@@ -34,11 +34,11 @@ def sample_ds_3d():
     return ds
 
 
-def test_constructor_coerces_to_dataset():
+def test_constructor_dataarray():
     da = xr.DataArray(np.random.rand(10), dims='x', name='foo')
     bg = BatchGenerator(da, input_dims={'x': 2})
-    assert isinstance(bg.ds, xr.Dataset)
-    assert bg.ds.equals(da.to_dataset())
+    assert isinstance(bg.ds, xr.DataArray)
+    assert bg.ds.equals(da)
 
 
 @pytest.mark.parametrize('bsize', [5, 6])
@@ -133,7 +133,6 @@ def test_batch_1d_overlap(sample_ds_1d, olap):
 
 @pytest.mark.parametrize('bsize', [5, 10])
 def test_batch_3d_1d_input(sample_ds_3d, bsize):
-
     # first do the iteration over just one dimension
     bg = BatchGenerator(sample_ds_3d, input_dims={'x': bsize})
     for n, ds_batch in enumerate(bg):
@@ -164,8 +163,19 @@ def test_batch_3d_2d_input(sample_ds_3d, bsize):
         assert isinstance(ds_batch, xr.Dataset)
         assert ds_batch.dims['x'] == xbsize
         assert ds_batch.dims['y'] == bsize
-        # TODO? Is it worth it to try to reproduce the internal logic of the
-        # generator and verify that the slices are correct?
+        yn, xn = np.unravel_index(
+            n,
+            (
+                (sample_ds_3d.dims['y'] // bsize),
+                (sample_ds_3d.dims['x'] // xbsize),
+            ),
+        )
+        expected_xslice = slice(xbsize * xn, xbsize * (xn + 1))
+        expected_yslice = slice(bsize * yn, bsize * (yn + 1))
+        ds_batch_expected = sample_ds_3d.isel(
+            x=expected_xslice, y=expected_yslice
+        )
+        xr.testing.assert_equal(ds_batch_expected, ds_batch)
     assert (n + 1) == (
         (sample_ds_3d.dims['x'] // xbsize) * (sample_ds_3d.dims['y'] // bsize)
     )
@@ -211,3 +221,16 @@ def test_preload_batch_true(sample_ds_1d):
     for ds_batch in bg:
         assert isinstance(ds_batch, xr.Dataset)
         assert not ds_batch.chunks
+
+
+def test_batch_exceptions(sample_ds_1d):
+    # ValueError when input_dim[dim] > ds.sizes[dim]
+    with pytest.raises(ValueError) as e:
+        BatchGenerator(sample_ds_1d, input_dims={'x': 110})
+        assert len(e) == 1
+    # ValueError when input_overlap[dim] > input_dim[dim]
+    with pytest.raises(ValueError) as e:
+        BatchGenerator(
+            sample_ds_1d, input_dims={'x': 10}, input_overlap={'x': 20}
+        )
+        assert len(e) == 1

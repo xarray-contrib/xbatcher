@@ -7,20 +7,15 @@ from typing import Any, Dict, Hashable, Iterator
 import xarray as xr
 
 
-def _as_xarray_dataset(ds):
-    # maybe coerce to xarray dataset
-    if isinstance(ds, xr.Dataset):
-        return ds
-    else:
-        return ds.to_dataset()
-
-
 def _slices(dimsize, size, overlap=0):
     # return a list of slices to chop up a single dimension
+    if overlap >= size:
+        raise ValueError(
+            'input overlap must be less than the input sample length, but '
+            f'the input sample length is {size} and the overlap is {overlap}'
+        )
     slices = []
     stride = size - overlap
-    assert stride > 0
-    assert stride <= dimsize
     for start in range(0, dimsize, stride):
         end = start + size
         if end <= dimsize:
@@ -31,9 +26,16 @@ def _slices(dimsize, size, overlap=0):
 def _iterate_through_dataset(ds, dims, overlap={}):
     dim_slices = []
     for dim in dims:
-        dimsize = ds.dims[dim]
+        dimsize = ds.sizes[dim]
         size = dims[dim]
         olap = overlap.get(dim, 0)
+        if size > dimsize:
+            raise ValueError(
+                'input sample length must be less than or equal to the '
+                f'dimension length, but the sample length of {size} '
+                f'is greater than the dimension length of {dimsize} '
+                f'for {dim}'
+            )
         dim_slices.append(_slices(dimsize, size, olap))
 
     for slices in itertools.product(*dim_slices):
@@ -56,7 +58,7 @@ def _drop_input_dims(ds, input_dims, suffix='_input'):
 
 
 def _maybe_stack_batch_dims(ds, input_dims, stacked_dim_name='sample'):
-    batch_dims = [d for d in ds.dims if d not in input_dims]
+    batch_dims = [d for d in ds.sizes if d not in input_dims]
     if len(batch_dims) < 2:
         return ds
     ds_stack = ds.stack(**{stacked_dim_name: batch_dims})
@@ -77,17 +79,20 @@ class BatchGenerator:
         A dictionary specifying the size of the inputs in each dimension,
         e.g. ``{'lat': 30, 'lon': 30}``
         These are the dimensions the ML library will see. All other dimensions
-        will be stacked into one dimension called ``batch``.
+        will be stacked into one dimension called ``sample``.
     input_overlap : dict, optional
         A dictionary specifying the overlap along each dimension
         e.g. ``{'lat': 3, 'lon': 3}``
     batch_dims : dict, optional
         A dictionary specifying the size of the batch along each dimension
-        e.g. ``{'time': 10}``. These will always be interated over.
+        e.g. ``{'time': 10}``. These will always be iterated over.
     concat_input_dims : bool, optional
         If ``True``, the dimension chunks specified in ``input_dims`` will be
-        concatenated and stacked into the batch dimension. If ``False``, they
-        will be iterated over.
+        concatenated and stacked into the ``sample`` dimension. The batch index
+        will be included as a new level ``input_batch`` in the ``sample``
+        coordinate.
+        If ``False``, the dimension chunks specified in ``input_dims`` will be
+        iterated over.
     preload_batch : bool, optional
         If ``True``, each batch will be loaded into memory before reshaping /
         processing, triggering any dask arrays to be computed.
@@ -108,7 +113,7 @@ class BatchGenerator:
         preload_batch: bool = True,
     ):
 
-        self.ds = _as_xarray_dataset(ds)
+        self.ds = ds
         # should be a dict
         self.input_dims = OrderedDict(input_dims)
         self.input_overlap = input_overlap
