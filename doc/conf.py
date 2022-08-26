@@ -74,7 +74,7 @@ autodoc_mock_imports = ['torch', 'tensorflow']
 
 # link to github issues
 extlinks = {
-    'issue': ('https://github.com/pangeo-data/xbatcher/issues/%s', 'GH')
+    'issue': ('https://github.com/xarray-contrib/xbatcher/issues/%s', 'GH')
 }
 
 # sphinx-copybutton configurations (from https://github.com/pydata/xarray/blob/main/doc/conf.py)

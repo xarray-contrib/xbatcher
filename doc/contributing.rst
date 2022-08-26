@@ -15,7 +15,7 @@ Bug reports and feature requests
 ================================
 
 To report bugs or request new features, head over to the `xbatcher repository
-<https://github.com/pangeo-data/xbatcher/issues>`_.
+<https://github.com/xarray-contrib/xbatcher/issues>`_.
 
 Contributing code
 ==================
@@ -30,12 +30,12 @@ Forking
 -------
 
 You will need your own fork to work on the code. Go to the `xbatcher project
-page <https://github.com/pangeo-data/xbatcher>`_ and hit the ``Fork`` button.
+page <https://github.com/xarray-contrib/xbatcher>`_ and hit the ``Fork`` button.
 You will need to clone your fork to your machine::
 
     git clone git@github.com:yourusername/xbatcher.git
     cd xbatcher
-    git remote add upstream git@github.com:pangeo-data/xbatcher.git
+    git remote add upstream git@github.com:xarray-contrib/xbatcher.git
 
 This creates the directory ``xbatcher`` and connects your repository to
 the upstream (main project) *xbatcher* repository.
@@ -245,4 +245,4 @@ Continuous integration is done with `GitHub Actions <https://docs.github.com/en/
 
 There is currently 1 workflow configured:
 
-- `main.yaml <https://github.com/pangeo-data/xbatcher/blob/main/.github/workflows/main.yaml>`_ - Run test suite with pytest.
+- `main.yaml <https://github.com/xarray-contrib/xbatcher/blob/main/.github/workflows/main.yaml>`_ - Run test suite with pytest.

@@ -20,7 +20,7 @@ Or via Conda as::
 
 Or from source as::
 
-    pip install git+https://github.com/pangeo-data/xbatcher.git
+    pip install git+https://github.com/xarray-contrib/xbatcher.git
 
 Basic Usage
 -----------
