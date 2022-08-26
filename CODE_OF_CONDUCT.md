@@ -1,1 +1,1 @@
-All contributors and maintainers must abide by the [Pangeo Code of Conduct](https://github.com/pangeo-data/governance/blob/master/conduct/code_of_conduct.md).
+All contributors and maintainers must abide by the [xarray-contrib organization Code of Conduct](https://github.com/xarray-contrib/.github/blob/main/CODE_OF_CONDUCT.md).
