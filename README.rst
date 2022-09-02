@@ -1,7 +1,7 @@
 xbatcher: Batch Generation from Xarray Datasets
 ===============================================
 
-|Build Status| |codecov| |docs| |pypi| |license|
+|Build Status| |codecov| |docs| |pypi| |conda-forge| |license|
 
 
 Xbatcher is a small library for iterating xarray DataArrays in batches. The
@@ -23,6 +23,9 @@ such as Keras_. View the |docs| for more info.
 .. |pypi| image:: https://img.shields.io/pypi/v/xbatcher.svg
    :target: https://pypi.python.org/pypi/xbatcher
    :alt: pypi
+.. |conda-forge| image:: https://img.shields.io/conda/vn/conda-forge/xbatcher.svg
+   :target: https://anaconda.org/conda-forge/xbatcher
+   :alt: conda-forge
 .. |license| image:: https://img.shields.io/github/license/mashape/apistatus.svg
    :target: https://github.com/xarray-contrib/xbatcher
    :alt: license
