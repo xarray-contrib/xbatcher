@@ -23,6 +23,8 @@ version-resolver:
       - "feature"
       - "enhancement"
   default: patch
+exclude-labels:
+  - 'skip-changelog'
 template: |
   ## Changes
 
