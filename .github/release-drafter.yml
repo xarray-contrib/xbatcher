@@ -22,9 +22,6 @@ version-resolver:
     labels:
       - "feature"
       - "enhancement"
-  patch:
-    labels:
-      - "patch"
   default: patch
 template: |
   ## Changes
