@@ -7,8 +7,6 @@ categories:
       - "enhancement"
   - title: "Bug Fixes"
     labels:
-      - "fix"
-      - "bugfix"
       - "bug"
   - title: "Maintenance"
     label: "chore"
