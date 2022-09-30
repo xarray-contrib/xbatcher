@@ -161,7 +161,11 @@ html_theme = 'pangeo_sphinx_book_theme'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-# html_theme_options = {}
+html_theme_options = {
+    'repository_url': 'https://github.com/xarray-contrib/xbatcher',
+    'use_repository_button': True,
+    'use_issues_button': True,
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
