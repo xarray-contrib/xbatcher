@@ -5,7 +5,7 @@ from .generators import BatchGenerator  # noqa: F401
 from .util.print_versions import show_versions  # noqa: F401
 
 try:
-    __version__ = version(__name__)
-except PackageNotFoundError:
+    __version__ = _version(__name__)
+except _PackageNotFoundError:
     # package is not installed
     __version__ = 'unknown'
