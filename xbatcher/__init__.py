@@ -1,11 +1,14 @@
-from pkg_resources import DistributionNotFound, get_distribution
+from importlib.metadata import (
+    PackageNotFoundError as _PackageNotFoundError,
+    version as _version,
+)
 
 from .accessors import BatchAccessor  # noqa: F401
 from .generators import BatchGenerator  # noqa: F401
 from .util.print_versions import show_versions  # noqa: F401
 
 try:
-    __version__ = get_distribution(__name__).version
-except DistributionNotFound:  # noqa: F401; pragma: no cover
+    __version__ = _version(__name__)
+except _PackageNotFoundError:
     # package is not installed
-    pass
+    __version__ = 'unknown'
