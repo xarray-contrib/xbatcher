@@ -1,4 +1,7 @@
-from importlib.metadata import PackageNotFoundError, version
+from importlib.metadata import (
+    PackageNotFoundError as _PackageNotFoundError,
+    version as _version,
+)
 
 from .accessors import BatchAccessor  # noqa: F401
 from .generators import BatchGenerator  # noqa: F401
