@@ -58,6 +58,7 @@ fallback_version = "999"
 
 [tool.isort]
 profile = 'black'
+known_third_party = ["numpy", "pytest", "setuptools", "sphinx_autosummary_accessors", "tensorflow", "torch", "xarray"]
 
 [tool.pytest.ini_options]
 log_cli = true
