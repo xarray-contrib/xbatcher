@@ -36,13 +36,13 @@ tensorflow = [
     "tensorflow",
 ]
 dev = [
-    "pytest",
-    "coverage",
-    "pytest-cov",
     "adlfs",
     "asv",
-    "torch",
+    "coverage",
+    "pytest",
+    "pytest-cov",
     "tensorflow",
+    "torch",
 ]
 [project.urls]
 documentation = "https://xbatcher.readthedocs.io/en/latest/"
@@ -57,14 +57,7 @@ local_scheme = 'dirty-tag'
 fallback_version = "999"
 
 [tool.isort]
-known_first_party = ["xbatcher"]
-known_third_party = ["numpy", "pytest", "setuptools", "sphinx_autosummary_accessors", "tensorflow", "torch", "xarray"]
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-combine_as_imports = true
-line_length = 80
-skip= ["doc/conf.py"]
+profile = 'black'
 
 [tool.pytest.ini_options]
 log_cli = true
