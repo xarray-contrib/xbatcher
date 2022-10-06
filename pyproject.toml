@@ -1,0 +1,71 @@
+[build-system]
+requires = [
+    "setuptools>=61",
+    "setuptools-scm"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = 'xbatcher'
+description = 'Batch generation from Xarray objects'
+license = {file = "LICENSE"}
+authors = [{name = "xbatcher Developers", email = "rpa@ldeo.columbia.edu"}]
+classifiers = [
+    'Development Status :: 4 - Beta',
+    'License :: OSI Approved :: MIT License',
+    'Operating System :: OS Independent',
+    'Intended Audience :: Science/Research',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Topic :: Scientific/Engineering',
+]
+dynamic = ["version"]
+dependencies = [
+    "dask",
+    "numpy",
+    "xarray",
+]
+[project.optional-dependencies]
+torch = [
+    "torch",
+]
+tensorflow = [
+    "tensorflow",
+]
+dev = [
+    "pytest",
+    "coverage",
+    "pytest-cov",
+    "adlfs",
+    "asv",
+    "torch",
+    "tensorflow",
+]
+[project.urls]
+documentation = "https://xbatcher.readthedocs.io/en/latest/"
+repository = "https://github.com/xarray-contrib/xbatcher"
+
+[tool.setuptools.packages.find]
+include = ["xbatcher*"]
+
+[tool.setuptools_scm]
+version_scheme = 'post-release'
+local_scheme = 'dirty-tag'
+fallback_version = "999"
+
+[tool.isort]
+known_first_party = ["xbatcher"]
+known_third_party = ["numpy", "pkg_resources", "pytest", "setuptools", "sphinx_autosummary_accessors", "tensorflow", "torch", "xarray"]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+combine_as_imports = true
+line_length = 80
+skip= ["doc/conf.py"]
+
+[tool.pytest.ini_options]
+log_cli = true
+log_level = "INFO"
