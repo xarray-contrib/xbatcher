@@ -12,13 +12,11 @@ repos:
       - id: check-json
         exclude: "asv_bench/asv.conf.json"
       - id: check-yaml
-      - id: double-quote-string-fixer
 
   - repo: https://github.com/psf/black
     rev: 22.8.0
     hooks:
       - id: black
-        args: ["--line-length", "80", "--skip-string-normalization"]
 
   - repo: https://github.com/PyCQA/flake8
     rev: 5.0.4

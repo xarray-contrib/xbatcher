@@ -2,33 +2,33 @@ import numpy as np
 import pytest
 import xarray as xr
 
-torch = pytest.importorskip('torch')
+torch = pytest.importorskip("torch")
 
 from xbatcher import BatchGenerator
 from xbatcher.loaders.torch import IterableDataset, MapDataset
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def ds_xy():
     n_samples = 100
     n_features = 5
     ds = xr.Dataset(
         {
-            'x': (
-                ['sample', 'feature'],
+            "x": (
+                ["sample", "feature"],
                 np.random.random((n_samples, n_features)),
             ),
-            'y': (['sample'], np.random.random(n_samples)),
+            "y": (["sample"], np.random.random(n_samples)),
         },
     )
     return ds
 
 
 @pytest.mark.parametrize(
-    ('x_var', 'y_var'),
+    ("x_var", "y_var"),
     [
-        ('x', 'y'),  # xr.DataArray
-        (['x'], ['y']),  # xr.Dataset
+        ("x", "y"),  # xr.DataArray
+        (["x"], ["y"]),  # xr.Dataset
     ],
 )
 def test_map_dataset(ds_xy, x_var, y_var):
@@ -36,8 +36,8 @@ def test_map_dataset(ds_xy, x_var, y_var):
     x = ds_xy[x_var]
     y = ds_xy[y_var]
 
-    x_gen = BatchGenerator(x, {'sample': 10})
-    y_gen = BatchGenerator(y, {'sample': 10})
+    x_gen = BatchGenerator(x, {"sample": 10})
+    y_gen = BatchGenerator(y, {"sample": 10})
 
     dataset = MapDataset(x_gen, y_gen)
 
@@ -72,18 +72,16 @@ def test_map_dataset(ds_xy, x_var, y_var):
     assert tuple(x_gen[-1].sizes.values()) == x_batch.shape
     # Check that array values from last item in generator and batch are the same
     gen_array = (
-        x_gen[-1].to_array().squeeze()
-        if hasattr(x_gen[-1], 'to_array')
-        else x_gen[-1]
+        x_gen[-1].to_array().squeeze() if hasattr(x_gen[-1], "to_array") else x_gen[-1]
     )
     np.testing.assert_array_equal(gen_array, x_batch)
 
 
 @pytest.mark.parametrize(
-    ('x_var', 'y_var'),
+    ("x_var", "y_var"),
     [
-        ('x', 'y'),  # xr.DataArray
-        (['x'], ['y']),  # xr.Dataset
+        ("x", "y"),  # xr.DataArray
+        (["x"], ["y"]),  # xr.Dataset
     ],
 )
 def test_map_dataset_with_transform(ds_xy, x_var, y_var):
@@ -91,8 +89,8 @@ def test_map_dataset_with_transform(ds_xy, x_var, y_var):
     x = ds_xy[x_var]
     y = ds_xy[y_var]
 
-    x_gen = BatchGenerator(x, {'sample': 10})
-    y_gen = BatchGenerator(y, {'sample': 10})
+    x_gen = BatchGenerator(x, {"sample": 10})
+    y_gen = BatchGenerator(y, {"sample": 10})
 
     def x_transform(batch):
         return batch * 0 + 1
@@ -112,10 +110,10 @@ def test_map_dataset_with_transform(ds_xy, x_var, y_var):
 
 
 @pytest.mark.parametrize(
-    ('x_var', 'y_var'),
+    ("x_var", "y_var"),
     [
-        ('x', 'y'),  # xr.DataArray
-        (['x'], ['y']),  # xr.Dataset
+        ("x", "y"),  # xr.DataArray
+        (["x"], ["y"]),  # xr.Dataset
     ],
 )
 def test_iterable_dataset(ds_xy, x_var, y_var):
@@ -123,8 +121,8 @@ def test_iterable_dataset(ds_xy, x_var, y_var):
     x = ds_xy[x_var]
     y = ds_xy[y_var]
 
-    x_gen = BatchGenerator(x, {'sample': 10})
-    y_gen = BatchGenerator(y, {'sample': 10})
+    x_gen = BatchGenerator(x, {"sample": 10})
+    y_gen = BatchGenerator(y, {"sample": 10})
 
     dataset = IterableDataset(x_gen, y_gen)
 
@@ -140,8 +138,6 @@ def test_iterable_dataset(ds_xy, x_var, y_var):
     assert tuple(x_gen[-1].sizes.values()) == x_batch.shape
     # Check that array values from last item in generator and batch are the same
     gen_array = (
-        x_gen[-1].to_array().squeeze()
-        if hasattr(x_gen[-1], 'to_array')
-        else x_gen[-1]
+        x_gen[-1].to_array().squeeze() if hasattr(x_gen[-1], "to_array") else x_gen[-1]
     )
     np.testing.assert_array_equal(gen_array, x_batch)

@@ -22,7 +22,7 @@ class MapDataset(torch.utils.data.Dataset):
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
     ) -> None:
-        '''
+        """
         PyTorch Dataset adapter for Xbatcher
 
         Parameters
@@ -33,7 +33,7 @@ class MapDataset(torch.utils.data.Dataset):
             A function/transform that takes in an array and returns a transformed version.
         target_transform : callable, optional
             A function/transform that takes in the target and transforms it.
-        '''
+        """
         self.X_generator = X_generator
         self.y_generator = y_generator
         self.transform = transform
@@ -49,7 +49,7 @@ class MapDataset(torch.utils.data.Dataset):
                 idx = idx[0]
             else:
                 raise NotImplementedError(
-                    f'{type(self).__name__}.__getitem__ currently requires a single integer key'
+                    f"{type(self).__name__}.__getitem__ currently requires a single integer key"
                 )
 
         # TODO: figure out the dataset -> array workflow
@@ -71,14 +71,14 @@ class IterableDataset(torch.utils.data.IterableDataset):
         X_generator,
         y_generator,
     ) -> None:
-        '''
+        """
         PyTorch Dataset adapter for Xbatcher
 
         Parameters
         ----------
         X_generator : xbatcher.BatchGenerator
         y_generator : xbatcher.BatchGenerator
-        '''
+        """
 
         self.X_generator = X_generator
         self.y_generator = y_generator
