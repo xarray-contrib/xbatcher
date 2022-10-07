@@ -4,12 +4,15 @@ categories:
   - title: "Features"
     labels:
       - "feature"
-      - "enhancement"
+  - title: "Enhancement"
+    label: "enhancement"
   - title: "Bug Fixes"
     labels:
       - "bug"
+  - title: "Documentation"
+    label: "documentation"
   - title: "Maintenance"
-    label: "chore"
+    label: "maintenance"
 change-template: "- $TITLE @$AUTHOR ([#$NUMBER]($URL))"
 change-title-escapes: '\<*_&#@'
 version-resolver:
