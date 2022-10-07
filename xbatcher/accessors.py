@@ -3,8 +3,8 @@ import xarray as xr
 from .generators import BatchGenerator
 
 
-@xr.register_dataarray_accessor('batch')
-@xr.register_dataset_accessor('batch')
+@xr.register_dataarray_accessor("batch")
+@xr.register_dataset_accessor("batch")
 class BatchAccessor:
     def __init__(self, xarray_obj):
         """
@@ -26,8 +26,8 @@ class BatchAccessor:
         return BatchGenerator(self._obj, *args, **kwargs)
 
 
-@xr.register_dataarray_accessor('torch')
-@xr.register_dataset_accessor('torch')
+@xr.register_dataarray_accessor("torch")
+@xr.register_dataset_accessor("torch")
 class TorchAccessor:
     def __init__(self, xarray_obj):
         self._obj = xarray_obj
@@ -39,7 +39,7 @@ class TorchAccessor:
         """
         try:
             # Convert xr.Dataset to xr.DataArray
-            dataarray = xr_obj.to_array().squeeze(dim='variable')
+            dataarray = xr_obj.to_array().squeeze(dim="variable")
         except AttributeError:  # 'DataArray' object has no attribute 'to_array'
             # If object is already an xr.DataArray
             dataarray = xr_obj
