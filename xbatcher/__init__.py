@@ -9,4 +9,4 @@ try:
     __version__ = _version(__name__)
 except _PackageNotFoundError:
     # package is not installed
-    __version__ = 'unknown'
+    __version__ = "unknown"

@@ -11,8 +11,8 @@ def _slices(dimsize, size, overlap=0):
     # return a list of slices to chop up a single dimension
     if overlap >= size:
         raise ValueError(
-            'input overlap must be less than the input sample length, but '
-            f'the input sample length is {size} and the overlap is {overlap}'
+            "input overlap must be less than the input sample length, but "
+            f"the input sample length is {size} and the overlap is {overlap}"
         )
     slices = []
     stride = size - overlap
@@ -31,10 +31,10 @@ def _iterate_through_dataset(ds, dims, overlap={}):
         olap = overlap.get(dim, 0)
         if size > dimsize:
             raise ValueError(
-                'input sample length must be less than or equal to the '
-                f'dimension length, but the sample length of {size} '
-                f'is greater than the dimension length of {dimsize} '
-                f'for {dim}'
+                "input sample length must be less than or equal to the "
+                f"dimension length, but the sample length of {size} "
+                f"is greater than the dimension length of {dimsize} "
+                f"for {dim}"
             )
         dim_slices.append(_slices(dimsize, size, olap))
 
@@ -43,7 +43,7 @@ def _iterate_through_dataset(ds, dims, overlap={}):
         yield ds.isel(**selector)
 
 
-def _drop_input_dims(ds, input_dims, suffix='_input'):
+def _drop_input_dims(ds, input_dims, suffix="_input"):
     # remove input_dims coordinates from datasets, rename the dimensions
     # then put intput_dims back in as coordinates
     out = ds.copy()
@@ -57,7 +57,7 @@ def _drop_input_dims(ds, input_dims, suffix='_input'):
     return out
 
 
-def _maybe_stack_batch_dims(ds, input_dims, stacked_dim_name='sample'):
+def _maybe_stack_batch_dims(ds, input_dims, stacked_dim_name="sample"):
     batch_dims = [d for d in ds.sizes if d not in input_dims]
     if len(batch_dims) < 2:
         return ds
@@ -121,9 +121,7 @@ class BatchGenerator:
         self.concat_input_dims = concat_input_dims
         self.preload_batch = preload_batch
 
-        self._batches: Dict[
-            int, Any
-        ] = self._gen_batches()  # dict cache for batches
+        self._batches: Dict[int, Any] = self._gen_batches()  # dict cache for batches
         # in the future, we can make this a lru cache or similar thing (cachey?)
 
     def __iter__(self) -> Iterator[xr.Dataset]:
@@ -137,7 +135,7 @@ class BatchGenerator:
 
         if not isinstance(idx, int):
             raise NotImplementedError(
-                f'{type(self).__name__}.__getitem__ currently requires a single integer key'
+                f"{type(self).__name__}.__getitem__ currently requires a single integer key"
             )
 
         if idx < 0:
@@ -146,7 +144,7 @@ class BatchGenerator:
         if idx in self._batches:
             return self._batches[idx]
         else:
-            raise IndexError('list index out of range')
+            raise IndexError("list index out of range")
 
     def _gen_batches(self) -> dict:
         # in the future, we will want to do the batch generation lazily
@@ -158,17 +156,15 @@ class BatchGenerator:
                 ds_batch.load()
             input_generator = self._iterate_input_dims(ds_batch)
             if self.concat_input_dims:
-                new_dim_suffix = '_input'
+                new_dim_suffix = "_input"
                 all_dsets = [
                     _drop_input_dims(
                         ds_input, list(self.input_dims), suffix=new_dim_suffix
                     )
                     for ds_input in input_generator
                 ]
-                dsc = xr.concat(all_dsets, dim='input_batch')
-                new_input_dims = [
-                    str(dim) + new_dim_suffix for dim in self.input_dims
-                ]
+                dsc = xr.concat(all_dsets, dim="input_batch")
+                new_input_dims = [str(dim) + new_dim_suffix for dim in self.input_dims]
                 batches.append(_maybe_stack_batch_dims(dsc, new_input_dims))
             else:
                 for ds_input in input_generator:
