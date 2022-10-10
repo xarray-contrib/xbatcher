@@ -8,11 +8,11 @@ build-backend = "setuptools.build_meta"
 [project]
 name = 'xbatcher'
 description = 'Batch generation from Xarray objects'
-license = {file = "LICENSE"}
+license = 'Apache'
 authors = [{name = "xbatcher Developers", email = "rpa@ldeo.columbia.edu"}]
 classifiers = [
     'Development Status :: 4 - Beta',
-    'License :: OSI Approved :: MIT License',
+    "License :: OSI Approved :: Apache Software License",
     'Operating System :: OS Independent',
     'Intended Audience :: Science/Research',
     'Programming Language :: Python',
