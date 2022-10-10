@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = 'xbatcher'
 description = 'Batch generation from Xarray objects'
-license = 'Apache'
+license = {text = "Apache"}
 authors = [{name = "xbatcher Developers", email = "rpa@ldeo.columbia.edu"}]
 classifiers = [
     'Development Status :: 4 - Beta',
