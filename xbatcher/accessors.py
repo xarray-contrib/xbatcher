@@ -41,6 +41,33 @@ class BatchAccessor:
         return BatchGenerator(self._obj, *args, **kwargs)
 
 
+@xr.register_dataarray_accessor("keras")
+@xr.register_dataset_accessor("keras")
+class KerasAccessor:
+    def __init__(self, xarray_obj):
+        self._obj = xarray_obj
+
+    def to_tensor(self):
+        """Convert this DataArray to a torch.Tensor"""
+        import tensorflow as tf
+
+        dataarray = _as_xarray_dataarray(xr_obj=self._obj)
+
+        return tf.convert_to_tensor(dataarray.data)
+
+    def to_named_tensor(self):
+        """
+        Convert this DataArray to a torch.Tensor with named dimensions.
+
+        See https://pytorch.org/docs/stable/named_tensor.html
+        """
+        import tensorflow as tf
+
+        dataarray = _as_xarray_dataarray(xr_obj=self._obj)
+
+        return tf.convert_to_tensor(dataarray.data, name=tuple(dataarray.sizes))
+
+
 @xr.register_dataarray_accessor("torch")
 @xr.register_dataset_accessor("torch")
 class TorchAccessor:
