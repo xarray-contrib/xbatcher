@@ -48,24 +48,26 @@ class KerasAccessor:
         self._obj = xarray_obj
 
     def to_tensor(self):
-        """Convert this DataArray to a torch.Tensor"""
+        """Convert this DataArray to a tensorflow.Tensor"""
         import tensorflow as tf
 
         dataarray = _as_xarray_dataarray(xr_obj=self._obj)
 
         return tf.convert_to_tensor(dataarray.data)
 
-    def to_named_tensor(self):
-        """
-        Convert this DataArray to a torch.Tensor with named dimensions.
+    def to_named_tensor(
+        self,
+    ):  # There does not seem to be a named tensor for tensorflow?
+        pass
 
-        See https://pytorch.org/docs/stable/named_tensor.html
-        """
-        import tensorflow as tf
+        # """
+        # Convert this DataArray to a .Tensor with named dimensions.
+        # """
+        # import tensorflow as tf
 
-        dataarray = _as_xarray_dataarray(xr_obj=self._obj)
+        # dataarray = _as_xarray_dataarray(xr_obj=self._obj)
 
-        return tf.convert_to_tensor(dataarray.data, name=tuple(dataarray.sizes))
+        # return tf.convert_to_tensor(dataarray.data, name=tuple(dataarray.sizes))
 
 
 @xr.register_dataarray_accessor("torch")

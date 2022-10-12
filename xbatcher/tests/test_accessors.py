@@ -71,6 +71,25 @@ def test_batch_accessor_da(sample_ds_3d):
         ["foo"],  # xr.Dataset
     ],
 )
+def test_keras_to_tensor(sample_ds_3d, foo_var):
+    tensorflow = pytest.importorskip("tensorflow")
+
+    foo = sample_ds_3d[foo_var]
+    t = foo.keras.to_tensor()
+    assert isinstance(t, tensorflow.Tensor)
+    assert t.shape == tuple(foo.sizes.values())
+
+    foo_array = foo.to_array().squeeze() if hasattr(foo, "to_array") else foo
+    np.testing.assert_array_equal(t, foo_array.values)
+
+
+@pytest.mark.parametrize(
+    "foo_var",
+    [
+        "foo",  # xr.DataArray
+        ["foo"],  # xr.Dataset
+    ],
+)
 def test_torch_to_tensor(sample_ds_3d, foo_var):
     torch = pytest.importorskip("torch")
 
