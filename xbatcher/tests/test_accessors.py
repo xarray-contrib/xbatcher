@@ -22,6 +22,30 @@ def sample_ds_3d():
     return ds
 
 
+@pytest.fixture(scope="module")
+def sample_dataArray():
+    return xr.DataArray(np.zeros((2, 4), dtype="i4"), dims=("x", "y"), name="foo")
+
+
+@pytest.fixture(scope="module")
+def sample_Dataset():
+    return xr.Dataset(
+        {
+            "x": xr.DataArray(np.arange(10), dims="x"),
+            "foo": xr.DataArray(np.ones(10, dtype="float"), dims="x"),
+        }
+    )
+
+
+def test_as_xarray_dataarray(sample_dataArray, sample_Dataset):
+    assert isinstance(
+        xbatcher.accessors._as_xarray_dataarray(sample_dataArray), xr.DataArray
+    )
+    assert isinstance(
+        xbatcher.accessors._as_xarray_dataarray(sample_Dataset), xr.DataArray
+    )
+
+
 def test_batch_accessor_ds(sample_ds_3d):
     bg_class = BatchGenerator(sample_ds_3d, input_dims={"x": 5})
     bg_acc = sample_ds_3d.batch.generator(input_dims={"x": 5})
