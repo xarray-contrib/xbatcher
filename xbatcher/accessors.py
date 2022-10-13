@@ -8,7 +8,7 @@ from .generators import BatchGenerator
 def _as_xarray_dataarray(xr_obj: Union[xr.Dataset, xr.DataArray]) -> xr.DataArray:
     """
     Convert xarray.Dataset to xarray.DataArray if needed, so that it can
-    be converted into a torch.Tensor object.
+    be converted into a Tensor object.
     """
     if isinstance(xr_obj, xr.Dataset):
         xr_obj = xr_obj.to_array().squeeze(dim="variable")
