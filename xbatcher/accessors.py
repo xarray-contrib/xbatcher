@@ -5,9 +5,7 @@ import xarray as xr
 from .generators import BatchGenerator
 
 
-def _as_xarray_dataarray(
-    xr_obj: Union[xr.Dataset, xr.DataArray]
-) -> Union[xr.Dataset, xr.DataArray]:
+def _as_xarray_dataarray(xr_obj: Union[xr.Dataset, xr.DataArray]) -> xr.DataArray:
     """
     Convert xarray.Dataset to xarray.DataArray if needed, so that it can
     be converted into a torch.Tensor object.
@@ -41,9 +39,9 @@ class BatchAccessor:
         return BatchGenerator(self._obj, *args, **kwargs)
 
 
-@xr.register_dataarray_accessor("keras")
-@xr.register_dataset_accessor("keras")
-class KerasAccessor:
+@xr.register_dataarray_accessor("tf")
+@xr.register_dataset_accessor("tf")
+class TFAccessor:
     def __init__(self, xarray_obj):
         self._obj = xarray_obj
 

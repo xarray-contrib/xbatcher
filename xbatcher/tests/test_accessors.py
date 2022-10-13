@@ -71,11 +71,11 @@ def test_batch_accessor_da(sample_ds_3d):
         ["foo"],  # xr.Dataset
     ],
 )
-def test_keras_to_tensor(sample_ds_3d, foo_var):
+def test_tf_to_tensor(sample_ds_3d, foo_var):
     tensorflow = pytest.importorskip("tensorflow")
 
     foo = sample_ds_3d[foo_var]
-    t = foo.keras.to_tensor()
+    t = foo.tf.to_tensor()
     assert isinstance(t, tensorflow.Tensor)
     assert t.shape == tuple(foo.sizes.values())
 
