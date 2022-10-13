@@ -22,6 +22,30 @@ def sample_ds_3d():
     return ds
 
 
+@pytest.fixture(scope="module")
+def sample_dataArray():
+    return xr.DataArray(np.zeros((2, 4), dtype="i4"), dims=("x", "y"), name="foo")
+
+
+@pytest.fixture(scope="module")
+def sample_Dataset():
+    return xr.Dataset(
+        {
+            "x": xr.DataArray(np.arange(10), dims="x"),
+            "foo": xr.DataArray(np.ones(10, dtype="float"), dims="x"),
+        }
+    )
+
+
+def test_as_xarray_dataarray(sample_dataArray, sample_Dataset):
+    assert isinstance(
+        xbatcher.accessors._as_xarray_dataarray(sample_dataArray), xr.DataArray
+    )
+    assert isinstance(
+        xbatcher.accessors._as_xarray_dataarray(sample_Dataset), xr.DataArray
+    )
+
+
 def test_batch_accessor_ds(sample_ds_3d):
     bg_class = BatchGenerator(sample_ds_3d, input_dims={"x": 5})
     bg_acc = sample_ds_3d.batch.generator(input_dims={"x": 5})
@@ -38,6 +62,25 @@ def test_batch_accessor_da(sample_ds_3d):
     assert isinstance(bg_acc, BatchGenerator)
     for batch_class, batch_acc in zip(bg_class, bg_acc):
         assert batch_class.equals(batch_acc)
+
+
+@pytest.mark.parametrize(
+    "foo_var",
+    [
+        "foo",  # xr.DataArray
+        ["foo"],  # xr.Dataset
+    ],
+)
+def test_tf_to_tensor(sample_ds_3d, foo_var):
+    tf = pytest.importorskip("tensorflow")
+
+    foo = sample_ds_3d[foo_var]
+    t = foo.tf.to_tensor()
+    assert isinstance(t, tf.Tensor)
+    assert t.shape == tuple(foo.sizes.values())
+
+    foo_array = foo.to_array().squeeze() if hasattr(foo, "to_array") else foo
+    np.testing.assert_array_equal(t, foo_array.values)
 
 
 @pytest.mark.parametrize(
