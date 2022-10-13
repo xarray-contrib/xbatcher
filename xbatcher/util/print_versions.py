@@ -63,3 +63,7 @@ def show_versions(file=sys.stdout):
     print("Dependency information:", file=file)
     for modname in deps:
         print(f"  {modname}: {_get_module_version(modname)}", file=file)
+
+
+if __name__ == "__main__":
+    show_versions()
