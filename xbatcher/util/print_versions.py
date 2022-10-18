@@ -65,5 +65,5 @@ def show_versions(file=sys.stdout):
         print(f"  {modname}: {_get_module_version(modname)}", file=file)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     show_versions()
