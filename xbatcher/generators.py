@@ -40,7 +40,7 @@ def _iterate_through_dataset(ds, dims, overlap={}):
 
     for slices in itertools.product(*dim_slices):
         selector = {key: slice for key, slice in zip(dims, slices)}
-        yield ds.isel(**selector)
+        yield selector
 
 
 def _drop_input_dims(ds, input_dims, suffix="_input"):
@@ -120,13 +120,11 @@ class BatchGenerator:
         self.batch_dims = OrderedDict(batch_dims)
         self.concat_input_dims = concat_input_dims
         self.preload_batch = preload_batch
-
         self._batches: Dict[int, Any] = self._gen_batches()  # dict cache for batches
-        # in the future, we can make this a lru cache or similar thing (cachey?)
 
     def __iter__(self) -> Iterator[xr.Dataset]:
-        for batch in self._batches.values():
-            yield batch
+        for idx in self._batches:
+            yield self[idx]
 
     def __len__(self) -> int:
         return len(self._batches)
@@ -142,7 +140,25 @@ class BatchGenerator:
             idx = list(self._batches)[idx]
 
         if idx in self._batches:
-            return self._batches[idx]
+
+            if self.concat_input_dims:
+                new_dim_suffix = "_input"
+                all_dsets = [
+                    _drop_input_dims(
+                        self.ds.isel(**ds_input_select),
+                        list(self.input_dims),
+                        suffix=new_dim_suffix,
+                    )
+                    for ds_input_select in self._batches[idx]
+                ]
+                dsc = xr.concat(all_dsets, dim="input_batch")
+                new_input_dims = [str(dim) + new_dim_suffix for dim in self.input_dims]
+                return _maybe_stack_batch_dims(dsc, new_input_dims)
+            else:
+
+                return _maybe_stack_batch_dims(
+                    self.ds.isel(**self._batches[idx]), list(self.input_dims)
+                )
         else:
             raise IndexError("list index out of range")
 
@@ -151,26 +167,17 @@ class BatchGenerator:
         # going the eager route for now is allowing me to fill out the loader api
         # but it is likely to perform poorly.
         batches = []
-        for ds_batch in self._iterate_batch_dims(self.ds):
+        for ds_batch_selector in self._iterate_batch_dims(self.ds):
+            ds_batch = self.ds.isel(**ds_batch_selector)
             if self.preload_batch:
                 ds_batch.load()
+
             input_generator = self._iterate_input_dims(ds_batch)
+
             if self.concat_input_dims:
-                new_dim_suffix = "_input"
-                all_dsets = [
-                    _drop_input_dims(
-                        ds_input, list(self.input_dims), suffix=new_dim_suffix
-                    )
-                    for ds_input in input_generator
-                ]
-                dsc = xr.concat(all_dsets, dim="input_batch")
-                new_input_dims = [str(dim) + new_dim_suffix for dim in self.input_dims]
-                batches.append(_maybe_stack_batch_dims(dsc, new_input_dims))
+                batches.append(list(input_generator))
             else:
-                for ds_input in input_generator:
-                    batches.append(
-                        _maybe_stack_batch_dims(ds_input, list(self.input_dims))
-                    )
+                batches += list(input_generator)
 
         return dict(zip(range(len(batches)), batches))
 
