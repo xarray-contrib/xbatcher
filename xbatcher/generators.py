@@ -167,7 +167,6 @@ class BatchGenerator:
         # going the eager route for now is allowing me to fill out the loader api
         # but it is likely to perform poorly.
         batches = []
-        # for ds_batch in self._iterate_batch_dims(self.ds):
         for ds_batch_selector in self._iterate_batch_dims(self.ds):
             ds_batch = self.ds.isel(**ds_batch_selector)
             if self.preload_batch:
