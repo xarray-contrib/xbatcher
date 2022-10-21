@@ -123,7 +123,7 @@ class BatchGenerator:
         self._batches: Dict[int, Any] = self._gen_batches()  # dict cache for batches
 
     def __iter__(self) -> Iterator[xr.Dataset]:
-        for idx in range(len(self._batches)):
+        for idx in self._batches:
             yield self[idx]
 
     def __len__(self) -> int:
