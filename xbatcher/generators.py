@@ -40,7 +40,6 @@ def _iterate_through_dataset(ds, dims, overlap={}):
 
     for slices in itertools.product(*dim_slices):
         selector = {key: slice for key, slice in zip(dims, slices)}
-        # yield ds.isel(**selector)
         yield selector
 
 
