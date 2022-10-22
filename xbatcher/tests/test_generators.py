@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 
 import numpy as np
 import pytest
@@ -227,7 +227,8 @@ def test_batch_exceptions(sample_ds_1d):
 
 
 def test_batcher_cached_getitem(sample_ds_1d) -> None:
-    cache: dict[str, Any] = {}
+    pytest.importorskip("zarr")
+    cache: Dict[str, Any] = {}
 
     def preproc(ds):
         processed = ds.load().chunk(-1)

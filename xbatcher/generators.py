@@ -111,7 +111,7 @@ class BatchGenerator:
         batch_dims: Dict[Hashable, int] = {},
         concat_input_dims: bool = False,
         preload_batch: bool = True,
-        cache: dict[str, Any] | None = None,
+        cache: Dict[str, Any] | None = None,
         cache_preprocess: Callable | None = None,
     ):
 
@@ -144,7 +144,7 @@ class BatchGenerator:
         if idx < 0:
             idx = list(self._batches)[idx]
 
-        if self.cache and idx in self.cache:
+        if self.cache and self._batch_in_cache(idx):
             return self._get_cached_batch(idx)
 
         if idx in self._batches:
@@ -177,7 +177,11 @@ class BatchGenerator:
 
         return batch
 
-    def _cache_batch(self, idx: int, batch: xr.Dataset):
+    def _batch_in_cache(self, idx: int) -> bool:
+        gkey = f"{idx}/.zgroup"
+        return gkey in self.cache
+
+    def _cache_batch(self, idx: int, batch: xr.Dataset) -> None:
         batch.to_zarr(self.cache, group=str(idx), mode="a")
 
     def _get_cached_batch(self, idx: int) -> xr.Dataset:
