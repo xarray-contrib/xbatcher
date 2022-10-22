@@ -2,7 +2,7 @@
 
 import itertools
 from collections import OrderedDict
-from typing import Any, Dict, Hashable, Iterator
+from typing import Any, Callable, Dict, Hashable, Iterator
 
 import xarray as xr
 
@@ -111,6 +111,8 @@ class BatchGenerator:
         batch_dims: Dict[Hashable, int] = {},
         concat_input_dims: bool = False,
         preload_batch: bool = True,
+        cache: dict[str, Any] | None = None,
+        cache_preprocess: Callable | None = None,
     ):
 
         self.ds = ds
@@ -120,6 +122,9 @@ class BatchGenerator:
         self.batch_dims = OrderedDict(batch_dims)
         self.concat_input_dims = concat_input_dims
         self.preload_batch = preload_batch
+        self.cache = cache
+        self.cache_preprocess = cache_preprocess
+
         self._batches: Dict[int, Any] = self._gen_batches()  # dict cache for batches
 
     def __iter__(self) -> Iterator[xr.Dataset]:
@@ -139,6 +144,9 @@ class BatchGenerator:
         if idx < 0:
             idx = list(self._batches)[idx]
 
+        if self.cache and idx in self.cache:
+            return self._get_cached_batch(idx)
+
         if idx in self._batches:
 
             if self.concat_input_dims:
@@ -153,14 +161,30 @@ class BatchGenerator:
                 ]
                 dsc = xr.concat(all_dsets, dim="input_batch")
                 new_input_dims = [str(dim) + new_dim_suffix for dim in self.input_dims]
-                return _maybe_stack_batch_dims(dsc, new_input_dims)
+                batch = _maybe_stack_batch_dims(dsc, new_input_dims)
             else:
 
-                return _maybe_stack_batch_dims(
+                batch = _maybe_stack_batch_dims(
                     self.ds.isel(**self._batches[idx]), list(self.input_dims)
                 )
         else:
             raise IndexError("list index out of range")
+
+        if self.cache is not None:
+            if self.cache_preprocess is not None:
+                batch = self.cache_preprocess(batch)
+            self._cache_batch(idx, batch)
+
+        return batch
+
+    def _cache_batch(self, idx: int, batch: xr.Dataset):
+        batch.to_zarr(self.cache, group=str(idx), mode="a")
+
+    def _get_cached_batch(self, idx: int) -> xr.Dataset:
+        ds = xr.open_zarr(self.cache, group=str(idx))
+        if self.preload_batch:
+            ds = ds.load()
+        return ds
 
     def _gen_batches(self) -> dict:
         # in the future, we will want to do the batch generation lazily

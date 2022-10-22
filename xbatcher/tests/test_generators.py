@@ -1,3 +1,5 @@
+from typing import Any
+
 import numpy as np
 import pytest
 import xarray as xr
@@ -222,3 +224,37 @@ def test_batch_exceptions(sample_ds_1d):
     with pytest.raises(ValueError) as e:
         BatchGenerator(sample_ds_1d, input_dims={"x": 10}, input_overlap={"x": 20})
         assert len(e) == 1
+
+
+def test_batcher_cached_getitem(sample_ds_1d) -> None:
+    cache: dict[str, Any] = {}
+
+    def preproc(ds):
+        processed = ds.load().chunk(-1)
+        processed.attrs["foo"] = "bar"
+        return processed
+
+    bg = BatchGenerator(
+        sample_ds_1d, input_dims={"x": 10}, cache=cache, cache_preprocess=preproc
+    )
+
+    # first batch
+    assert bg[0].dims["x"] == 10
+    ds_no_cache = bg[1]
+    # last batch
+    assert bg[-1].dims["x"] == 10
+
+    assert "0/.zgroup" in cache
+
+    # now from cache
+    # first batch
+    assert bg[0].dims["x"] == 10
+    # last batch
+    assert bg[-1].dims["x"] == 10
+    ds_cache = bg[1]
+
+    assert ds_no_cache.attrs["foo"] == "bar"
+    assert ds_cache.attrs["foo"] == "bar"
+
+    xr.testing.assert_equal(ds_no_cache, ds_cache)
+    xr.testing.assert_identical(ds_no_cache, ds_cache)
