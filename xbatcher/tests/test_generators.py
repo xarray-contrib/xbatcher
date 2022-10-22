@@ -226,7 +226,8 @@ def test_batch_exceptions(sample_ds_1d):
         assert len(e) == 1
 
 
-def test_batcher_cached_getitem(sample_ds_1d) -> None:
+@pytest.mark.parametrize("preload", [True, False])
+def test_batcher_cached_getitem(sample_ds_1d, preload) -> None:
     pytest.importorskip("zarr")
     cache: Dict[str, Any] = {}
 
@@ -236,7 +237,11 @@ def test_batcher_cached_getitem(sample_ds_1d) -> None:
         return processed
 
     bg = BatchGenerator(
-        sample_ds_1d, input_dims={"x": 10}, cache=cache, cache_preprocess=preproc
+        sample_ds_1d,
+        input_dims={"x": 10},
+        cache=cache,
+        cache_preprocess=preproc,
+        preload_batch=preload,
     )
 
     # first batch
@@ -257,5 +262,17 @@ def test_batcher_cached_getitem(sample_ds_1d) -> None:
     assert ds_no_cache.attrs["foo"] == "bar"
     assert ds_cache.attrs["foo"] == "bar"
 
+    xr.testing.assert_equal(ds_no_cache, ds_cache)
+    xr.testing.assert_identical(ds_no_cache, ds_cache)
+
+    # without preprocess func
+    bg = BatchGenerator(
+        sample_ds_1d, input_dims={"x": 10}, cache=cache, preload_batch=preload
+    )
+    assert bg.cache_preprocess is None
+    assert bg[0].dims["x"] == 10
+    ds_no_cache = bg[1]
+    assert "1/.zgroup" in cache
+    ds_cache = bg[1]
     xr.testing.assert_equal(ds_no_cache, ds_cache)
     xr.testing.assert_identical(ds_no_cache, ds_cache)

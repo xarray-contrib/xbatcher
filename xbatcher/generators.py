@@ -170,9 +170,9 @@ class BatchGenerator:
         else:
             raise IndexError("list index out of range")
 
+        if self.cache is not None and self.cache_preprocess is not None:
+            batch = self.cache_preprocess(batch)
         if self.cache is not None:
-            if self.cache_preprocess is not None:
-                batch = self.cache_preprocess(batch)
             self._cache_batch(idx, batch)
 
         return batch
