@@ -2,7 +2,7 @@
 
 import itertools
 from collections import OrderedDict
-from typing import Any, Callable, Dict, Hashable, Iterator
+from typing import Any, Callable, Dict, Hashable, Iterator, Optional
 
 import xarray as xr
 
@@ -111,8 +111,8 @@ class BatchGenerator:
         batch_dims: Dict[Hashable, int] = {},
         concat_input_dims: bool = False,
         preload_batch: bool = True,
-        cache: Dict[str, Any] | None = None,
-        cache_preprocess: Callable | None = None,
+        cache: Optional[Dict[str, Any]] = None,
+        cache_preprocess: Optional[Callable] = None,
     ):
 
         self.ds = ds
@@ -178,8 +178,7 @@ class BatchGenerator:
         return batch
 
     def _batch_in_cache(self, idx: int) -> bool:
-        gkey = f"{idx}/.zgroup"
-        return gkey in self.cache
+        return self.cache is not None and f"{idx}/.zgroup" in self.cache
 
     def _cache_batch(self, idx: int, batch: xr.Dataset) -> None:
         batch.to_zarr(self.cache, group=str(idx), mode="a")
