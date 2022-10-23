@@ -49,6 +49,7 @@ help:
 clean:
 	rm -rf $(BUILDDIR)/*
 	rm -rf generated/*
+	rm -rf api/*
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html

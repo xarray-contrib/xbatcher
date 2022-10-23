@@ -62,6 +62,6 @@ or via a built-in `Xarray accessor <http://xarray.pydata.org/en/stable/internals
    :caption: Contents:
 
    roadmap
-   api
+   API reference <api/modules>
    demo
    contributing
