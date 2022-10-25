@@ -12,7 +12,7 @@ Installation
 
 Xbatcher can be installed from PyPI as::
 
-    pip install xbatcher
+    python -m pip install xbatcher
 
 Or via Conda as::
 
@@ -20,7 +20,33 @@ Or via Conda as::
 
 Or from source as::
 
-    pip install git+https://github.com/xarray-contrib/xbatcher.git
+    python -m pip install git+https://github.com/xarray-contrib/xbatcher.git
+
+Optional Dependencies
+~~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+    The required dependencies installed with Xbatcher are `Xarray <https://xarray.dev/>`_,
+    `Dask <https://www.dask.org/>`_, and `NumPy <https://numpy.org/>`_.
+    You will need to separately install `TensorFlow <https://www.tensorflow.org/>`_
+    or `PyTorch <https://pytorch.org/>`_ to use those data loaders or
+    Xarray accessors.
+
+To install Xbatcher and PyTorch via `Conda <https://docs.conda.io/>`_::
+
+    conda install -c conda-forge xbatcher pytorch
+
+Or via PyPI::
+
+    python -m pip install xbatcher[torch]
+
+To install Xbatcher and TensorFlow via `Conda <https://docs.conda.io/>`_::
+
+    conda install -c conda-forge xbatcher tensorflow
+
+Or via PyPI::
+
+    python -m pip install xbatcher[tensorflow]
 
 Basic Usage
 -----------
