@@ -8,6 +8,9 @@ on:
   #  branches:
   #    - main
 
+permissions:
+  contents: read
+
 jobs:
   build-artifacts:
     runs-on: ubuntu-latest
@@ -81,7 +84,6 @@ jobs:
         if: github.event_name == 'push'
         uses: pypa/gh-action-pypi-publish@v1.5.1
         with:
-          user: __token__
           password: ${{ secrets.TESTPYPI_TOKEN }}
           repository_url: https://test.pypi.org/legacy/
           # verbose: true
@@ -98,6 +100,5 @@ jobs:
       - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@v1.5.1
         with:
-          user: __token__
           password: ${{ secrets.PYPI_TOKEN }}
           # verbose: true
