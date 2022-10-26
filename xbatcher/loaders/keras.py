@@ -2,11 +2,11 @@ from typing import Any, Callable, Optional, Tuple
 
 try:
     import tensorflow as tf
-except ImportError:
+except ImportError as exc:
     raise ImportError(
         "The Xbatcher TensorFlow Dataset API depends on TensorFlow. Please "
         "install TensorFlow to proceed."
-    )
+    ) from exc
 
 # Notes:
 # This module includes one Keras dataset, which can be provided to model.fit().
