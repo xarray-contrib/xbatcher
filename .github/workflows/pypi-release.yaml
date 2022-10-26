@@ -4,9 +4,9 @@ on:
     types:
       - published
   # Runs for pull requests should be disabled other than for testing purposes
-  #pull_request:
-  #  branches:
-  #    - main
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -84,7 +84,7 @@ jobs:
         if: github.event_name == 'push'
         uses: pypa/gh-action-pypi-publish@v1.5.1
         with:
-          password: ${{ secrets.TESTPYPI_TOKEN }}
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
           repository_url: https://test.pypi.org/legacy/
           # verbose: true
 
