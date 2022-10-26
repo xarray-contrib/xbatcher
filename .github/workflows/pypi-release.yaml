@@ -75,13 +75,11 @@ jobs:
           ls -ltrh
           ls -ltrh dist
       - name: Verify the built dist/wheel is valid
-        if: github.event_name == 'push'
         run: |
           python -m pip install --upgrade pip
           python -m pip install dist/xbatcher*.whl
           python -m xbatcher.show_versions
       - name: Publish package to TestPyPI
-        if: github.event_name == 'push'
         uses: pypa/gh-action-pypi-publish@v1.5.1
         with:
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
