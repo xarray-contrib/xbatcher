@@ -98,5 +98,5 @@ jobs:
       - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@v1.5.1
         with:
-          password: ${{ secrets.PYPI_TOKEN }}
+          password: ${{ secrets.PYPI_API_TOKEN }}
           # verbose: true
