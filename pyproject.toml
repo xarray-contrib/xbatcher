@@ -6,22 +6,23 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = 'xbatcher'
-description = 'Batch generation from Xarray objects'
+name = "xbatcher"
+description = "Batch generation from Xarray objects"
+readme = "README.rst"
 license = {text = "Apache"}
 authors = [{name = "xbatcher Developers", email = "rpa@ldeo.columbia.edu"}]
 requires-python = ">=3.8"
 classifiers = [
-    'Development Status :: 4 - Beta',
+    "Development Status :: 4 - Beta",
     "License :: OSI Approved :: Apache Software License",
-    'Operating System :: OS Independent',
-    'Intended Audience :: Science/Research',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.8',
-    'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10',
-    'Topic :: Scientific/Engineering',
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering",
 ]
 dynamic = ["version"]
 dependencies = [
@@ -53,12 +54,12 @@ repository = "https://github.com/xarray-contrib/xbatcher"
 include = ["xbatcher*"]
 
 [tool.setuptools_scm]
-version_scheme = 'post-release'
-local_scheme = 'dirty-tag'
+version_scheme = "post-release"
+local_scheme = "dirty-tag"
 fallback_version = "999"
 
 [tool.isort]
-profile = 'black'
+profile = "black"
 known_third_party = ["numpy", "pytest", "setuptools", "sphinx_autosummary_accessors", "torch", "xarray"]
 
 [tool.pytest.ini_options]
