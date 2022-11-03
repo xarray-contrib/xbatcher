@@ -1,14 +1,12 @@
-name-template: "$RESOLVED_VERSION"
-tag-template: "$RESOLVED_VERSION"
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
 categories:
   - title: "Features"
-    labels:
-      - "feature"
+    label: "feature"
   - title: "Enhancement"
     label: "enhancement"
   - title: "Bug Fixes"
-    labels:
-      - "bug"
+    label: "bug"
   - title: "Documentation"
     label: "documentation"
   - title: "Maintenance"
@@ -27,6 +25,6 @@ version-resolver:
 exclude-labels:
   - "skip-changelog"
 template: |
-  ## Changes
+  ## Release v$RESOLVED_VERSION (20YY/MM/DD)
 
   $CHANGES
