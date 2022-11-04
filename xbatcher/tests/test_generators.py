@@ -41,10 +41,10 @@ def test_constructor_dataarray():
     assert bg.ds.equals(da)
 
 
-@pytest.mark.parametrize("bsize", [5, 6])
-def test_batcher_lenth(sample_ds_1d, bsize):
-    bg = BatchGenerator(sample_ds_1d, input_dims={"x": bsize})
-    assert len(bg) == sample_ds_1d.dims["x"] // bsize
+@pytest.mark.parametrize("input_size", [5, 6])
+def test_batcher_length(sample_ds_1d, input_size):
+    bg = BatchGenerator(sample_ds_1d, input_dims={"x": input_size})
+    assert len(bg) == sample_ds_1d.dims["x"] // input_size
 
 
 def test_batcher_getitem(sample_ds_1d):
@@ -63,83 +63,85 @@ def test_batcher_getitem(sample_ds_1d):
         bg[[1, 2, 3]]
 
 
-# TODO: decide how to handle bsizes like 15 that don't evenly divide the dimension
-# Should we enforce that each batch size always has to be the same
-@pytest.mark.parametrize("bsize", [5, 10])
-def test_batch_1d(sample_ds_1d, bsize):
-    bg = BatchGenerator(sample_ds_1d, input_dims={"x": bsize})
+@pytest.mark.parametrize("input_size", [5, 10])
+def test_batch_1d(sample_ds_1d, input_size):
+    bg = BatchGenerator(sample_ds_1d, input_dims={"x": input_size})
     for n, ds_batch in enumerate(bg):
         assert isinstance(ds_batch, xr.Dataset)
         # TODO: maybe relax this? see comment above
-        assert ds_batch.dims["x"] == bsize
-        expected_slice = slice(bsize * n, bsize * (n + 1))
+        assert ds_batch.dims["x"] == input_size
+        expected_slice = slice(input_size * n, input_size * (n + 1))
         ds_batch_expected = sample_ds_1d.isel(x=expected_slice)
         assert ds_batch.equals(ds_batch_expected)
 
 
-@pytest.mark.parametrize("bsize", [5, 10])
-def test_batch_1d_concat(sample_ds_1d, bsize):
-    bg = BatchGenerator(sample_ds_1d, input_dims={"x": bsize}, concat_input_dims=True)
+@pytest.mark.parametrize("input_size", [5, 10])
+def test_batch_1d_concat(sample_ds_1d, input_size):
+    bg = BatchGenerator(
+        sample_ds_1d, input_dims={"x": input_size}, concat_input_dims=True
+    )
     for n, ds_batch in enumerate(bg):
         assert isinstance(ds_batch, xr.Dataset)
-        assert ds_batch.dims["x_input"] == bsize
-        assert ds_batch.dims["input_batch"] == sample_ds_1d.dims["x"] // bsize
+        assert ds_batch.dims["x_input"] == input_size
+        assert ds_batch.dims["input_batch"] == sample_ds_1d.dims["x"] // input_size
         assert "x" in ds_batch.coords
 
 
-@pytest.mark.parametrize("bsize", [5, 10])
-def test_batch_1d_no_coordinate(sample_ds_1d, bsize):
+@pytest.mark.parametrize("input_size", [5, 10])
+def test_batch_1d_no_coordinate(sample_ds_1d, input_size):
     # fix for #3
     ds_dropped = sample_ds_1d.drop_vars("x")
-    bg = BatchGenerator(ds_dropped, input_dims={"x": bsize})
+    bg = BatchGenerator(ds_dropped, input_dims={"x": input_size})
     for n, ds_batch in enumerate(bg):
         assert isinstance(ds_batch, xr.Dataset)
-        assert ds_batch.dims["x"] == bsize
-        expected_slice = slice(bsize * n, bsize * (n + 1))
+        assert ds_batch.dims["x"] == input_size
+        expected_slice = slice(input_size * n, input_size * (n + 1))
         ds_batch_expected = ds_dropped.isel(x=expected_slice)
         assert ds_batch.equals(ds_batch_expected)
 
 
-@pytest.mark.parametrize("bsize", [5, 10])
-def test_batch_1d_concat_no_coordinate(sample_ds_1d, bsize):
+@pytest.mark.parametrize("input_size", [5, 10])
+def test_batch_1d_concat_no_coordinate(sample_ds_1d, input_size):
     # test for #3
     ds_dropped = sample_ds_1d.drop_vars("x")
-    bg = BatchGenerator(ds_dropped, input_dims={"x": bsize}, concat_input_dims=True)
+    bg = BatchGenerator(
+        ds_dropped, input_dims={"x": input_size}, concat_input_dims=True
+    )
     for n, ds_batch in enumerate(bg):
         assert isinstance(ds_batch, xr.Dataset)
-        assert ds_batch.dims["x_input"] == bsize
-        assert ds_batch.dims["input_batch"] == sample_ds_1d.dims["x"] // bsize
+        assert ds_batch.dims["x_input"] == input_size
+        assert ds_batch.dims["input_batch"] == sample_ds_1d.dims["x"] // input_size
         assert "x" not in ds_batch.coords
 
 
-@pytest.mark.parametrize("olap", [1, 4])
-def test_batch_1d_overlap(sample_ds_1d, olap):
-    bsize = 10
+@pytest.mark.parametrize("input_overlap", [1, 4])
+def test_batch_1d_overlap(sample_ds_1d, input_overlap):
+    input_size = 10
     bg = BatchGenerator(
-        sample_ds_1d, input_dims={"x": bsize}, input_overlap={"x": olap}
+        sample_ds_1d, input_dims={"x": input_size}, input_overlap={"x": input_overlap}
     )
-    stride = bsize - olap
+    stride = input_size - input_overlap
     for n, ds_batch in enumerate(bg):
         assert isinstance(ds_batch, xr.Dataset)
-        assert ds_batch.dims["x"] == bsize
-        expected_slice = slice(stride * n, stride * n + bsize)
+        assert ds_batch.dims["x"] == input_size
+        expected_slice = slice(stride * n, stride * n + input_size)
         ds_batch_expected = sample_ds_1d.isel(x=expected_slice)
         assert ds_batch.equals(ds_batch_expected)
 
 
-@pytest.mark.parametrize("bsize", [5, 10])
-def test_batch_3d_1d_input(sample_ds_3d, bsize):
+@pytest.mark.parametrize("input_size", [5, 10])
+def test_batch_3d_1d_input(sample_ds_3d, input_size):
     # first do the iteration over just one dimension
-    bg = BatchGenerator(sample_ds_3d, input_dims={"x": bsize})
+    bg = BatchGenerator(sample_ds_3d, input_dims={"x": input_size})
     for n, ds_batch in enumerate(bg):
         assert isinstance(ds_batch, xr.Dataset)
-        assert ds_batch.dims["x"] == bsize
+        assert ds_batch.dims["x"] == input_size
         # time and y should be collapsed into batch dimension
         assert (
             ds_batch.dims["sample"]
             == sample_ds_3d.dims["y"] * sample_ds_3d.dims["time"]
         )
-        expected_slice = slice(bsize * n, bsize * (n + 1))
+        expected_slice = slice(input_size * n, input_size * (n + 1))
         ds_batch_expected = (
             sample_ds_3d.isel(x=expected_slice)
             .stack(sample=["time", "y"])
@@ -150,47 +152,48 @@ def test_batch_3d_1d_input(sample_ds_3d, bsize):
         assert ds_batch.equals(ds_batch_expected)
 
 
-@pytest.mark.parametrize("bsize", [5, 10])
-def test_batch_3d_2d_input(sample_ds_3d, bsize):
+@pytest.mark.parametrize("input_size", [5, 10])
+def test_batch_3d_2d_input(sample_ds_3d, input_size):
     # now iterate over both
-    xbsize = 20
-    bg = BatchGenerator(sample_ds_3d, input_dims={"y": bsize, "x": xbsize})
+    x_input_size = 20
+    bg = BatchGenerator(sample_ds_3d, input_dims={"y": input_size, "x": x_input_size})
     for n, ds_batch in enumerate(bg):
         assert isinstance(ds_batch, xr.Dataset)
-        assert ds_batch.dims["x"] == xbsize
-        assert ds_batch.dims["y"] == bsize
+        assert ds_batch.dims["x"] == x_input_size
+        assert ds_batch.dims["y"] == input_size
         yn, xn = np.unravel_index(
             n,
             (
-                (sample_ds_3d.dims["y"] // bsize),
-                (sample_ds_3d.dims["x"] // xbsize),
+                (sample_ds_3d.dims["y"] // input_size),
+                (sample_ds_3d.dims["x"] // x_input_size),
             ),
         )
-        expected_xslice = slice(xbsize * xn, xbsize * (xn + 1))
-        expected_yslice = slice(bsize * yn, bsize * (yn + 1))
+        expected_xslice = slice(x_input_size * xn, x_input_size * (xn + 1))
+        expected_yslice = slice(input_size * yn, input_size * (yn + 1))
         ds_batch_expected = sample_ds_3d.isel(x=expected_xslice, y=expected_yslice)
         xr.testing.assert_equal(ds_batch_expected, ds_batch)
     assert (n + 1) == (
-        (sample_ds_3d.dims["x"] // xbsize) * (sample_ds_3d.dims["y"] // bsize)
+        (sample_ds_3d.dims["x"] // x_input_size)
+        * (sample_ds_3d.dims["y"] // input_size)
     )
 
 
-@pytest.mark.parametrize("bsize", [5, 10])
-def test_batch_3d_2d_input_concat(sample_ds_3d, bsize):
+@pytest.mark.parametrize("input_size", [5, 10])
+def test_batch_3d_2d_input_concat(sample_ds_3d, input_size):
     # now iterate over both
-    xbsize = 20
+    x_input_size = 20
     bg = BatchGenerator(
         sample_ds_3d,
-        input_dims={"y": bsize, "x": xbsize},
+        input_dims={"y": input_size, "x": x_input_size},
         concat_input_dims=True,
     )
     for n, ds_batch in enumerate(bg):
         assert isinstance(ds_batch, xr.Dataset)
-        assert ds_batch.dims["x_input"] == xbsize
-        assert ds_batch.dims["y_input"] == bsize
+        assert ds_batch.dims["x_input"] == x_input_size
+        assert ds_batch.dims["y_input"] == input_size
         assert ds_batch.dims["sample"] == (
-            (sample_ds_3d.dims["x"] // xbsize)
-            * (sample_ds_3d.dims["y"] // bsize)
+            (sample_ds_3d.dims["x"] // x_input_size)
+            * (sample_ds_3d.dims["y"] // input_size)
             * sample_ds_3d.dims["time"]
         )
 
