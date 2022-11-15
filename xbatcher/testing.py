@@ -112,9 +112,7 @@ def get_batch_dimensions(generator):
     suffix = "_input" if generator.concat_input_dims else ""
     # input_dims stay the same, possibly with a new suffix
     expected_dims = {
-        f"{k}{suffix}": generator.input_dims.get(k)
-        for k in generator.ds.dims.keys()
-        if generator.input_dims.get(k) is not None
+        f"{k}{suffix}": generator.input_dims.get(k) for k in generator.input_dims.keys()
     }
     # Add a sample dimension if there's anything to get stacked
     if (
@@ -123,7 +121,10 @@ def get_batch_dimensions(generator):
         and not generator.batch_dims
     ):
         expected_dims = {**{"input_batch": expected_sample_length}, **expected_dims}
-    elif generator.concat_input_dims or len(non_specified_ds_dims) > 1:
+    elif (
+        generator.concat_input_dims
+        or (len(generator.ds.dims.items()) - len(generator.input_dims.items())) > 1
+    ):
         expected_dims = {**{"sample": expected_sample_length}, **expected_dims}
     else:
         expected_dims = {
@@ -153,6 +154,7 @@ def validate_batch_dimensions(*, expected_dims, batch):
     )
     # Check the dimension order is equal
     for var in batch.data_vars:
+        print(f"shape: {batch[var].shape}")
         TestCase().assertEqual(
             tuple(expected_dims.values()),
             batch[var].shape,
