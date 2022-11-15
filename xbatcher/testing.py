@@ -123,3 +123,69 @@ def validate_batch_dimensions(*, generator, batch):
             batch[var].shape,
             msg="Dimension orders differ",
         )
+
+
+def get_nbatches_from_input_dims(generator):
+    """
+    Calculate the number of batches expected due to arguments provided
+    to ``input_dims`` and ``input_overlap``
+
+    Parameters
+    ----------
+    generator : xbatcher.BatchGenerator
+        The batch generator object.
+
+    Returns
+    -------
+    s : float
+        Number of batches expected given ``input_dims`` and ``input_overlap``.
+    """
+    nbatches_from_input_nonoverlap = np.product(
+        [
+            generator.ds.dims[k] // generator.input_dims[k]
+            for k in generator.input_dims.keys()
+            if generator.input_overlap.get(k) is None
+        ]
+    )
+    if generator.input_overlap:
+        nbatches_from_input_overlap = np.product(
+            [
+                (generator.ds.dims[k] - generator.input_overlap[k])
+                // (generator.input_dims[k] - generator.input_overlap[k])
+                for k in generator.input_overlap
+            ]
+        )
+        return nbatches_from_input_overlap * nbatches_from_input_nonoverlap
+    else:
+        return nbatches_from_input_nonoverlap
+
+
+def validate_generator_length(generator):
+    """
+    Raises an AssertionError if the generator length does not match
+    expectations based on the input Dataset and ``input_dims``.
+
+    Parameters
+    ----------
+    generator : xbatcher.BatchGenerator
+        The batch generator object.
+    """
+    non_input_batch_dims = get_non_input_batch_dims(generator)
+    nbatches_from_non_input_batch_dims = np.product(
+        [
+            generator.ds.dims[k] // non_input_batch_dims[k]
+            for k in non_input_batch_dims.keys()
+        ]
+    )
+    if generator.concat_input_dims:
+        expected_length = int(nbatches_from_non_input_batch_dims)
+    else:
+        nbatches_from_input_dims = get_nbatches_from_input_dims(generator)
+        expected_length = int(
+            nbatches_from_non_input_batch_dims * nbatches_from_input_dims
+        )
+    TestCase().assertEqual(
+        expected_length,
+        len(generator),
+        msg="Batch generator length differs",
+    )
