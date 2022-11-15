@@ -246,3 +246,5 @@ Continuous integration is done with `GitHub Actions <https://docs.github.com/en/
 There is currently 1 workflow configured:
 
 - `main.yaml <https://github.com/xarray-contrib/xbatcher/blob/main/.github/workflows/main.yaml>`_ - Run test suite with pytest.
+- `pypi-release.yaml <https://github.com/xarray-contrib/xbatcher/blob/main/.github/workflows/pypi-release.yaml>`_ - Publish
+  wheels to TestPyPI and PyPI on a tagged release. The pull request trigger can be uncommented to test a release using Test PyPI.

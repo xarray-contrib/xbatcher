@@ -1,6 +1,12 @@
 from typing import Any, Callable, Optional, Tuple
 
-import torch
+try:
+    import torch
+except ImportError as exc:
+    raise ImportError(
+        "The Xbatcher PyTorch Dataset API depends on PyTorch. Please "
+        "install PyTorch to proceed."
+    ) from exc
 
 # Notes:
 # This module includes two PyTorch datasets.

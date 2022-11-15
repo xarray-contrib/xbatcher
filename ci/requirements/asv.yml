@@ -1,0 +1,14 @@
+name: xbatcher-benchmarks
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  # Required dependencies
+  - python=3.9
+  - dask
+  - numpy
+  - xarray
+  - pytorch
+  - tensorflow
+  # Xbatcher installation
+  - pip
