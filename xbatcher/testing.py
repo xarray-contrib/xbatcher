@@ -3,7 +3,7 @@ from unittest import TestCase
 import numpy as np
 
 
-def get_non_specified_dims(generator):
+def _nbatches_from_batch_dims(generator):
     """
     Return all dimensions that are in the input dataset but not ``input_dims``
     or ``batch_dims``.
@@ -26,7 +26,7 @@ def get_non_specified_dims(generator):
     }
 
 
-def get_non_input_batch_dims(generator):
+def _get_non_input_batch_dims(generator):
     """
     Return all dimensions that are in batch_dims but not input_dims.
 
@@ -48,7 +48,7 @@ def get_non_input_batch_dims(generator):
     }
 
 
-def get_sample_length(*, generator, non_specified_ds_dims, non_input_batch_dims):
+def _get_sample_length(*, generator, non_specified_ds_dims, non_input_batch_dims):
     """
     Return the expected length of the sample dimension.
 
@@ -97,10 +97,10 @@ def validate_batch_dimensions(*, generator, batch):
         The xarray data object returned by the batch generator.
     """
     # dimensions that are in the input dataset but not input_dims or batch_dims
-    non_specified_ds_dims = get_non_specified_dims(generator)
+    non_specified_ds_dims = _nbatches_from_batch_dims(generator)
     # dimensions that are in batch_dims but not input_dims
-    non_input_batch_dims = get_non_input_batch_dims(generator)
-    expected_sample_length = get_sample_length(
+    non_input_batch_dims = _get_non_input_batch_dims(generator)
+    expected_sample_length = _get_sample_length(
         generator=generator,
         non_specified_ds_dims=non_specified_ds_dims,
         non_input_batch_dims=non_input_batch_dims,
@@ -136,7 +136,7 @@ def validate_batch_dimensions(*, generator, batch):
         )
 
 
-def get_nbatches_from_input_dims(generator):
+def _get_nbatches_from_input_dims(generator):
     """
     Calculate the number of batches expected based on ``input_dims`` and
     ``input_overlap``.
@@ -181,7 +181,7 @@ def validate_generator_length(generator):
     generator : xbatcher.BatchGenerator
         The batch generator object.
     """
-    non_input_batch_dims = get_non_input_batch_dims(generator)
+    non_input_batch_dims = _get_non_input_batch_dims(generator)
     nbatches_from_batch_dims = np.product(
         [
             generator.ds.dims[k] // non_input_batch_dims[k]
@@ -191,7 +191,7 @@ def validate_generator_length(generator):
     if generator.concat_input_dims:
         expected_length = int(nbatches_from_batch_dims)
     else:
-        nbatches_from_input_dims = get_nbatches_from_input_dims(generator)
+        nbatches_from_input_dims = _get_nbatches_from_input_dims(generator)
         expected_length = int(nbatches_from_batch_dims * nbatches_from_input_dims)
     TestCase().assertEqual(
         expected_length,
