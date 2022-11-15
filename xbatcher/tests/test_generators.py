@@ -238,10 +238,6 @@ def test_batch_3d_2d_input(sample_ds_3d, input_size):
         ds_batch_expected = sample_ds_3d.isel(x=expected_xslice, y=expected_yslice)
         xr.testing.assert_identical(ds_batch_expected, ds_batch)
         validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
-    assert (n + 1) == (
-        (sample_ds_3d.dims["x"] // x_input_size)
-        * (sample_ds_3d.dims["y"] // input_size)
-    )
 
 
 @pytest.mark.parametrize("input_size", [5, 10])
