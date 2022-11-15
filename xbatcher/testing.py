@@ -117,16 +117,20 @@ def get_batch_dimensions(generator):
         if generator.input_dims.get(k) is not None
     }
     # Add a sample dimension if there's anything to get stacked
-    if generator.concat_input_dims and len(non_specified_ds_dims) < 1:
-        expected_dims = {**{"input_batch": expected_sample_length}, **expected_dims}
-    elif (
+    if (
         generator.concat_input_dims
-        or generator.batch_dims
-        or len(non_specified_ds_dims) > 1
+        and len(non_specified_ds_dims) < 1
+        and not generator.batch_dims
     ):
+        expected_dims = {**{"input_batch": expected_sample_length}, **expected_dims}
+    elif generator.concat_input_dims or len(non_specified_ds_dims) > 1:
         expected_dims = {**{"sample": expected_sample_length}, **expected_dims}
     else:
-        expected_dims = {**non_specified_ds_dims, **expected_dims}
+        expected_dims = {
+            **non_specified_ds_dims,
+            **non_input_batch_dims,
+            **expected_dims,
+        }
     return expected_dims
 
 
