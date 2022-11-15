@@ -207,7 +207,10 @@ def test_batch_3d_1d_input_batch_dims(sample_ds_3d, concat):
     Test batch generation for a 3D dataset using ``input_dims`` and batch_dims``.
     """
     bg = BatchGenerator(
-        sample_ds_3d, input_dims={"x": 5}, batch_dims={"y": 5}, concat_input_dims=concat
+        sample_ds_3d,
+        input_dims={"x": 5, "y": 10},
+        batch_dims={"time": 2},
+        concat_input_dims=concat,
     )
     validate_generator_length(bg)
     expected_dims = get_batch_dimensions(bg)
