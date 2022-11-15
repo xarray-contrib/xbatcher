@@ -83,18 +83,22 @@ def _get_sample_length(*, generator, non_specified_ds_dims, non_input_batch_dims
     )
 
 
-def validate_batch_dimensions(*, generator, batch):
+def get_batch_dimensions(generator):
     """
-    Raises an AssertionError if the shape and dimensions of a batch are not
-    as expected based on the ``input_dims``, ``batch_dims``, and
-    ``concat_input_dims`` attributes of the batch generator.
+    Return the expected batch dimensions based on the ``input_dims``,
+    ``batch_dims``, and ``concat_input_dims`` attributes of the batch
+    generator.
 
     Parameters
     ----------
     generator : xbatcher.BatchGenerator
-        The batch generator object used to return the batch.
-    batch : xarray.Dataset or xarray.DataArray
-        The xarray data object returned by the batch generator.
+        The batch generator object.
+
+    Returns
+    -------
+    d : dict
+        Dict containing the expected dimensions for batches returned by the
+        batch generator.
     """
     # dimensions that are in the input dataset but not input_dims or batch_dims
     non_specified_ds_dims = _nbatches_from_batch_dims(generator)
@@ -123,6 +127,22 @@ def validate_batch_dimensions(*, generator, batch):
         expected_dims = {**{"sample": expected_sample_length}, **expected_dims}
     else:
         expected_dims = {**non_specified_ds_dims, **expected_dims}
+    return expected_dims
+
+
+def validate_batch_dimensions(*, expected_dims, batch):
+    """
+    Raises an AssertionError if the shape and dimensions of a batch do not
+    match expected_dims.
+
+    Parameters
+    ----------
+    expected_dims : Dict
+        Dict containing the expected dimensions for batches.
+    batch : xarray.Dataset or xarray.DataArray
+        The xarray data object returned by the batch generator.
+    """
+
     # Check the names and lengths of the dimensions are equal
     TestCase().assertDictEqual(
         expected_dims, batch.dims.mapping, msg="Dimension names and/or lengths differ"
