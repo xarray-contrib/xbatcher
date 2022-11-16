@@ -3,7 +3,7 @@ from unittest import TestCase
 import numpy as np
 
 
-def _nbatches_from_batch_dims(generator):
+def _get_non_specified_dims(generator):
     """
     Return all dimensions that are in the input dataset but not ``input_dims``
     or ``batch_dims``.
@@ -101,7 +101,7 @@ def get_batch_dimensions(generator):
         batch generator.
     """
     # dimensions that are in the input dataset but not input_dims or batch_dims
-    non_specified_ds_dims = _nbatches_from_batch_dims(generator)
+    non_specified_ds_dims = _get_non_specified_dims(generator)
     # dimensions that are in batch_dims but not input_dims
     non_input_batch_dims = _get_non_input_batch_dims(generator)
     expected_sample_length = _get_sample_length(
