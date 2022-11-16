@@ -5,10 +5,8 @@ channels:
 dependencies:
   - python=3.8
   - dask
-  - docrep
   - ipython
   - matplotlib
-  - nbsphinx
   - numpy
   - numpydoc
   - pangeo-sphinx-book-theme
@@ -17,6 +15,12 @@ dependencies:
   - sphinx-autosummary-accessors
   - sphinx-copybutton
   - xarray
+  # For examples
+  - adlfs
+  - ipykernel
+  - nbsphinx
+  - zarr
+  # Editable xbatcher installation
   - pip
   - pip:
       # relative to this file. Needs to be editable to be accepted.
