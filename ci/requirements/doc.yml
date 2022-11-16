@@ -8,6 +8,7 @@ dependencies:
   - ipython
   - matplotlib
   - numpy
+  - numpydoc
   - pangeo-sphinx-book-theme
   - pytest
   - sphinx
