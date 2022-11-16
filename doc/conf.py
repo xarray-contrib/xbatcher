@@ -54,7 +54,7 @@ extensions = [
     "sphinx_copybutton",
 ]
 
-# never execute notebooks: avoids lots of expensive imports on rtd
+# only execute notebooks without any outputs
 # https://nbsphinx.readthedocs.io/en/0.2.14/never-execute.html
 nbsphinx_execute = "auto"
 

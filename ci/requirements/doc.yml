@@ -17,8 +17,8 @@ dependencies:
   - xarray
   # For examples
   - adlfs
-  - nbsphinx
   - ipykernel
+  - nbsphinx
   - zarr
   # Editable xbatcher installation
   - pip
