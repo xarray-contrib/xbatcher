@@ -1,9 +1,13 @@
+from typing import Dict, Hashable, Union
 from unittest import TestCase
 
 import numpy as np
+import xarray as xr
+
+from .generators import BatchGenerator
 
 
-def _get_non_specified_dims(generator):
+def _get_non_specified_dims(generator: BatchGenerator) -> Dict[Hashable, int]:
     """
     Return all dimensions that are in the input dataset but not ``input_dims``
     or ``batch_dims``.
@@ -26,7 +30,7 @@ def _get_non_specified_dims(generator):
     }
 
 
-def _get_non_input_batch_dims(generator):
+def _get_non_input_batch_dims(generator: BatchGenerator) -> Dict[Hashable, int]:
     """
     Return all dimensions that are in batch_dims but not input_dims.
 
@@ -48,7 +52,12 @@ def _get_non_input_batch_dims(generator):
     }
 
 
-def _get_sample_length(*, generator, non_specified_ds_dims, non_input_batch_dims):
+def _get_sample_length(
+    *,
+    generator: BatchGenerator,
+    non_specified_ds_dims: Dict[Hashable, int],
+    non_input_batch_dims: Dict[Hashable, int],
+) -> int:
     """
     Return the expected length of the sample dimension.
 
@@ -83,7 +92,7 @@ def _get_sample_length(*, generator, non_specified_ds_dims, non_input_batch_dims
     )
 
 
-def get_batch_dimensions(generator):
+def get_batch_dimensions(generator: BatchGenerator) -> Dict[Hashable, int]:
     """
     Return the expected batch dimensions based on the ``input_dims``,
     ``batch_dims``, and ``concat_input_dims`` attributes of the batch
@@ -109,10 +118,10 @@ def get_batch_dimensions(generator):
         non_specified_ds_dims=non_specified_ds_dims,
         non_input_batch_dims=non_input_batch_dims,
     )
-    suffix = "_input" if generator.concat_input_dims else ""
     # input_dims stay the same, possibly with a new suffix
     expected_dims = {
-        f"{k}{suffix}": generator.input_dims.get(k) for k in generator.input_dims.keys()
+        f"{k}_input" if generator.concat_input_dims else k: v
+        for k, v in generator.input_dims.items()
     }
     # Add a sample dimension if there's anything to get stacked
     if (
@@ -135,7 +144,9 @@ def get_batch_dimensions(generator):
     return expected_dims
 
 
-def validate_batch_dimensions(*, expected_dims, batch):
+def validate_batch_dimensions(
+    *, expected_dims: Dict[Hashable, int], batch: Union[xr.Dataset, xr.DataArray]
+) -> None:
     """
     Raises an AssertionError if the shape and dimensions of a batch do not
     match expected_dims.
@@ -150,7 +161,7 @@ def validate_batch_dimensions(*, expected_dims, batch):
 
     # Check the names and lengths of the dimensions are equal
     TestCase().assertDictEqual(
-        expected_dims, batch.dims.mapping, msg="Dimension names and/or lengths differ"
+        expected_dims, batch.sizes.mapping, msg="Dimension names and/or lengths differ"
     )
     # Check the dimension order is equal
     for var in batch.data_vars:
@@ -162,7 +173,7 @@ def validate_batch_dimensions(*, expected_dims, batch):
         )
 
 
-def _get_nbatches_from_input_dims(generator):
+def _get_nbatches_from_input_dims(generator: BatchGenerator) -> int:
     """
     Calculate the number of batches expected based on ``input_dims`` and
     ``input_overlap``.
@@ -174,7 +185,7 @@ def _get_nbatches_from_input_dims(generator):
 
     Returns
     -------
-    s : float
+    s : int
         Number of batches expected given ``input_dims`` and ``input_overlap``.
     """
     nbatches_from_input_dims = np.product(
@@ -192,12 +203,12 @@ def _get_nbatches_from_input_dims(generator):
                 for k in generator.input_overlap
             ]
         )
-        return nbatches_from_input_overlap * nbatches_from_input_dims
+        return int(nbatches_from_input_overlap * nbatches_from_input_dims)
     else:
-        return nbatches_from_input_dims
+        return int(nbatches_from_input_dims)
 
 
-def validate_generator_length(generator):
+def validate_generator_length(generator: BatchGenerator) -> None:
     """
     Raises an AssertionError if the generator length does not match
     expectations based on the input Dataset and ``input_dims``.
