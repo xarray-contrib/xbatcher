@@ -126,13 +126,12 @@ def get_batch_dimensions(generator: BatchGenerator) -> Dict[Hashable, int]:
     # Add a sample dimension if there's anything to get stacked
     if (
         generator.concat_input_dims
-        and len(non_specified_ds_dims) < 1
-        and not generator.batch_dims
+        and (len(generator.ds.dims) - len(generator.input_dims)) == 0
     ):
         expected_dims = {**{"input_batch": expected_sample_length}, **expected_dims}
     elif (
         generator.concat_input_dims
-        or (len(generator.ds.dims.items()) - len(generator.input_dims.items())) > 1
+        or (len(generator.ds.dims) - len(generator.input_dims)) > 1
     ):
         expected_dims = {**{"sample": expected_sample_length}, **expected_dims}
     else:
