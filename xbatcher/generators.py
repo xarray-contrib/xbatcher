@@ -42,7 +42,7 @@ def _iterate_through_dataset(
         dim_slices.append(_slices(dimsize, size, olap))
 
     for slices in itertools.product(*dim_slices):
-        selector = {key: slice for key, slice in zip(dims, slices)}
+        selector = dict(zip(dims, slices))
         yield selector
 
 
@@ -188,7 +188,7 @@ class BatchGenerator:
             else:
                 batches += list(input_generator)
 
-        return dict(zip(range(len(batches)), batches))
+        return dict(enumerate(batches))
 
     def _iterate_batch_dims(self) -> Any:
         return _iterate_through_dataset(self.ds, self.batch_dims)
