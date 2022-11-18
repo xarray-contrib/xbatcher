@@ -25,7 +25,7 @@ def _get_non_specified_dims(generator: BatchGenerator) -> Dict[Hashable, int]:
     """
     return {
         k: v
-        for k, v in generator.ds.dims.items()
+        for k, v in generator.ds.sizes.items()
         if (generator.input_dims.get(k) is None and generator.batch_dims.get(k) is None)
     }
 
@@ -79,7 +79,7 @@ def _get_sample_length(
     """
     if generator.concat_input_dims:
         batch_concat_dims = [
-            generator.ds.dims.get(k)
+            generator.ds.sizes.get(k)
             // np.nanmax([v, generator.batch_dims.get(k, np.nan)])
             for k, v in generator.input_dims.items()
         ]
@@ -126,12 +126,12 @@ def get_batch_dimensions(generator: BatchGenerator) -> Dict[Hashable, int]:
     # Add a sample dimension if there's anything to get stacked
     if (
         generator.concat_input_dims
-        and (len(generator.ds.dims) - len(generator.input_dims)) == 0
+        and (len(generator.ds.sizes) - len(generator.input_dims)) == 0
     ):
         expected_dims = {**{"input_batch": expected_sample_length}, **expected_dims}
     elif (
         generator.concat_input_dims
-        or (len(generator.ds.dims) - len(generator.input_dims)) > 1
+        or (len(generator.ds.sizes) - len(generator.input_dims)) > 1
     ):
         expected_dims = {**{"sample": expected_sample_length}, **expected_dims}
     else:
@@ -189,7 +189,7 @@ def _get_nbatches_from_input_dims(generator: BatchGenerator) -> int:
     """
     nbatches_from_input_dims = np.product(
         [
-            generator.ds.dims[k] // generator.input_dims[k]
+            generator.ds.sizes[k] // generator.input_dims[k]
             for k in generator.input_dims.keys()
             if generator.input_overlap.get(k) is None
         ]
@@ -197,7 +197,7 @@ def _get_nbatches_from_input_dims(generator: BatchGenerator) -> int:
     if generator.input_overlap:
         nbatches_from_input_overlap = np.product(
             [
-                (generator.ds.dims[k] - generator.input_overlap[k])
+                (generator.ds.sizes[k] - generator.input_overlap[k])
                 // (generator.input_dims[k] - generator.input_overlap[k])
                 for k in generator.input_overlap
             ]
@@ -220,7 +220,7 @@ def validate_generator_length(generator: BatchGenerator) -> None:
     non_input_batch_dims = _get_non_input_batch_dims(generator)
     nbatches_from_batch_dims = np.product(
         [
-            generator.ds.dims[k] // non_input_batch_dims[k]
+            generator.ds.sizes[k] // non_input_batch_dims[k]
             for k in non_input_batch_dims.keys()
         ]
     )
