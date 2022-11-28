@@ -135,11 +135,11 @@ def get_batch_dimensions(generator: BatchGenerator) -> Dict[Hashable, int]:
     ):
         expected_dims = {**{"sample": expected_sample_length}, **expected_dims}
     else:
-        expected_dims = {
+        expected_dims = dict(
             **non_specified_ds_dims,
             **non_input_batch_dims,
             **expected_dims,
-        }
+        )
     return expected_dims
 
 
@@ -164,7 +164,6 @@ def validate_batch_dimensions(
     )
     # Check the dimension order is equal
     for var in batch.data_vars:
-        print(f"shape: {batch[var].shape}")
         TestCase().assertEqual(
             tuple(expected_dims.values()),
             batch[var].shape,
