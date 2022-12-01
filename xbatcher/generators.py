@@ -32,7 +32,7 @@ def _iterate_over_dimensions(
     for dim in dims:
         dim_size = ds.sizes[dim]
         slice_size = dims[dim]
-        olap = overlap.get(dim, 0)
+        slice_overlap = overlap.get(dim, 0)
         if slice_size > dim_size:
             raise ValueError(
                 "input sample length must be less than or equal to the "
@@ -41,7 +41,7 @@ def _iterate_over_dimensions(
                 f"for {dim}"
             )
         dim_slices.append(
-            _gen_slices(dim_size=dim_size, slice_size=slice_size, overlap=olap)
+            _gen_slices(dim_size=dim_size, slice_size=slice_size, overlap=slice_overlap)
         )
 
     for slices in itertools.product(*dim_slices):
