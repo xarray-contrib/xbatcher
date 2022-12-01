@@ -6,7 +6,7 @@ from typing import Any, Dict, Hashable, Iterator, List, OrderedDict, Sequence, U
 import xarray as xr
 
 
-def _slices(dimsize: int, size: int, overlap: int = 0) -> Any:
+def _gen_slices(dimsize: int, size: int, overlap: int = 0) -> Any:
     # return a list of slices to chop up a single dimension
     if overlap >= size:
         raise ValueError(
@@ -39,7 +39,7 @@ def _iterate_through_dataset(
                 f"is greater than the dimension length of {dimsize} "
                 f"for {dim}"
             )
-        dim_slices.append(_slices(dimsize, size, olap))
+        dim_slices.append(_gen_slices(dimsize, size, olap))
 
     for slices in itertools.product(*dim_slices):
         selector = dict(zip(dims, slices))
