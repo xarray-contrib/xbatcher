@@ -132,14 +132,16 @@ class BatchGenerator:
         self.batch_dims = dict(batch_dims)
         self.concat_input_dims = concat_input_dims
         self.preload_batch = preload_batch
-        self._batches: Dict[int, Any] = self._gen_batches()  # dict cache for batches
+        self._batch_selectors: Dict[
+            int, Any
+        ] = self._gen_batch_selectors()  # dict cache for batches
 
     def __iter__(self) -> Iterator[Union[xr.DataArray, xr.Dataset]]:
-        for idx in self._batches:
+        for idx in self._batch_selectors:
             yield self[idx]
 
     def __len__(self) -> int:
-        return len(self._batches)
+        return len(self._batch_selectors)
 
     def __getitem__(self, idx: int) -> Union[xr.Dataset, xr.DataArray]:
 
@@ -149,14 +151,14 @@ class BatchGenerator:
             )
 
         if idx < 0:
-            idx = list(self._batches)[idx]
+            idx = list(self._batch_selectors)[idx]
 
-        if idx in self._batches:
+        if idx in self._batch_selectors:
 
             if self.concat_input_dims:
                 new_dim_suffix = "_input"
                 all_dsets: List = []
-                for ds_input_select in self._batches[idx]:
+                for ds_input_select in self._batch_selectors[idx]:
                     all_dsets.append(
                         _drop_input_dims(
                             self.ds.isel(**ds_input_select),
@@ -170,12 +172,12 @@ class BatchGenerator:
             else:
 
                 return _maybe_stack_batch_dims(
-                    self.ds.isel(**self._batches[idx]), list(self.input_dims)
+                    self.ds.isel(**self._batch_selectors[idx]), list(self.input_dims)
                 )
         else:
             raise IndexError("list index out of range")
 
-    def _gen_batches(self) -> dict:
+    def _gen_batch_selectors(self) -> dict:
         # in the future, we will want to do the batch generation lazily
         # going the eager route for now is allowing me to fill out the loader api
         # but it is likely to perform poorly.
