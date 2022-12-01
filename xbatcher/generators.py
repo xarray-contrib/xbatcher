@@ -27,7 +27,7 @@ def _iterate_over_dimensions(
     *,
     dims: Dict[Hashable, int],
     overlap: Dict[Hashable, int] = {},
-) -> Any:
+) -> Iterator[Dict[Hashable, slice]]:
     dim_slices = []
     for dim in dims:
         dim_size = ds.sizes[dim]
@@ -43,7 +43,6 @@ def _iterate_over_dimensions(
         dim_slices.append(
             _gen_slices(dim_size=dim_size, slice_size=slice_size, overlap=slice_overlap)
         )
-
     for slices in itertools.product(*dim_slices):
         selector = dict(zip(dims, slices))
         yield selector
