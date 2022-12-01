@@ -1,7 +1,7 @@
 """Classes for iterating through xarray datarrays / datasets in batches."""
 
 import itertools
-from typing import Any, Dict, Hashable, Iterator, List, OrderedDict, Sequence, Union
+from typing import Any, Dict, Hashable, Iterator, List, Sequence, Union
 
 import xarray as xr
 
@@ -25,7 +25,7 @@ def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> Any:
 def _iterate_through_dataset(
     ds: Union[xr.Dataset, xr.DataArray],
     *,
-    dims: OrderedDict[Hashable, int],
+    dims: Dict[Hashable, int],
     overlap: Dict[Hashable, int] = {},
 ) -> Any:
     dim_slices = []
@@ -51,7 +51,7 @@ def _iterate_through_dataset(
 
 def _drop_input_dims(
     ds: Union[xr.Dataset, xr.DataArray],
-    input_dims: OrderedDict[Hashable, int],
+    input_dims: Dict[Hashable, int],
     suffix: str = "_input",
 ) -> Union[xr.Dataset, xr.DataArray]:
     # remove input_dims coordinates from datasets, rename the dimensions
@@ -127,10 +127,9 @@ class BatchGenerator:
     ):
 
         self.ds = ds
-        # should be a dict
-        self.input_dims = OrderedDict(input_dims)
+        self.input_dims = dict(input_dims)
         self.input_overlap = input_overlap
-        self.batch_dims = OrderedDict(batch_dims)
+        self.batch_dims = dict(batch_dims)
         self.concat_input_dims = concat_input_dims
         self.preload_batch = preload_batch
         self._batches: Dict[int, Any] = self._gen_batches()  # dict cache for batches
