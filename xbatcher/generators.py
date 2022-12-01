@@ -6,7 +6,7 @@ from typing import Any, Dict, Hashable, Iterator, List, Sequence, Union
 import xarray as xr
 
 
-def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> Any:
+def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> List[slice]:
     # return a list of slices to chop up a single dimension
     if overlap >= slice_size:
         raise ValueError(
