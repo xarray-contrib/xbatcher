@@ -166,10 +166,13 @@ class BatchGenerator:
                 new_dim_suffix = "_input"
                 all_dsets: List = []
                 batch_dims_selector, input_dims_selectors = self._batch_selectors[idx]
+                batch_ds = self.ds.isel(batch_dims_selector)
+                if self.preload_batch:
+                    batch_ds.load()
                 for selector in input_dims_selectors:
                     all_dsets.append(
                         _drop_input_dims(
-                            self.ds.isel(dict(**batch_dims_selector, **selector)),
+                            batch_ds.isel(dict(**selector)),
                             self.input_dims,
                             suffix=new_dim_suffix,
                         )
@@ -178,8 +181,11 @@ class BatchGenerator:
                 new_input_dims = [str(dim) + new_dim_suffix for dim in self.input_dims]
                 return _maybe_stack_batch_dims(dsc, new_input_dims)
             else:
+                batch_ds = self.ds.isel(self._batch_selectors[idx])
+                if self.preload_batch:
+                    batch_ds.load()
                 return _maybe_stack_batch_dims(
-                    self.ds.isel(self._batch_selectors[idx]),
+                    batch_ds,
                     list(self.input_dims),
                 )
         else:
