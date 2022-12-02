@@ -22,7 +22,7 @@ def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> List[sli
     return slices
 
 
-def _iterate_over_dimensions(
+def _iterate_through_dimensions(
     ds: Union[xr.Dataset, xr.DataArray],
     *,
     dims: Dict[Hashable, int],
@@ -194,9 +194,9 @@ class BatchGenerator:
         return dict(enumerate(batches))
 
     def _iterate_batch_dims(self) -> Any:
-        return _iterate_over_dimensions(self.ds, dims=self.batch_dims)
+        return _iterate_through_dimensions(self.ds, dims=self.batch_dims)
 
     def _iterate_input_dims(self) -> Any:
-        return _iterate_over_dimensions(
+        return _iterate_through_dimensions(
             self.ds, dims=self.input_dims, overlap=self.input_overlap
         )
