@@ -1,9 +1,17 @@
 """Classes for iterating through xarray datarrays / datasets in batches."""
 
 import itertools
-from typing import Any, Dict, Hashable, Iterator, List, Sequence, Union
+from typing import Any, Dict, Hashable, Iterator, List, Sequence, Tuple, Union
 
 import xarray as xr
+
+DimSelector = Dict[Hashable, slice]
+ConcatBatchSelector = Tuple[DimSelector, List[DimSelector]]
+BatchSelector = Union[
+    List[ConcatBatchSelector],
+    Iterator[DimSelector],
+]
+BatchSelectors = Union[Dict[int, ConcatBatchSelector], Dict[int, DimSelector]]
 
 
 def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> List[slice]:
@@ -157,10 +165,11 @@ class BatchGenerator:
             if self.concat_input_dims:
                 new_dim_suffix = "_input"
                 all_dsets: List = []
-                for ds_input_select in self._batch_selectors[idx]:
+                batch_dims_selector, input_dims_selectors = self._batch_selectors[idx]
+                for selector in input_dims_selectors:
                     all_dsets.append(
                         _drop_input_dims(
-                            self.ds.isel(**ds_input_select),
+                            self.ds.isel(dict(**batch_dims_selector, **selector)),
                             self.input_dims,
                             suffix=new_dim_suffix,
                         )
@@ -169,34 +178,37 @@ class BatchGenerator:
                 new_input_dims = [str(dim) + new_dim_suffix for dim in self.input_dims]
                 return _maybe_stack_batch_dims(dsc, new_input_dims)
             else:
-
                 return _maybe_stack_batch_dims(
-                    self.ds.isel(**self._batch_selectors[idx]), list(self.input_dims)
+                    self.ds.isel(self._batch_selectors[idx]),
+                    list(self.input_dims),
                 )
         else:
             raise IndexError("list index out of range")
 
-    def _gen_batch_selectors(self) -> dict:
-        # in the future, we will want to do the batch generation lazily
-        # going the eager route for now is allowing me to fill out the loader api
-        # but it is likely to perform poorly.
-        batches = []
-        for ds_batch_selector in self._iterate_batch_dims():
-            ds_batch = self.ds.isel(**ds_batch_selector)
-            if self.preload_batch:
-                ds_batch.load()
-            input_generator = self._iterate_input_dims()
-            if self.concat_input_dims:
-                batches.append(list(input_generator))
-            else:
-                batches += list(input_generator)
-
-        return dict(enumerate(batches))
-
-    def _iterate_batch_dims(self) -> Any:
-        return _iterate_over_dimensions(self.ds, dims=self.batch_dims)
-
-    def _iterate_input_dims(self) -> Any:
-        return _iterate_over_dimensions(
-            self.ds, dims=self.input_dims, overlap=self.input_overlap
-        )
+    def _gen_batch_selectors(
+        self,
+    ) -> BatchSelectors:
+        """
+        Create batch selectors dict, which can be used to create a batch
+        from an xarray data object.
+        """
+        if self.concat_input_dims:
+            batch_dim_selectors = _iterate_over_dimensions(
+                self.ds, dims=self.batch_dims
+            )
+            # TODO: Consider iterator protocol rather than copying to list
+            input_dim_selectors = list(
+                _iterate_over_dimensions(
+                    self.ds, dims=self.input_dims, overlap=self.input_overlap
+                )
+            )
+            batch_selectors: BatchSelector = [
+                (selector, input_dim_selectors) for selector in batch_dim_selectors
+            ]
+        else:
+            batch_selectors = _iterate_over_dimensions(
+                self.ds,
+                dims=dict(**self.batch_dims, **self.input_dims),
+                overlap=self.input_overlap,
+            )
+        return dict(enumerate(batch_selectors))
