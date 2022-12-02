@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Any, Union
 
 import xarray as xr
 
@@ -19,13 +19,13 @@ def _as_xarray_dataarray(xr_obj: Union[xr.Dataset, xr.DataArray]) -> xr.DataArra
 @xr.register_dataarray_accessor("batch")
 @xr.register_dataset_accessor("batch")
 class BatchAccessor:
-    def __init__(self, xarray_obj):
+    def __init__(self, xarray_obj: Union[xr.Dataset, xr.DataArray]):
         """
         Batch accessor returning a BatchGenerator object via the `generator method`
         """
         self._obj = xarray_obj
 
-    def generator(self, *args, **kwargs):
+    def generator(self, *args, **kwargs) -> BatchGenerator:
         """
         Return a BatchGenerator via the batch accessor
 
@@ -42,10 +42,10 @@ class BatchAccessor:
 @xr.register_dataarray_accessor("tf")
 @xr.register_dataset_accessor("tf")
 class TFAccessor:
-    def __init__(self, xarray_obj):
+    def __init__(self, xarray_obj: Union[xr.Dataset, xr.DataArray]):
         self._obj = xarray_obj
 
-    def to_tensor(self):
+    def to_tensor(self) -> Any:
         """Convert this DataArray to a tensorflow.Tensor"""
         import tensorflow as tf
 
@@ -57,10 +57,10 @@ class TFAccessor:
 @xr.register_dataarray_accessor("torch")
 @xr.register_dataset_accessor("torch")
 class TorchAccessor:
-    def __init__(self, xarray_obj):
+    def __init__(self, xarray_obj: Union[xr.Dataset, xr.DataArray]):
         self._obj = xarray_obj
 
-    def to_tensor(self):
+    def to_tensor(self) -> Any:
         """Convert this DataArray to a torch.Tensor"""
         import torch
 
@@ -68,7 +68,7 @@ class TorchAccessor:
 
         return torch.tensor(data=dataarray.data)
 
-    def to_named_tensor(self):
+    def to_named_tensor(self) -> Any:
         """
         Convert this DataArray to a torch.Tensor with named dimensions.
 
