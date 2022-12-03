@@ -1,46 +1,48 @@
 """Classes for iterating through xarray datarrays / datasets in batches."""
 
 import itertools
-from typing import Any, Dict, Hashable, Iterator, List, OrderedDict, Sequence, Union
+from typing import Any, Dict, Hashable, Iterator, List, Sequence, Union
 
 import xarray as xr
 
 
-def _slices(dimsize: int, size: int, overlap: int = 0) -> Any:
+def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> List[slice]:
     # return a list of slices to chop up a single dimension
-    if overlap >= size:
+    if overlap >= slice_size:
         raise ValueError(
             "input overlap must be less than the input sample length, but "
-            f"the input sample length is {size} and the overlap is {overlap}"
+            f"the input sample length is {slice_size} and the overlap is {overlap}"
         )
     slices = []
-    stride = size - overlap
-    for start in range(0, dimsize, stride):
-        end = start + size
-        if end <= dimsize:
+    stride = slice_size - overlap
+    for start in range(0, dim_size, stride):
+        end = start + slice_size
+        if end <= dim_size:
             slices.append(slice(start, end))
     return slices
 
 
-def _iterate_through_dataset(
+def _iterate_through_dimensions(
     ds: Union[xr.Dataset, xr.DataArray],
-    dims: OrderedDict[Hashable, int],
+    *,
+    dims: Dict[Hashable, int],
     overlap: Dict[Hashable, int] = {},
-) -> Any:
+) -> Iterator[Dict[Hashable, slice]]:
     dim_slices = []
     for dim in dims:
-        dimsize = ds.sizes[dim]
-        size = dims[dim]
-        olap = overlap.get(dim, 0)
-        if size > dimsize:
+        dim_size = ds.sizes[dim]
+        slice_size = dims[dim]
+        slice_overlap = overlap.get(dim, 0)
+        if slice_size > dim_size:
             raise ValueError(
                 "input sample length must be less than or equal to the "
-                f"dimension length, but the sample length of {size} "
-                f"is greater than the dimension length of {dimsize} "
+                f"dimension length, but the sample length of {slice_size} "
+                f"is greater than the dimension length of {dim_size} "
                 f"for {dim}"
             )
-        dim_slices.append(_slices(dimsize, size, olap))
-
+        dim_slices.append(
+            _gen_slices(dim_size=dim_size, slice_size=slice_size, overlap=slice_overlap)
+        )
     for slices in itertools.product(*dim_slices):
         selector = dict(zip(dims, slices))
         yield selector
@@ -48,7 +50,7 @@ def _iterate_through_dataset(
 
 def _drop_input_dims(
     ds: Union[xr.Dataset, xr.DataArray],
-    input_dims: OrderedDict[Hashable, int],
+    input_dims: Dict[Hashable, int],
     suffix: str = "_input",
 ) -> Union[xr.Dataset, xr.DataArray]:
     # remove input_dims coordinates from datasets, rename the dimensions
@@ -124,20 +126,21 @@ class BatchGenerator:
     ):
 
         self.ds = ds
-        # should be a dict
-        self.input_dims = OrderedDict(input_dims)
+        self.input_dims = dict(input_dims)
         self.input_overlap = input_overlap
-        self.batch_dims = OrderedDict(batch_dims)
+        self.batch_dims = dict(batch_dims)
         self.concat_input_dims = concat_input_dims
         self.preload_batch = preload_batch
-        self._batches: Dict[int, Any] = self._gen_batches()  # dict cache for batches
+        self._batch_selectors: Dict[
+            int, Any
+        ] = self._gen_batch_selectors()  # dict cache for batches
 
     def __iter__(self) -> Iterator[Union[xr.DataArray, xr.Dataset]]:
-        for idx in self._batches:
+        for idx in self._batch_selectors:
             yield self[idx]
 
     def __len__(self) -> int:
-        return len(self._batches)
+        return len(self._batch_selectors)
 
     def __getitem__(self, idx: int) -> Union[xr.Dataset, xr.DataArray]:
 
@@ -147,14 +150,14 @@ class BatchGenerator:
             )
 
         if idx < 0:
-            idx = list(self._batches)[idx]
+            idx = list(self._batch_selectors)[idx]
 
-        if idx in self._batches:
+        if idx in self._batch_selectors:
 
             if self.concat_input_dims:
                 new_dim_suffix = "_input"
                 all_dsets: List = []
-                for ds_input_select in self._batches[idx]:
+                for ds_input_select in self._batch_selectors[idx]:
                     all_dsets.append(
                         _drop_input_dims(
                             self.ds.isel(**ds_input_select),
@@ -168,12 +171,12 @@ class BatchGenerator:
             else:
 
                 return _maybe_stack_batch_dims(
-                    self.ds.isel(**self._batches[idx]), list(self.input_dims)
+                    self.ds.isel(**self._batch_selectors[idx]), list(self.input_dims)
                 )
         else:
             raise IndexError("list index out of range")
 
-    def _gen_batches(self) -> dict:
+    def _gen_batch_selectors(self) -> dict:
         # in the future, we will want to do the batch generation lazily
         # going the eager route for now is allowing me to fill out the loader api
         # but it is likely to perform poorly.
@@ -191,7 +194,9 @@ class BatchGenerator:
         return dict(enumerate(batches))
 
     def _iterate_batch_dims(self) -> Any:
-        return _iterate_through_dataset(self.ds, self.batch_dims)
+        return _iterate_through_dimensions(self.ds, dims=self.batch_dims)
 
     def _iterate_input_dims(self) -> Any:
-        return _iterate_through_dataset(self.ds, self.input_dims, self.input_overlap)
+        return _iterate_through_dimensions(
+            self.ds, dims=self.input_dims, overlap=self.input_overlap
+        )
