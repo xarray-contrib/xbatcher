@@ -30,7 +30,7 @@ def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> List[sli
     return slices
 
 
-def _iterate_over_dimensions(
+def _iterate_through_dimensions(
     ds: Union[xr.Dataset, xr.DataArray],
     *,
     dims: Dict[Hashable, int],
@@ -199,12 +199,12 @@ class BatchGenerator:
         from an xarray data object.
         """
         if self.concat_input_dims:
-            batch_dim_selectors = _iterate_over_dimensions(
+            batch_dim_selectors = _iterate_through_dimensions(
                 self.ds, dims=self.batch_dims
             )
             # TODO: Consider iterator protocol rather than copying to list
             input_dim_selectors = list(
-                _iterate_over_dimensions(
+                _iterate_through_dimensions(
                     self.ds, dims=self.input_dims, overlap=self.input_overlap
                 )
             )
@@ -212,7 +212,7 @@ class BatchGenerator:
                 (selector, input_dim_selectors) for selector in batch_dim_selectors
             ]
         else:
-            batch_selectors = _iterate_over_dimensions(
+            batch_selectors = _iterate_through_dimensions(
                 self.ds,
                 dims=dict(**self.batch_dims, **self.input_dims),
                 overlap=self.input_overlap,
