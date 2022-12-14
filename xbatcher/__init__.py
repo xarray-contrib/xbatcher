@@ -3,7 +3,7 @@ from importlib.metadata import version as _version
 
 from . import testing  # noqa: F401
 from .accessors import BatchAccessor  # noqa: F401
-from .generators import BatchGenerator  # noqa: F401
+from .generators import BatchGenerator, BatchSchema  # noqa: F401
 from .util.print_versions import show_versions  # noqa: F401
 
 try:
