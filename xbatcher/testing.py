@@ -24,9 +24,10 @@ def _get_non_specified_dims(generator: BatchGenerator) -> Dict[Hashable, int]:
         in the input_dims or batch_dims attributes of the batch generator.
     """
     return {
-        k: v
-        for k, v in generator.ds.sizes.items()
-        if (generator.input_dims.get(k) is None and generator.batch_dims.get(k) is None)
+        dim: length
+        for dim, length in generator.ds.sizes.items()
+        if generator.input_dims.get(dim) is None
+        and generator.batch_dims.get(dim) is None
     }
 
 
@@ -46,9 +47,31 @@ def _get_non_input_batch_dims(generator: BatchGenerator) -> Dict[Hashable, int]:
         not also in input_dims
     """
     return {
-        k: v
-        for k, v in generator.batch_dims.items()
-        if (generator.input_dims.get(k) is None)
+        dim: length
+        for dim, length in generator.batch_dims.items()
+        if generator.input_dims.get(dim) is None
+    }
+
+
+def _get_duplicate_batch_dims(generator: BatchGenerator) -> Dict[Hashable, int]:
+    """
+    Return all dimensions that are in batch_dims as well as input_dims.
+
+    Parameters
+    ----------
+    generator : xbatcher.BatchGenerator
+        The batch generator object.
+
+    Returns
+    -------
+    d : dict
+        Dict containing all dimensions in specified in batch_dims that are
+        not also in input_dims
+    """
+    return {
+        dim: length
+        for dim, length in generator.batch_dims.items()
+        if generator.input_dims.get(dim) is not None
     }
 
 
@@ -188,17 +211,18 @@ def _get_nbatches_from_input_dims(generator: BatchGenerator) -> int:
     """
     nbatches_from_input_dims = np.product(
         [
-            generator.ds.sizes[k] // generator.input_dims[k]
-            for k in generator.input_dims.keys()
-            if generator.input_overlap.get(k) is None
+            generator.ds.sizes[dim] // length
+            for dim, length in generator.input_dims.items()
+            if generator.input_overlap.get(dim) is None
+            and generator.batch_dims.get(dim) is None
         ]
     )
     if generator.input_overlap:
         nbatches_from_input_overlap = np.product(
             [
-                (generator.ds.sizes[k] - generator.input_overlap[k])
-                // (generator.input_dims[k] - generator.input_overlap[k])
-                for k in generator.input_overlap
+                (generator.ds.sizes[dim] - overlap)
+                // (generator.input_dims[dim] - overlap)
+                for dim, overlap in generator.input_overlap.items()
             ]
         )
         return int(nbatches_from_input_overlap * nbatches_from_input_dims)
@@ -217,17 +241,30 @@ def validate_generator_length(generator: BatchGenerator) -> None:
         The batch generator object.
     """
     non_input_batch_dims = _get_non_input_batch_dims(generator)
-    nbatches_from_batch_dims = np.product(
+    duplicate_batch_dims = _get_duplicate_batch_dims(generator)
+    nbatches_from_unique_batch_dims = np.product(
         [
-            generator.ds.sizes[k] // non_input_batch_dims[k]
-            for k in non_input_batch_dims.keys()
+            generator.ds.sizes[dim] // length
+            for dim, length in non_input_batch_dims.items()
+        ]
+    )
+    nbatches_from_duplicate_batch_dims = np.product(
+        [
+            generator.ds.sizes[dim] // length
+            for dim, length in duplicate_batch_dims.items()
         ]
     )
     if generator.concat_input_dims:
-        expected_length = int(nbatches_from_batch_dims)
+        expected_length = int(
+            nbatches_from_unique_batch_dims * nbatches_from_duplicate_batch_dims
+        )
     else:
         nbatches_from_input_dims = _get_nbatches_from_input_dims(generator)
-        expected_length = int(nbatches_from_batch_dims * nbatches_from_input_dims)
+        expected_length = int(
+            nbatches_from_unique_batch_dims
+            * nbatches_from_duplicate_batch_dims
+            * nbatches_from_input_dims
+        )
     TestCase().assertEqual(
         expected_length,
         len(generator),
