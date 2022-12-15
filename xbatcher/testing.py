@@ -55,7 +55,7 @@ def _get_non_input_batch_dims(generator: BatchGenerator) -> Dict[Hashable, int]:
 
 def _get_duplicate_batch_dims(generator: BatchGenerator) -> Dict[Hashable, int]:
     """
-    Return all dimensions that are in batch_dims as well as input_dims.
+    Return all dimensions that are in both batch_dims and input_dims.
 
     Parameters
     ----------
@@ -65,8 +65,7 @@ def _get_duplicate_batch_dims(generator: BatchGenerator) -> Dict[Hashable, int]:
     Returns
     -------
     d : dict
-        Dict containing all dimensions in specified in batch_dims that are
-        not also in input_dims
+        Dict containing all dimensions duplicated between batch_dims and input_dims.
     """
     return {
         dim: length
