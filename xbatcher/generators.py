@@ -135,7 +135,6 @@ class BatchSchema:
                     patch_selectors, key=itemgetter(*self.batch_dims)
                 )
             ]
-        # Group patches based on the unique dimensions in ``batch_dims``
         return batch_selectors
 
 
