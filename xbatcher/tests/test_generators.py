@@ -125,7 +125,7 @@ def test_batch_1d_concat_duplicate_dim(sample_ds_1d):
     )
     validate_generator_length(bg)
     expected_dims = get_batch_dimensions(bg)
-    for n, ds_batch in enumerate(bg):
+    for ds_batch in bg:
         assert isinstance(ds_batch, xr.Dataset)
         validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
 
