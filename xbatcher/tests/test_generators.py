@@ -109,10 +109,28 @@ def test_batch_1d_concat(sample_ds_1d, input_size):
     )
     validate_generator_length(bg)
     expected_dims = get_batch_dimensions(bg)
-    for n, ds_batch in enumerate(bg):
+    for ds_batch in bg:
         assert isinstance(ds_batch, xr.Dataset)
         validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
         assert "x" in ds_batch.coords
+
+
+@pytest.mark.xfail(
+    reason="Bug described in https://github.com/xarray-contrib/xbatcher/issues/131"
+)
+def test_batch_1d_concat_duplicate_dim(sample_ds_1d):
+    """
+    Test batch generation for a 1D dataset using ``concat_input_dims`` when
+    the same dimension occurs in ``input_dims`` and `batch_dims``
+    """
+    bg = BatchGenerator(
+        sample_ds_1d, input_dims={"x": 5}, batch_dims={"x": 10}, concat_input_dims=True
+    )
+    validate_generator_length(bg)
+    expected_dims = get_batch_dimensions(bg)
+    for ds_batch in bg:
+        assert isinstance(ds_batch, xr.Dataset)
+        validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
 
 
 @pytest.mark.parametrize("input_size", [5, 10])
@@ -148,7 +166,7 @@ def test_batch_1d_concat_no_coordinate(sample_ds_1d, input_size):
     )
     validate_generator_length(bg)
     expected_dims = get_batch_dimensions(bg)
-    for n, ds_batch in enumerate(bg):
+    for ds_batch in bg:
         assert isinstance(ds_batch, xr.Dataset)
         validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
         assert "x" not in ds_batch.coords
@@ -201,6 +219,9 @@ def test_batch_3d_1d_input(sample_ds_3d, input_size):
         validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
 
 
+@pytest.mark.xfail(
+    reason="Bug described in https://github.com/xarray-contrib/xbatcher/issues/131"
+)
 @pytest.mark.parametrize("concat", [True, False])
 def test_batch_3d_1d_input_batch_dims(sample_ds_3d, concat):
     """
@@ -211,6 +232,26 @@ def test_batch_3d_1d_input_batch_dims(sample_ds_3d, concat):
         input_dims={"x": 5, "y": 10},
         batch_dims={"time": 2},
         concat_input_dims=concat,
+    )
+    validate_generator_length(bg)
+    expected_dims = get_batch_dimensions(bg)
+    for ds_batch in bg:
+        validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
+
+
+@pytest.mark.xfail(
+    reason="Bug described in https://github.com/xarray-contrib/xbatcher/issues/131"
+)
+def test_batch_3d_1d_input_batch_concat_duplicate_dim(sample_ds_3d):
+    """
+    Test batch generation for a 3D dataset using ``concat_input_dims`` when
+    the same dimension occurs in ``input_dims`` and batch_dims``.
+    """
+    bg = BatchGenerator(
+        sample_ds_3d,
+        input_dims={"x": 5, "y": 10},
+        batch_dims={"x": 10, "y": 20},
+        concat_input_dims=True,
     )
     validate_generator_length(bg)
     expected_dims = get_batch_dimensions(bg)
@@ -257,7 +298,7 @@ def test_batch_3d_2d_input_concat(sample_ds_3d, input_size):
     )
     validate_generator_length(bg)
     expected_dims = get_batch_dimensions(bg)
-    for n, ds_batch in enumerate(bg):
+    for ds_batch in bg:
         assert isinstance(ds_batch, xr.Dataset)
         validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
 
@@ -268,7 +309,7 @@ def test_batch_3d_2d_input_concat(sample_ds_3d, input_size):
     )
     validate_generator_length(bg)
     expected_dims = get_batch_dimensions(bg)
-    for n, ds_batch in enumerate(bg):
+    for ds_batch in bg:
         assert isinstance(ds_batch, xr.Dataset)
         validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
 
