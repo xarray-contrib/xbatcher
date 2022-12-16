@@ -114,7 +114,7 @@ def test_batch_1d_concat(sample_ds_1d, input_size):
         validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
         assert "x" in ds_batch.coords
 
-
+@pytest.mark.xfail
 def test_batch_1d_concat_duplicate_dim(sample_ds_1d):
     """
     Test batch generation for a 1D dataset using ``concat_input_dims`` when
