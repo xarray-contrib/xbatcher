@@ -109,7 +109,7 @@ def test_batch_1d_concat(sample_ds_1d, input_size):
     )
     validate_generator_length(bg)
     expected_dims = get_batch_dimensions(bg)
-    for n, ds_batch in enumerate(bg):
+    for ds_batch in bg:
         assert isinstance(ds_batch, xr.Dataset)
         validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
         assert "x" in ds_batch.coords
@@ -163,7 +163,7 @@ def test_batch_1d_concat_no_coordinate(sample_ds_1d, input_size):
     )
     validate_generator_length(bg)
     expected_dims = get_batch_dimensions(bg)
-    for n, ds_batch in enumerate(bg):
+    for ds_batch in bg:
         assert isinstance(ds_batch, xr.Dataset)
         validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
         assert "x" not in ds_batch.coords
@@ -289,7 +289,7 @@ def test_batch_3d_2d_input_concat(sample_ds_3d, input_size):
     )
     validate_generator_length(bg)
     expected_dims = get_batch_dimensions(bg)
-    for n, ds_batch in enumerate(bg):
+    for ds_batch in bg:
         assert isinstance(ds_batch, xr.Dataset)
         validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
 
@@ -300,7 +300,7 @@ def test_batch_3d_2d_input_concat(sample_ds_3d, input_size):
     )
     validate_generator_length(bg)
     expected_dims = get_batch_dimensions(bg)
-    for n, ds_batch in enumerate(bg):
+    for ds_batch in bg:
         assert isinstance(ds_batch, xr.Dataset)
         validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
 
