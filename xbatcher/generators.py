@@ -3,10 +3,12 @@
 import itertools
 from dataclasses import dataclass
 from operator import itemgetter
-from typing import Dict, Hashable, Iterator, List, Sequence, Union
+from typing import Any, Dict, Hashable, Iterator, List, Sequence, Union
 
+import numpy as np
 import xarray as xr
 
+PatchGenerator = Iterator[Dict[Hashable, slice]]
 BatchSelector = List[Dict[Hashable, slice]]
 BatchSelectorSet = Dict[int, BatchSelector]
 
@@ -66,32 +68,42 @@ class BatchSchema:
         self.preload_batch = preload_batch
         self.selectors: BatchSelectorSet = self._gen_batch_selectors(ds)
 
-    def _gen_batch_selectors(self, ds) -> BatchSelectorSet:
+    def _gen_batch_selectors(
+        self, ds: Union[xr.DataArray, xr.Dataset]
+    ) -> BatchSelectorSet:
         """
         Create batch selectors dict, which can be used to create a batch
         from an xarray data object.
         """
         # Separate batch_dims that are/are not also included in input_dims
-        self._duplicate_batch_dims = {
+        self._duplicate_batch_dims: Dict[Hashable, int] = {
             dim: length
             for dim, length in self.batch_dims.items()
             if self.input_dims.get(dim) is not None
         }
-        self._unique_batch_dims = {
+        self._unique_batch_dims: Dict[Hashable, int] = {
             dim: length
             for dim, length in self.batch_dims.items()
             if self.input_dims.get(dim) is None
         }
+        self._input_stride: Dict[Hashable, int] = {
+            dim: length - self.input_overlap.get(dim, 0)
+            for dim, length in self.input_dims.items()
+        }
+        self._all_sliced_dims: Dict[Hashable, int] = dict(
+            **self._unique_batch_dims, **self.input_dims
+        )
         # Create an iterator that returns an object usable for .isel in xarray
         patch_selectors = self._gen_patch_selectors(ds)
         # Create the Dict containing batch selectors
         if self.concat_input_dims:  # Combine the patches into batches
-            batch_selectors = self._combine_patches_into_batch(ds, patch_selectors)
-            return dict(enumerate(batch_selectors))
+            return self._combine_patches_into_batch(ds, patch_selectors)
         else:  # Each patch gets its own batch
             return {ind: [value] for ind, value in enumerate(patch_selectors)}
 
-    def _gen_patch_selectors(self, ds) -> Iterator[Dict[Hashable, slice]]:
+    def _gen_patch_selectors(
+        self, ds: Union[xr.DataArray, xr.Dataset]
+    ) -> PatchGenerator:
         """
         Create an iterator that can be used to index an Xarray Dataset/DataArray.
         """
@@ -106,14 +118,14 @@ class BatchSchema:
         # Generate the slices by iterating over batch_dims and input_dims
         all_slices = _iterate_through_dimensions(
             ds,
-            dims=dict(**self._unique_batch_dims, **self.input_dims),
+            dims=self._all_sliced_dims,
             overlap=self.input_overlap,
         )
         return all_slices
 
     def _combine_patches_into_batch(
-        self, ds, patch_selectors
-    ) -> List[List[Dict[Hashable, slice]]]:
+        self, ds: Union[xr.DataArray, xr.Dataset], patch_selectors: PatchGenerator
+    ) -> BatchSelectorSet:
         """
         Combine the patch selectors to form a batch
         """
@@ -122,19 +134,90 @@ class BatchSchema:
             raise AssertionError(
                 "Patches should only be combined into batches when ``concat_input_dims`` is ``True``"
             )
-        # If ``batch_dims`` isn't used, all patches will be included in a single batch
         if not self.batch_dims:
-            batch_selectors = [list(patch_selectors)]
+            return self._combine_patches_into_one_batch(patch_selectors)
         elif self._duplicate_batch_dims:
-            raise NotImplementedError("Not Implemented")
-        # Group patches based on the unique slices for dimensions in ``batch_dims``
+            return self._combine_patches_grouped_by_input_and_batch_dims(
+                ds=ds, patch_selectors=patch_selectors
+            )
         else:
-            batch_selectors = [
-                list(value)
-                for _, value in itertools.groupby(
-                    patch_selectors, key=itemgetter(*self.batch_dims)
-                )
-            ]
+            return self._combine_patches_grouped_by_batch_dims(patch_selectors)
+
+    def _combine_patches_into_one_batch(
+        self, patch_selectors: PatchGenerator
+    ) -> BatchSelectorSet:
+        """
+        Group all patches into a single batch
+        """
+        return dict(enumerate([list(patch_selectors)]))
+
+    def _combine_patches_grouped_by_batch_dims(
+        self, patch_selectors: PatchGenerator
+    ) -> BatchSelectorSet:
+        """
+        Group patches based on the unique slices for dimensions in ``batch_dims``
+        """
+        batch_selectors = [
+            list(value)
+            for _, value in itertools.groupby(
+                patch_selectors, key=itemgetter(*self.batch_dims)
+            )
+        ]
+        return dict(enumerate(batch_selectors))
+
+    def _combine_patches_grouped_by_input_and_batch_dims(
+        self, ds: Union[xr.DataArray, xr.Dataset], patch_selectors: PatchGenerator
+    ) -> BatchSelectorSet:
+        """
+        Combine patches with multiple slices along ``batch_dims`` grouped into
+        each patch. Required when a dimension is duplicated between ``batch_dims``
+        and ``input_dims``.
+        """
+        if self._unique_batch_dims:
+            raise NotImplementedError("Not implemented")
+        n_patches_per_batch: Dict[Hashable, int] = {
+            dim: int(np.ceil(length / self._input_stride[dim]))
+            for dim, length in self.batch_dims.items()
+        }
+        n_patches_per_dim: Dict[Hashable, int] = {
+            dim: int((ds.sizes[dim] - self.input_overlap.get(dim, 0)) // length)
+            for dim, length in self._input_stride.items()
+        }
+        n_batches_per_dim: Dict[Hashable, int] = {
+            dim: int(ds.sizes[dim] // self.batch_dims.get(dim, ds.sizes[dim]))
+            for dim in self._all_sliced_dims.keys()
+        }
+        batch_id_per_dim: Dict[Hashable, Any] = {
+            dim: np.floor(
+                np.arange(0, n_patches) / n_patches_per_batch.get(dim, n_patches + 1)
+            ).astype(np.int64)
+            for dim, n_patches in n_patches_per_dim.items()
+        }
+        batch_id_per_patch = np.array(
+            list(itertools.product(*batch_id_per_dim.values()))
+        ).transpose()
+        batch_id_maximum = np.fromiter(n_batches_per_dim.values(), dtype=int)
+        batch_id_maximum = np.pad(
+            batch_id_maximum,
+            (0, (len(n_patches_per_dim) - len(n_batches_per_dim))),
+            constant_values=(1),
+        )
+        batch_id_maximum = batch_id_maximum[:, np.newaxis]
+        batch_in_range_for_each_patch = np.all(
+            batch_id_per_patch < batch_id_maximum, axis=0
+        )
+        batch_id_per_patch = np.ravel_multi_index(
+            multi_index=batch_id_per_patch,
+            dims=tuple(n_batches_per_dim.values()),
+            mode="clip",
+        )  # type: ignore
+        n_batches = np.product(list(n_batches_per_dim.values()))
+        batch_selectors: Dict[int, List[Dict[Hashable, slice]]] = {
+            k: [] for k in range(n_batches)
+        }
+        for i, patch in enumerate(patch_selectors):
+            if batch_in_range_for_each_patch[i]:
+                batch_selectors[batch_id_per_patch[i]].append(patch)
         return batch_selectors
 
 
