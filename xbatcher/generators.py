@@ -174,51 +174,92 @@ class BatchSchema:
         and ``input_dims``.
         """
         if self._unique_batch_dims:
-            raise NotImplementedError("Not implemented")
-        n_patches_per_batch: Dict[Hashable, int] = {
+            raise NotImplementedError(
+                "Currently either all or no batch_dims must be duplicated as input_dims."
+            )
+        self._gen_patch_numbers(ds)
+        self._gen_batch_numbers(ds)
+        batch_id_per_patch = self._get_batch_multi_index_per_patch()
+        patch_in_range = self._get_batch_in_range_per_batch(
+            batch_multi_index=batch_id_per_patch
+        )
+        batch_id_per_patch = self._ravel_batch_multi_index(batch_id_per_patch)
+        batch_selectors = self._gen_empty_batch_selectors()
+        for i, patch in enumerate(patch_selectors):
+            if patch_in_range[i]:
+                batch_selectors[batch_id_per_patch[i]].append(patch)
+        return batch_selectors
+
+    def _gen_empty_batch_selectors(self) -> BatchSelectorSet:
+        """
+        Create an empty batch selector set that can be populated by appending
+        patches to each batch.
+        """
+        n_batches = np.product(list(self._n_batches_per_dim.values()))
+        return {k: [] for k in range(n_batches)}
+
+    def _gen_patch_numbers(self, ds: Union[xr.DataArray, xr.Dataset]):
+        """
+        Calculate the number of patches per dimension and the number of patches
+        in each batch per dimension.
+        """
+        self._n_patches_per_batch: Dict[Hashable, int] = {
             dim: int(np.ceil(length / self._input_stride[dim]))
             for dim, length in self.batch_dims.items()
         }
-        n_patches_per_dim: Dict[Hashable, int] = {
+        self._n_patches_per_dim: Dict[Hashable, int] = {
             dim: int((ds.sizes[dim] - self.input_overlap.get(dim, 0)) // length)
             for dim, length in self._input_stride.items()
         }
-        n_batches_per_dim: Dict[Hashable, int] = {
+
+    def _gen_batch_numbers(self, ds: Union[xr.DataArray, xr.Dataset]):
+        """
+        Calculate the number of batches per dimension
+        """
+        self._n_batches_per_dim: Dict[Hashable, int] = {
             dim: int(ds.sizes[dim] // self.batch_dims.get(dim, ds.sizes[dim]))
             for dim in self._all_sliced_dims.keys()
         }
+
+    def _get_batch_multi_index_per_patch(self):
+        """
+        Calculate the batch multi-index for each patch
+        """
         batch_id_per_dim: Dict[Hashable, Any] = {
             dim: np.floor(
-                np.arange(0, n_patches) / n_patches_per_batch.get(dim, n_patches + 1)
+                np.arange(0, n_patches)
+                / self._n_patches_per_batch.get(dim, n_patches + 1)
             ).astype(np.int64)
-            for dim, n_patches in n_patches_per_dim.items()
+            for dim, n_patches in self._n_patches_per_dim.items()
         }
         batch_id_per_patch = np.array(
             list(itertools.product(*batch_id_per_dim.values()))
         ).transpose()
-        batch_id_maximum = np.fromiter(n_batches_per_dim.values(), dtype=int)
+        return batch_id_per_patch
+
+    def _ravel_batch_multi_index(self, batch_multi_index):
+        """
+        Convert the batch multi-index to a flat index for each patch
+        """
+        return np.ravel_multi_index(
+            multi_index=batch_multi_index,
+            dims=tuple(self._n_batches_per_dim.values()),
+            mode="clip",
+        )
+
+    def _get_batch_in_range_per_batch(self, batch_multi_index):
+        """
+        Determine whether each patch is contained within any of the batches.
+        """
+        batch_id_maximum = np.fromiter(self._n_batches_per_dim.values(), dtype=int)
         batch_id_maximum = np.pad(
             batch_id_maximum,
-            (0, (len(n_patches_per_dim) - len(n_batches_per_dim))),
+            (0, (len(self._n_patches_per_dim) - len(self._n_batches_per_dim))),
             constant_values=(1),
         )
         batch_id_maximum = batch_id_maximum[:, np.newaxis]
-        batch_in_range_for_each_patch = np.all(
-            batch_id_per_patch < batch_id_maximum, axis=0
-        )
-        batch_id_per_patch = np.ravel_multi_index(
-            multi_index=batch_id_per_patch,
-            dims=tuple(n_batches_per_dim.values()),
-            mode="clip",
-        )  # type: ignore
-        n_batches = np.product(list(n_batches_per_dim.values()))
-        batch_selectors: Dict[int, List[Dict[Hashable, slice]]] = {
-            k: [] for k in range(n_batches)
-        }
-        for i, patch in enumerate(patch_selectors):
-            if batch_in_range_for_each_patch[i]:
-                batch_selectors[batch_id_per_patch[i]].append(patch)
-        return batch_selectors
+        batch_in_range_per_patch = np.all(batch_multi_index < batch_id_maximum, axis=0)
+        return batch_in_range_per_patch
 
 
 def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> List[slice]:
