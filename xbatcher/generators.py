@@ -1,6 +1,7 @@
 """Classes for iterating through xarray datarrays / datasets in batches."""
 
 import itertools
+import warnings
 from operator import itemgetter
 from typing import Any, Dict, Hashable, Iterator, List, Sequence, Union
 
@@ -106,12 +107,10 @@ class BatchSchema:
         Create an iterator that can be used to index an Xarray Dataset/DataArray.
         """
         if self._duplicate_batch_dims and not self.concat_input_dims:
-            raise UserWarning(
-                f"""
-                The following dimensions were included in both ``input_dims``
-                and ``batch_dims``. Since ``concat_input_dims`` is ``False``,
-                these dimensions will not impact batch generation: {self._duplicate_batch_dims}
-                """
+            warnings.warn(
+                "The following dimensions were included in both ``input_dims`` "
+                "and ``batch_dims``. Since ``concat_input_dims`` is ``False``, "
+                f"these dimensions will not impact batch generation: {self._duplicate_batch_dims}"
             )
         # Generate the slices by iterating over batch_dims and input_dims
         all_slices = _iterate_through_dimensions(
