@@ -216,7 +216,18 @@ def test_batch_3d_1d_input(sample_ds_3d, input_size):
         validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
 
 
-@pytest.mark.parametrize("concat", [True, False])
+@pytest.mark.parametrize(
+    "concat",
+    [
+        True,
+        pytest.param(
+            False,
+            marks=pytest.mark.xfail(
+                reason="Bug described in https://github.com/xarray-contrib/xbatcher/issues/126"
+            ),
+        ),
+    ],
+)
 def test_batch_3d_1d_input_batch_dims(sample_ds_3d, concat):
     """
     Test batch generation for a 3D dataset using ``input_dims`` and batch_dims``.
