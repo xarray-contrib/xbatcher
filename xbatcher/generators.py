@@ -1,7 +1,6 @@
 """Classes for iterating through xarray datarrays / datasets in batches."""
 
 import itertools
-from dataclasses import dataclass
 from operator import itemgetter
 from typing import Any, Dict, Hashable, Iterator, List, Sequence, Union
 
@@ -13,7 +12,6 @@ BatchSelector = List[Dict[Hashable, slice]]
 BatchSelectorSet = Dict[int, BatchSelector]
 
 
-@dataclass
 class BatchSchema:
     """
     A representation of the indices and stacking/transposing parameters needed
@@ -66,16 +64,7 @@ class BatchSchema:
         self.batch_dims = dict(batch_dims)
         self.concat_input_dims = concat_input_bins
         self.preload_batch = preload_batch
-        self.selectors: BatchSelectorSet = self._gen_batch_selectors(ds)
-
-    def _gen_batch_selectors(
-        self, ds: Union[xr.DataArray, xr.Dataset]
-    ) -> BatchSelectorSet:
-        """
-        Create batch selectors dict, which can be used to create a batch
-        from an xarray data object.
-        """
-        # Separate batch_dims that are/are not also included in input_dims
+        # Store helpful information based on arguments
         self._duplicate_batch_dims: Dict[Hashable, int] = {
             dim: length
             for dim, length in self.batch_dims.items()
@@ -93,6 +82,15 @@ class BatchSchema:
         self._all_sliced_dims: Dict[Hashable, int] = dict(
             **self._unique_batch_dims, **self.input_dims
         )
+        self.selectors: BatchSelectorSet = self._gen_batch_selectors(ds)
+
+    def _gen_batch_selectors(
+        self, ds: Union[xr.DataArray, xr.Dataset]
+    ) -> BatchSelectorSet:
+        """
+        Create batch selectors dict, which can be used to create a batch
+        from an xarray data object.
+        """
         # Create an iterator that returns an object usable for .isel in xarray
         patch_selectors = self._gen_patch_selectors(ds)
         # Create the Dict containing batch selectors
