@@ -24,16 +24,16 @@ class Base:
         shape_4d = (10, 50, 100, 3)
         self.ds_4d = xr.Dataset(
             {
-                "foo": (["time", "y", "x", "b"], np.random.rand(*shape_4d)),
+                "foo": (["time", "y", "x", "z"], np.random.rand(*shape_4d)),
             },
             {
                 "x": (["x"], np.arange(shape_4d[-2])),
                 "y": (["y"], np.arange(shape_4d[-3])),
-                "b": (["b"], np.arange(shape_4d[-1])),
+                "z": (["z"], np.arange(shape_4d[-1])),
             },
         )
 
-        self.ds_xy = xr.Dataset(
+        self.ds_2d = xr.Dataset(
             {
                 "x": (
                     ["sample", "feature"],
@@ -51,7 +51,7 @@ class Generator(Base):
         Construct a generator on a chunked DataSet with and without preloading
         batches.
         """
-        ds_dask = self.ds_xy.chunk({"sample": 2})
+        ds_dask = self.ds_2d.chunk({"sample": 2})
         BatchGenerator(ds_dask, input_dims={"sample": 2}, preload_batch=preload_batch)
 
     @parameterized(
@@ -125,8 +125,8 @@ class Accessor(Base):
 class TorchLoader(Base):
     def setup(self, *args, **kwargs):
         super().setup(**kwargs)
-        self.x_gen = BatchGenerator(self.ds_xy["x"], {"sample": 10})
-        self.y_gen = BatchGenerator(self.ds_xy["y"], {"sample": 10})
+        self.x_gen = BatchGenerator(self.ds_2d["x"], {"sample": 10})
+        self.y_gen = BatchGenerator(self.ds_2d["y"], {"sample": 10})
 
     def time_map_dataset(self):
         """
@@ -134,7 +134,7 @@ class TorchLoader(Base):
         """
         dataset = MapDataset(self.x_gen, self.y_gen)
         loader = torch.utils.data.DataLoader(dataset)
-        iter(loader).next()
+        next(iter(loader))
 
     def time_iterable_dataset(self):
         """
@@ -142,4 +142,4 @@ class TorchLoader(Base):
         """
         dataset = IterableDataset(self.x_gen, self.y_gen)
         loader = torch.utils.data.DataLoader(dataset)
-        iter(loader).next()
+        next(iter(loader))
