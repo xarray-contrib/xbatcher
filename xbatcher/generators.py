@@ -430,13 +430,21 @@ class BatchGenerator:
             if self.concat_input_dims:
                 new_dim_suffix = "_input"
                 all_dsets: List = []
+                batch_selector = {}
+                for dim in self._batch_selectors.batch_dims.keys():
+                    starts = [
+                        x[dim].start for x in self._batch_selectors.selectors[idx]
+                    ]
+                    stops = [x[dim].stop for x in self._batch_selectors.selectors[idx]]
+                    batch_selector[dim] = slice(min(starts), max(stops))
+                batch_ds = self.ds.isel(batch_selector)
+                if self.preload_batch:
+                    batch_ds.load()
                 for selector in self._batch_selectors.selectors[idx]:
-                    batch_ds = self.ds.isel(selector)
-                    if self.preload_batch:
-                        batch_ds.load()
+                    patch_ds = self.ds.isel(selector)
                     all_dsets.append(
                         _drop_input_dims(
-                            batch_ds,
+                            patch_ds,
                             self.input_dims,
                             suffix=new_dim_suffix,
                         )
