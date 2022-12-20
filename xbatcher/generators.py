@@ -197,12 +197,15 @@ class BatchSchema:
         in each batch per dimension.
         """
         self._n_patches_per_batch: Dict[Hashable, int] = {
-            dim: int(np.ceil(length / self._input_stride[dim]))
+            dim: int(np.ceil(length / self._input_stride.get(dim, length)))
             for dim, length in self.batch_dims.items()
         }
         self._n_patches_per_dim: Dict[Hashable, int] = {
-            dim: int((ds.sizes[dim] - self.input_overlap.get(dim, 0)) // length)
-            for dim, length in self._input_stride.items()
+            dim: int(
+                (ds.sizes[dim] - self.input_overlap.get(dim, 0))
+                // (length - self.input_overlap.get(dim, 0))
+            )
+            for dim, length in self._all_sliced_dims.items()
         }
 
     def _gen_batch_numbers(self, ds: Union[xr.DataArray, xr.Dataset]):
