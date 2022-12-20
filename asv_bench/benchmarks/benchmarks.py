@@ -52,7 +52,11 @@ class Generator(Base):
         batches.
         """
         ds_dask = self.ds_2d.chunk({"sample": 2})
-        BatchGenerator(ds_dask, input_dims={"sample": 2}, preload_batch=preload_batch)
+        bg = BatchGenerator(
+            ds_dask, input_dims={"sample": 2}, preload_batch=preload_batch
+        )
+        for batch in bg:
+            pass
 
     @parameterized(
         ["input_dims", "batch_dims", "input_overlap"],
@@ -66,12 +70,14 @@ class Generator(Base):
         """
         Benchmark simple batch generation case.
         """
-        BatchGenerator(
+        bg = BatchGenerator(
             self.ds_3d,
             input_dims=input_dims,
             batch_dims=batch_dims,
             input_overlap=input_overlap,
         )
+        for batch in bg:
+            pass
 
     @parameterized(
         ["input_dims", "concat_input_dims"],
@@ -82,11 +88,13 @@ class Generator(Base):
         Construct a generator on a DataSet with and without concatenating
         chunks specified by ``input_dims`` into the batch dimension.
         """
-        BatchGenerator(
+        bg = BatchGenerator(
             self.ds_3d,
             input_dims=input_dims,
             concat_input_dims=concat_input_dims,
         )
+        for batch in bg:
+            pass
 
     @parameterized(
         ["input_dims", "batch_dims", "concat_input_dims"],
@@ -101,12 +109,14 @@ class Generator(Base):
         Construct a generator on a DataSet with and without concatenating
         chunks specified by ``input_dims`` into the batch dimension.
         """
-        BatchGenerator(
+        bg = BatchGenerator(
             self.ds_4d,
             input_dims=input_dims,
             batch_dims=batch_dims,
             concat_input_dims=concat_input_dims,
         )
+        for batch in bg:
+            pass
 
 
 class Accessor(Base):
@@ -119,7 +129,9 @@ class Accessor(Base):
         Benchmark simple batch generation case using xarray accessor
         Equivalent to subset of ``time_batch_input()``.
         """
-        self.ds_3d.batch.generator(input_dims=input_dims)
+        bg = self.ds_3d.batch.generator(input_dims=input_dims)
+        for batch in bg:
+            pass
 
 
 class TorchLoader(Base):
