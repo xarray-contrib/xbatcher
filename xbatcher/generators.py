@@ -170,10 +170,6 @@ class BatchSchema:
         each patch. Required when a dimension is duplicated between ``batch_dims``
         and ``input_dims``.
         """
-        if self._unique_batch_dims:
-            raise NotImplementedError(
-                "Currently either all or no batch_dims must be duplicated as input_dims."
-            )
         self._gen_patch_numbers(ds)
         self._gen_batch_numbers(ds)
         batch_id_per_patch = self._get_batch_multi_index_per_patch()
