@@ -101,9 +101,10 @@ def _get_sample_length(
     """
     if generator.concat_input_dims:
         batch_concat_dims = [
-            generator.ds.sizes.get(k)
-            // np.nanmax([v, generator.batch_dims.get(k, np.nan)])
-            for k, v in generator.input_dims.items()
+            generator.batch_dims.get(dim) // length
+            if generator.batch_dims.get(dim)
+            else generator.ds.sizes.get(dim) // length
+            for dim, length in generator.input_dims.items()
         ]
     else:
         batch_concat_dims = []
