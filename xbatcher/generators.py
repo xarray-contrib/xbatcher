@@ -55,11 +55,15 @@ class BatchSchema:
         self,
         ds: Union[xr.Dataset, xr.DataArray],
         input_dims: Dict[Hashable, int],
-        input_overlap: Dict[Hashable, int] = {},
-        batch_dims: Dict[Hashable, int] = {},
+        input_overlap: Dict[Hashable, int] = None,
+        batch_dims: Dict[Hashable, int] = None,
         concat_input_bins: bool = True,
         preload_batch: bool = True,
     ):
+        if input_overlap is None:
+            input_overlap = {}
+        if batch_dims is None:
+            batch_dims = {}
         self.input_dims = dict(input_dims)
         self.input_overlap = input_overlap
         self.batch_dims = dict(batch_dims)
