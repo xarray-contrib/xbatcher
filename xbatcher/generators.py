@@ -3,7 +3,7 @@
 import itertools
 import warnings
 from operator import itemgetter
-from typing import Any, Dict, Hashable, Iterator, List, Sequence, Union
+from typing import Any, Dict, Hashable, Iterator, List, Optional, Sequence, Union
 
 import numpy as np
 import xarray as xr
@@ -55,8 +55,8 @@ class BatchSchema:
         self,
         ds: Union[xr.Dataset, xr.DataArray],
         input_dims: Dict[Hashable, int],
-        input_overlap: Dict[Hashable, int] = None,
-        batch_dims: Dict[Hashable, int] = None,
+        input_overlap: Optional[Dict[Hashable, int]] = None,
+        batch_dims: Optional[Dict[Hashable, int]] = None,
         concat_input_bins: bool = True,
         preload_batch: bool = True,
     ):
