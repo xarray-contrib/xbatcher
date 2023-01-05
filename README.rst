@@ -52,8 +52,8 @@ Or from source as::
    `Dask <https://www.dask.org/>`_, and `NumPy <https://numpy.org/>`_.
    You will need to separately install `TensorFlow <https://www.tensorflow.org/>`_
    or `PyTorch <https://pytorch.org/>`_ to use those data loaders or
-   Xarray accessors. `Review the docs <https://xbatcher.readthedocs.io/en/latest/#optional-dependencies>`_
-   for more instructions.
+   Xarray accessors. `Review the installation instructions <https://xbatcher.readthedocs.io/en/latest/#optional-dependencies>`_
+   for more details.
 
 Documentation
 ------------
