@@ -52,6 +52,7 @@ extensions = [
     "IPython.sphinxext.ipython_console_highlighting",
     "sphinx_autosummary_accessors",
     "sphinx_copybutton",
+    "sphinxcontrib.apidoc",
 ]
 
 # only execute notebooks without any outputs
@@ -82,6 +83,13 @@ copybutton_prompt_is_regexp = True
 autosummary_generate = True
 numpydoc_class_members_toctree = False
 numpydoc_show_class_members = False
+
+# API docs
+
+apidoc_module_dir = "../xbatcher"
+apidoc_output_dir = "api"
+apidoc_excluded_paths = []
+apidoc_separate_modules = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates", sphinx_autosummary_accessors.templates_path]

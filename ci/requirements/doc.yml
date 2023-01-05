@@ -12,6 +12,7 @@ dependencies:
   - pangeo-sphinx-book-theme
   - pytest
   - sphinx
+  - sphinxcontrib-apidoc
   - sphinx-autosummary-accessors
   - sphinx-copybutton
   - xarray
