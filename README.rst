@@ -55,10 +55,12 @@ Or from source as::
     Xarray accessors. `Review the docs <https://xbatcher.readthedocs.io/en/latest/#optional-dependencies>`_
     for more instructions.
 
-## Documentation
+Documentation
+------------
 
 Documentation is hosted on ReadTheDocs: https://xbatcher.readthedocs.org
 
-## License
+License
+------------
 
 Apache License 2.0, see LICENSE file.
