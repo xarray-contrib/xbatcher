@@ -54,8 +54,6 @@ extensions = [
     "sphinx_copybutton",
 ]
 
-# only execute notebooks without any outputs
-# https://nbsphinx.readthedocs.io/en/0.2.14/never-execute.html
 nbsphinx_execute = "auto"
 
 
@@ -152,7 +150,7 @@ pygments_style = "sphinx"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 # tml_theme = 'default'
-html_theme = "pangeo_sphinx_book_theme"
+html_theme = "furo"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

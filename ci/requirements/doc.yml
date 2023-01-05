@@ -5,11 +5,11 @@ channels:
 dependencies:
   - python=3.8
   - dask
+  - furo
   - ipython
   - matplotlib
   - numpy
   - numpydoc
-  - pangeo-sphinx-book-theme
   - pytest
   - sphinx
   - sphinx-autosummary-accessors
