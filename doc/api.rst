@@ -23,6 +23,9 @@ Core
 .. autoclass:: xbatcher.BatchGenerator
    :members:
 
+.. autoclass:: xbatcher.BatchSchema
+   :members:
+
 Dataloaders
 ===========
 .. autoclass:: xbatcher.loaders.torch.MapDataset
