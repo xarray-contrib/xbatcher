@@ -14,6 +14,7 @@
 
 # type: ignore
 
+import datetime
 import sys
 
 import sphinx_autosummary_accessors
@@ -57,17 +58,6 @@ extensions = [
 nbsphinx_execute = "auto"
 
 
-# http://stackoverflow.com/questions/5599254/how-to-use-sphinxs-autodoc-to-document-a-classs-init-self-method
-def skip(app, what, name, obj, skip, options):
-    if name == "__init__":
-        return False
-    return skip
-
-
-def setup(app):
-    app.connect("autodoc-skip-member", skip)
-
-
 autodoc_mock_imports = ["torch", "tensorflow"]
 
 # link to github issues
@@ -95,7 +85,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "xbatcher"
-copyright = "2021, xbatcher developers"
+copyright = f"2016-{datetime.datetime.now().year}, xbatcher developers"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

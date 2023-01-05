@@ -20,19 +20,21 @@ Dataset.batch and DataArray.batch
 Core
 ====
 
-.. autoclass:: xbatcher.BatchGenerator
-   :members:
+.. currentmodule:: xbatcher
 
-.. autoclass:: xbatcher.BatchSchema
-   :members:
+.. autosummary::
+   :toctree: generated/
+
+   BatchGenerator
+   BatchSchema
 
 Dataloaders
 ===========
-.. autoclass:: xbatcher.loaders.torch.MapDataset
-   :members:
 
-.. autoclass:: xbatcher.loaders.torch.IterableDataset
-   :members:
+.. autosummary::
+   :toctree: generated/
 
-.. autoclass:: xbatcher.loaders.keras.CustomTFDataset
+   loaders.torch.MapDataset
+   loaders.torch.IterableDataset
+   loaders.keras.CustomTFDataset
    :members:
