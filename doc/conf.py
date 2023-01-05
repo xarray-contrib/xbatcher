@@ -71,7 +71,7 @@ def setup(app):
 autodoc_mock_imports = ["torch", "tensorflow"]
 
 # link to github issues
-extlinks = {"issue": ("https://github.com/xarray-contrib/xbatcher/issues/%s", "GH")}
+extlinks = {"issue": ("https://github.com/xarray-contrib/xbatcher/issues/%s", "#%s")}
 
 # sphinx-copybutton configurations (from https://github.com/pydata/xarray/blob/main/doc/conf.py)
 copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
@@ -155,11 +155,7 @@ html_theme = "furo"
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = {
-    "repository_url": "https://github.com/xarray-contrib/xbatcher",
-    "use_repository_button": True,
-    "use_issues_button": True,
-}
+html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
