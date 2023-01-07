@@ -87,7 +87,7 @@ or via a built-in `Xarray accessor <http://xarray.pydata.org/en/stable/internals
    :maxdepth: 2
    :caption: Contents:
 
-   roadmap
    api
    demo
+   roadmap
    contributing

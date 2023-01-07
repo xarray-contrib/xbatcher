@@ -14,6 +14,7 @@
 
 # type: ignore
 
+import datetime
 import sys
 
 import sphinx_autosummary_accessors
@@ -54,26 +55,13 @@ extensions = [
     "sphinx_copybutton",
 ]
 
-# only execute notebooks without any outputs
-# https://nbsphinx.readthedocs.io/en/0.2.14/never-execute.html
 nbsphinx_execute = "auto"
-
-
-# http://stackoverflow.com/questions/5599254/how-to-use-sphinxs-autodoc-to-document-a-classs-init-self-method
-def skip(app, what, name, obj, skip, options):
-    if name == "__init__":
-        return False
-    return skip
-
-
-def setup(app):
-    app.connect("autodoc-skip-member", skip)
 
 
 autodoc_mock_imports = ["torch", "tensorflow"]
 
 # link to github issues
-extlinks = {"issue": ("https://github.com/xarray-contrib/xbatcher/issues/%s", "GH")}
+extlinks = {"issue": ("https://github.com/xarray-contrib/xbatcher/issues/%s", "#%s")}
 
 # sphinx-copybutton configurations (from https://github.com/pydata/xarray/blob/main/doc/conf.py)
 copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
@@ -97,7 +85,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "xbatcher"
-copyright = "2021, xbatcher developers"
+copyright = f"2016-{datetime.datetime.now().year}, xbatcher developers"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -152,15 +140,14 @@ pygments_style = "sphinx"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 # tml_theme = 'default'
-html_theme = "pangeo_sphinx_book_theme"
+html_theme = "pydata_sphinx_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    "repository_url": "https://github.com/xarray-contrib/xbatcher",
-    "use_repository_button": True,
-    "use_issues_button": True,
+    "search_bar_position": "sidebar",
+    "github_url": "https://github.com/xarray-contrib/xbatcher",
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -175,7 +162,7 @@ html_theme_options = {
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-# html_logo = None
+html_logo = None
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
