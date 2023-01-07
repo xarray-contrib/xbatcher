@@ -29,6 +29,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install build twine
+          pip list
 
       - name: Fix up version string for TestPyPI
         if: ${{ !startsWith(github.ref, 'refs/tags') }}
@@ -38,7 +39,6 @@ jobs:
 
       - name: Build tarball and wheels
         run: |
-          cat pyproject.toml
           python -m build
           echo "Generated files:"
           ls -lh dist/
