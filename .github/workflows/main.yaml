@@ -5,12 +5,12 @@ on:
     branches: main
   pull_request:
     branches: main
+    paths-ignore:
+      - ".github/workflows/*-release.yaml"
+      - "asv_bench/**"
+      - "doc/**"
   schedule:
     - cron: "0 0 * * *"
-  paths-ignore:
-    - ".github/workflows/*-release.yaml"
-    - "asv_bench/**"
-    - "doc/**"
 
 jobs:
   test:
