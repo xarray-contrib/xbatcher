@@ -31,3 +31,36 @@ such as PyTorch_ or TensorFlow_. View the |docs| for more info.
 .. |license| image:: https://img.shields.io/github/license/xarray-contrib/xbatcher.svg
    :target: https://github.com/xarray-contrib/xbatcher
    :alt: license
+
+Installation
+------------
+
+Xbatcher can be installed from PyPI as::
+
+    python -m pip install xbatcher
+
+Or via Conda as::
+
+    conda install -c conda-forge xbatcher
+
+Or from source as::
+
+    python -m pip install git+https://github.com/xarray-contrib/xbatcher.git
+
+.. note::
+   The required dependencies installed with Xbatcher are `Xarray <https://xarray.dev/>`_,
+   `Dask <https://www.dask.org/>`_, and `NumPy <https://numpy.org/>`_.
+   You will need to separately install `TensorFlow <https://www.tensorflow.org/>`_
+   or `PyTorch <https://pytorch.org/>`_ to use those data loaders or
+   Xarray accessors. `Review the installation instructions <https://xbatcher.readthedocs.io/en/latest/#optional-dependencies>`_
+   for more details.
+
+Documentation
+------------
+
+Documentation is hosted on ReadTheDocs: https://xbatcher.readthedocs.org
+
+License
+------------
+
+Apache License 2.0, see LICENSE file.
