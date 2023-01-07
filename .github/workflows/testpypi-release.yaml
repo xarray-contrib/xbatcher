@@ -34,8 +34,8 @@ jobs:
       - name: Fix up version string for TestPyPI
         if: ${{ !startsWith(github.ref, 'refs/tags') }}
         run: |
-          sed --in-place "/version_scheme/d" pyproject.toml
-          sed --in-place "s/dirty-tag/no-local-version/g" pyproject.toml
+          sed --in-place "s/node-and-date/no-local-version/g" pyproject.toml
+          git update-index --assume-unchanged pyproject.toml
 
       - name: Build tarball and wheels
         run: |

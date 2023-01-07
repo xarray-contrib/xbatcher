@@ -54,8 +54,7 @@ repository = "https://github.com/xarray-contrib/xbatcher"
 include = ["xbatcher*"]
 
 [tool.setuptools_scm]
-version_scheme = "post-release"
-local_scheme = "dirty-tag"
+local_scheme = "node-and-date"
 fallback_version = "999"
 
 [tool.isort]
