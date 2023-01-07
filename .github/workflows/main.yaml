@@ -7,6 +7,10 @@ on:
     branches: main
   schedule:
     - cron: "0 0 * * *"
+  paths-ignore:
+    - ".github/workflows/*-release.yaml"
+    - "asv_bench/**"
+    - "doc/**"
 
 jobs:
   test:
@@ -14,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
     steps:
       - uses: actions/checkout@v3
       - name: Setup Python
