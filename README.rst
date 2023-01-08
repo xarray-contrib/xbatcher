@@ -56,7 +56,7 @@ Or from source as::
    for more details.
 
 Documentation
-------------
+-------------
 
 Documentation is hosted on ReadTheDocs: https://xbatcher.readthedocs.org
 

@@ -1,7 +1,7 @@
 [build-system]
 requires = [
-    "setuptools>=61",
-    "setuptools-scm"
+    "setuptools>=64",
+    "setuptools-scm[toml]>=6.2"
 ]
 build-backend = "setuptools.build_meta"
 
@@ -54,13 +54,12 @@ repository = "https://github.com/xarray-contrib/xbatcher"
 include = ["xbatcher*"]
 
 [tool.setuptools_scm]
-version_scheme = "post-release"
-local_scheme = "dirty-tag"
+local_scheme = "node-and-date"
 fallback_version = "999"
 
 [tool.isort]
 profile = "black"
-known_third_party = ["numpy", "pytest", "setuptools", "sphinx_autosummary_accessors", "torch", "xarray"]
+known_third_party = ["numpy", "pytest", "sphinx_autosummary_accessors", "torch", "xarray"]
 
 [tool.pytest.ini_options]
 log_cli = true
