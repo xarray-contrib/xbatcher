@@ -4,9 +4,10 @@ xbatcher: Batch Generation from Xarray Datasets
 |Build Status| |codecov| |docs| |pypi| |conda-forge| |license|
 
 
-Xbatcher is a small library for iterating xarray DataArrays in batches. The
-goal is to make it easy to feed xarray datasets to machine learning libraries
-such as PyTorch_ or TensorFlow_. View the |docs| for more info.
+Xbatcher is a small library for iterating Xarray DataArrays and Datasets in
+batches. The goal is to make it easy to feed Xarray objects to machine
+learning libraries such as PyTorch_ or TensorFlow_. View the |docs| for more
+info.
 
 .. _TensorFlow: https://www.tensorflow.org/
 
