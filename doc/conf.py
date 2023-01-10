@@ -15,6 +15,7 @@
 # type: ignore
 
 import datetime
+import os
 import sys
 
 import sphinx_autosummary_accessors
@@ -141,6 +142,30 @@ pygments_style = "sphinx"
 # a list of builtin themes.
 # tml_theme = 'default'
 html_theme = "pydata_sphinx_theme"
+html_logo = "_static/logo.svg"
+html_favicon = "_static/logo.svg"
+
+# The following is from the pydata-sphinx-theme settings (https://github.com/pydata/pydata-sphinx-theme/blob/main/docs/conf.py)
+# Define the json_url for our version switcher.
+json_url = "https://xbatcher.readthedocs.io/en/latest/_static/switcher.json"
+
+# Define the version we use for matching in the version switcher.
+version_match = os.environ.get("READTHEDOCS_VERSION")
+# If READTHEDOCS_VERSION doesn't exist, we're not on RTD
+# If it is an integer, we're in a PR build and the version isn't correct.
+if not version_match or version_match.isdigit():
+    # For local development, infer the version to match from the package.
+    release = xbatcher.__version__
+    if "dev" in release or "post" in release or "rc" in release:
+        version_match = "latest"
+        # We want to keep the relative reference if we are in dev mode
+        # but we want the whole url if we are effectively in a released version
+        json_url = "_static/switcher.json"
+    else:
+        version_match = "v" + release
+
+print(f"release: {release}")
+
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -148,7 +173,21 @@ html_theme = "pydata_sphinx_theme"
 html_theme_options = {
     "search_bar_position": "sidebar",
     "github_url": "https://github.com/xarray-contrib/xbatcher",
+    "switcher": {
+        "json_url": json_url,
+        "version_match": version_match,
+    },
+    "logo": {
+        "text": "Xbatcher",
+        "alt_text": "Xbatcher",
+    },
+    "navbar_align": "left",  # [left, content, right] For testing that the navbar items align properly
+    "navbar_center": ["version-switcher", "navbar-nav"],
 }
+
+# Define the json_url for our version switcher.
+
+json_url = "https://xbatcher.readthedocs.io/en/latest/_static/switcher.json"
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
@@ -162,7 +201,7 @@ html_theme_options = {
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = None
+# html_logo = None
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
