@@ -147,7 +147,9 @@ html_favicon = "_static/logo.svg"
 
 # The following is from the pydata-sphinx-theme settings (https://github.com/pydata/pydata-sphinx-theme/blob/main/docs/conf.py)
 # Define the json_url for our version switcher.
-json_url = "https://xbatcher.readthedocs.io/en/latest/_static/switcher.json"
+json_url = (
+    "https://github.com/xarray-contrib/xbatcher/blob/main/doc/_static/switcher.json"
+)
 
 # Define the version we use for matching in the version switcher.
 version_match = os.environ.get("READTHEDOCS_VERSION")
