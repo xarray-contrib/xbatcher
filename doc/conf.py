@@ -147,9 +147,7 @@ html_favicon = "_static/logo.svg"
 
 # The following is from the pydata-sphinx-theme settings (https://github.com/pydata/pydata-sphinx-theme/blob/main/docs/conf.py)
 # Define the json_url for our version switcher.
-json_url = (
-    "https://github.com/xarray-contrib/xbatcher/blob/main/doc/_static/switcher.json"
-)
+json_url = "https://xbatcher.readthedocs.io/en/latest/_static/switcher.json"
 
 # Define the version we use for matching in the version switcher.
 version_match = os.environ.get("READTHEDOCS_VERSION")
@@ -175,21 +173,17 @@ print(f"release: {release}")
 html_theme_options = {
     "search_bar_position": "sidebar",
     "github_url": "https://github.com/xarray-contrib/xbatcher",
-    "switcher": {
-        "json_url": json_url,
-        "version_match": version_match,
-    },
+    # "switcher": {
+    #     "json_url": json_url,
+    #     "version_match": version_match,
+    # },
     "logo": {
         "text": "Xbatcher",
         "alt_text": "Xbatcher",
     },
     "navbar_align": "left",  # [left, content, right] For testing that the navbar items align properly
-    "navbar_center": ["version-switcher", "navbar-nav"],
+    "navbar_center": ["navbar-nav"],
 }
-
-# Define the json_url for our version switcher.
-
-json_url = "https://xbatcher.readthedocs.io/en/latest/_static/switcher.json"
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
@@ -213,7 +207,7 @@ json_url = "https://xbatcher.readthedocs.io/en/latest/_static/switcher.json"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ['_static']
+html_static_path = ["_static"]
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
