@@ -65,3 +65,13 @@ License
 ------------
 
 Apache License 2.0, see LICENSE file.
+
+Acknowledgements
+----------------
+
+This work was funded in part by:
+
+NASA ACCESS19-0049: Pangeo ML: Open Source Tools and Pipelines for Scalable Machine Learning Using NASA Earth Observation Data
+
+This work was motivated by many conversations in the Pangeo community and Pangeo ML working group
+
