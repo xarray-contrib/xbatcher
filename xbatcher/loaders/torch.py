@@ -16,7 +16,6 @@ except ImportError as exc:
 # Assumptions made:
 #  - Each dataset takes pre-configured X/y xbatcher generators (may not always want two generators in a dataset)
 # TODOs:
-#  - sort out xarray -> numpy pattern. Currently there is a hardcoded variable name for x/y
 #  - need to test with additional dataset parameters (e.g. transforms)
 
 
@@ -58,8 +57,6 @@ class MapDataset(torch.utils.data.Dataset):
                     f"{type(self).__name__}.__getitem__ currently requires a single integer key"
                 )
 
-        # TODO: figure out the dataset -> array workflow
-        # currently hardcoding a variable name
         X_batch = self.X_generator[idx].torch.to_tensor()
         y_batch = self.y_generator[idx].torch.to_tensor()
 
