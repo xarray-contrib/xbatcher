@@ -173,16 +173,16 @@ print(f"release: {release}")
 html_theme_options = {
     "search_bar_position": "sidebar",
     "github_url": "https://github.com/xarray-contrib/xbatcher",
-    # "switcher": {
-    #     "json_url": json_url,
-    #     "version_match": version_match,
-    # },
+    "switcher": {
+        "json_url": json_url,
+        "version_match": version_match,
+    },
     "logo": {
         "text": "Xbatcher",
         "alt_text": "Xbatcher",
     },
     "navbar_align": "left",  # [left, content, right] For testing that the navbar items align properly
-    "navbar_center": ["navbar-nav"],
+    "navbar_center": ["version-switcher", "navbar-nav"],
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
