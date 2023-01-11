@@ -16,7 +16,7 @@ BatchSelectorSet = Dict[int, BatchSelector]
 class BatchSchema:
     """
     A representation of the indices and stacking/transposing parameters needed
-    to generator batches from Xarray Datasets and DataArrays using
+    to generator batches from Xarray DataArrays and Datasets using
     xbatcher.BatchGenerator.
 
     Parameters
@@ -94,7 +94,7 @@ class BatchSchema:
     ) -> BatchSelectorSet:
         """
         Create batch selectors dict, which can be used to create a batch
-        from an xarray data object.
+        from an Xarray data object.
         """
         # Create an iterator that returns an object usable for .isel in xarray
         patch_selectors = self._gen_patch_selectors(ds)
@@ -336,7 +336,7 @@ def _maybe_stack_batch_dims(
 
 
 class BatchGenerator:
-    """Create generator for iterating through xarray datarrays / datasets in
+    """Create generator for iterating through Xarray DataArrays / Datasets in
     batches.
 
     Parameters

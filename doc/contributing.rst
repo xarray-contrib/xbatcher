@@ -1,8 +1,8 @@
 .. _contributing:
 
-************************
-Contributing to xbatcher
-************************
+******************
+Contributing guide
+******************
 
 .. note::
 

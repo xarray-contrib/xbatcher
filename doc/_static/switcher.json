@@ -1,0 +1,19 @@
+[
+  {
+    "name": "dev",
+    "version": "latest",
+    "url": "https://xbatcher.readthedocs.io/en/latest/"
+  },
+  {
+    "version": "0.3.0",
+    "url": "https://xbatcher.readthedocs.io/en/v0.3.0/"
+  },
+  {
+    "version": "0.2.0",
+    "url": "https://xbatcher.readthedocs.io/en/v0.2.0/"
+  },
+  {
+    "version": "0.1.0",
+    "url": "https://xbatcher.readthedocs.io/en/0.1.0/"
+  }
+]
