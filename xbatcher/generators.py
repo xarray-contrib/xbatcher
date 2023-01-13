@@ -2,6 +2,8 @@
 
 import itertools
 import warnings
+import json
+
 from operator import itemgetter
 from typing import Any, Dict, Hashable, Iterator, List, Optional, Sequence, Union
 
@@ -260,6 +262,38 @@ class BatchSchema:
         batch_id_maximum = batch_id_maximum[:, np.newaxis]
         batch_in_range_per_patch = np.all(batch_multi_index < batch_id_maximum, axis=0)
         return batch_in_range_per_patch
+
+    def to_json(self, out_file_name: str):
+        """
+        Dump the BatchSchema properties to a JSON file.
+
+        Parameters
+        ----------
+        out_file_name: str
+            The name of the JSON file to create.
+        """
+        out_dict = {}
+        out_dict["input_dims"] = self.input_dims
+        out_dict["input_overlap"] = self.input_overlap
+        out_dict["batch_dims"] = self.batch_dims
+        out_dict["concat_input_dims"] = self.input_dims
+        out_dict["preload_batch"] = self.preload_batch
+        batch_selector_dict = {}
+        for i in self.selectors.keys():
+            batch_selector_dict[i] = self.selectors[i]
+            list_index = 0
+            for member in batch_selector_dict[i]:
+                out_member_dict = {}
+                member_keys = [x for x in member.keys()]
+                for member_key in member_keys:
+                    out_member_dict[member_key] = {'start': member[member_key].start,
+                                                   'stop': member[member_key].stop,
+                                                   'step': member[member_key].step}
+        out_dict["selector"] = out_member_dict
+        out_file = open(out_file_name, mode='w')
+        json.dump(out_dict, out_file)
+        out_file.close()
+
 
 
 def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> List[slice]:

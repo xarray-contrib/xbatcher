@@ -1,8 +1,10 @@
 import numpy as np
 import pytest
 import xarray as xr
+import tempfile
+import json
 
-from xbatcher import BatchGenerator
+from xbatcher import BatchGenerator, BatchSchema
 from xbatcher.testing import (
     get_batch_dimensions,
     validate_batch_dimensions,
@@ -356,3 +358,16 @@ def test_input_overlap_exceptions(sample_ds_1d):
     with pytest.raises(ValueError) as e:
         BatchGenerator(sample_ds_1d, input_dims={"x": 10}, input_overlap={"x": 20})
         assert len(e) == 1
+
+@pytest.mark.parametrize("input_size", [5, 10])
+def test_to_json(sample_ds_3d, input_size):
+    x_input_size = 20
+    bg = BatchSchema(
+        sample_ds_3d,
+        input_dims={"time": input_size, "x": x_input_size},
+    )
+    out_file = tempfile.NamedTemporaryFile(mode="w+b")
+    bg.to_json(out_file.name)
+    in_dict = json.load(out_file)
+    assert in_dict["input_dims"]["time"] == input_size
+    assert in_dict["input_dims"]["x"] == x_input_size
