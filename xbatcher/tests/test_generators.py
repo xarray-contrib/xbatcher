@@ -371,3 +371,4 @@ def test_to_json(sample_ds_3d, input_size):
     in_dict = json.load(out_file)
     assert in_dict["input_dims"]["time"] == input_size
     assert in_dict["input_dims"]["x"] == x_input_size
+    out_file.close()
