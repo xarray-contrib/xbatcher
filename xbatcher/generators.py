@@ -1,9 +1,8 @@
 """Classes for iterating through xarray datarrays / datasets in batches."""
 
 import itertools
-import warnings
 import json
-
+import warnings
 from operator import itemgetter
 from typing import Any, Dict, Hashable, Iterator, List, Optional, Sequence, Union
 
@@ -285,9 +284,11 @@ class BatchSchema:
                 out_member_dict = {}
                 member_keys = [x for x in member.keys()]
                 for member_key in member_keys:
-                    out_member_dict[member_key] = {'start': member[member_key].start,
-                                                   'stop': member[member_key].stop,
-                                                   'step': member[member_key].step}
+                    out_member_dict[member_key] = {
+                        "start": member[member_key].start,
+                        "stop": member[member_key].stop,
+                        "step": member[member_key].step,
+                    }
         out_dict["selector"] = out_member_dict
         return json.dumps(out_dict)
 
@@ -301,7 +302,7 @@ class BatchSchema:
             The path to the json file to write to.
         """
         out_json = self.to_json()
-        out_file = open(out_file_name, mode='w')
+        out_file = open(out_file_name, mode="w")
         out_file.write(out_json)
         out_file.close()
 

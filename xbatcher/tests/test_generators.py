@@ -1,8 +1,9 @@
+import json
+import tempfile
+
 import numpy as np
 import pytest
 import xarray as xr
-import tempfile
-import json
 
 from xbatcher import BatchGenerator, BatchSchema
 from xbatcher.testing import (
