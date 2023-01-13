@@ -367,7 +367,7 @@ def test_to_json(sample_ds_3d, input_size):
         input_dims={"time": input_size, "x": x_input_size},
     )
     out_file = tempfile.NamedTemporaryFile(mode="w+b")
-    bg.to_json(out_file.name)
+    bg.to_file(out_file.name)
     in_dict = json.load(out_file)
     assert in_dict["input_dims"]["time"] == input_size
     assert in_dict["input_dims"]["x"] == x_input_size

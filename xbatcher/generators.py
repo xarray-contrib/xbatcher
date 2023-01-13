@@ -263,14 +263,14 @@ class BatchSchema:
         batch_in_range_per_patch = np.all(batch_multi_index < batch_id_maximum, axis=0)
         return batch_in_range_per_patch
 
-    def to_json(self, out_file_name: str):
+    def to_json(self):
         """
         Dump the BatchSchema properties to a JSON file.
 
-        Parameters
+        Returns
         ----------
-        out_file_name: str
-            The name of the JSON file to create.
+        out_json: str
+            The JSON representation of the BatchSchema
         """
         out_dict = {}
         out_dict["input_dims"] = self.input_dims
@@ -290,8 +290,20 @@ class BatchSchema:
                                                    'stop': member[member_key].stop,
                                                    'step': member[member_key].step}
         out_dict["selector"] = out_member_dict
+        return json.dumps(out_dict)
+
+    def to_file(self, out_file_name: str):
+        """
+        Dumps the JSON representation of the BatchSchema object to a file.
+
+        Parameters
+        ----------
+        out_file_name: str
+            The path to the json file to write to.
+        """
+        out_json = self.to_json()
         out_file = open(out_file_name, mode='w')
-        json.dump(out_dict, out_file)
+        out_file.write(out_json)
         out_file.close()
 
 
