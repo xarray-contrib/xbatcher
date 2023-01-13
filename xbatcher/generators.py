@@ -281,7 +281,6 @@ class BatchSchema:
         batch_selector_dict = {}
         for i in self.selectors.keys():
             batch_selector_dict[i] = self.selectors[i]
-            list_index = 0
             for member in batch_selector_dict[i]:
                 out_member_dict = {}
                 member_keys = [x for x in member.keys()]
@@ -305,7 +304,6 @@ class BatchSchema:
         out_file = open(out_file_name, mode='w')
         out_file.write(out_json)
         out_file.close()
-
 
 
 def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> List[slice]:

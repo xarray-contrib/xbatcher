@@ -359,6 +359,7 @@ def test_input_overlap_exceptions(sample_ds_1d):
         BatchGenerator(sample_ds_1d, input_dims={"x": 10}, input_overlap={"x": 20})
         assert len(e) == 1
 
+
 @pytest.mark.parametrize("input_size", [5, 10])
 def test_to_json(sample_ds_3d, input_size):
     x_input_size = 20
