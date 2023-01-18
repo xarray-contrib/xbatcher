@@ -101,17 +101,13 @@ class PrefetchBatchGenerator:
     def __iter__(self):
         """..."""
         client = get_client()
-        consumed = 0
-        while consumed < self.total_batches:
+        n_submissions = max(int(np.ceil(self.total_batches / self._prefetch)), 1)
+        for _ in range(n_submissions):
             self._submit_prefetch_batches()
-            for batch_of_batches_futures in as_completed(
-                self._future_buffer, with_results=True
-            ).batches():
+            for batch_of_batches_futures in as_completed(self._future_buffer).batches():
                 batch_of_batches = client.gather(batch_of_batches_futures)
-                for batches in batch_of_batches:
-                    for batch in batches:
-                        yield batch
-                        consumed += 1
+                for batch in batch_of_batches:
+                    yield batch
             self._future_buffer = self._prefetch_buffer
             self._prefetch_buffer = []
 
@@ -136,21 +132,27 @@ if __name__ == "__main__":
     client = Client(address)
 
     # write out an example zarr dataset
-    target_array = da.random.random((50000, 9, 100, 100), chunks=[256, 9, 100, 100])
+    target_array = da.random.random((50000, 9, 100, 100), chunks=[1024, 9, 100, 100])
     target_array.to_zarr(remote_path, overwrite=True)
 
     def do_ml():
         # load array for your data problem
         array = da.from_zarr(remote_path)
-        batch_gen = PrefetchBatchGenerator(array=array, batch_size=256, prefetch=20)
+        batch_gen = PrefetchBatchGenerator(
+            array=array[:50000], batch_size=1024, prefetch=25
+        )
         nbytes = 0
+        shapes = []
         t0 = time.time()
         for b in batch_gen:
             nbytes += b.nbytes
+            shapes.append(b.shape)
         elapsed = time.time() - t0
         gbps = (nbytes / elapsed) / 1024**3
-        return gbps
+        n = sum([s[0] for s in shapes])
+
+        return gbps, n
 
     f = client.submit(do_ml, pure=False)
-    r = f.result()
-    print(f"We achieved about {r} gbps.")
+    gbps, n = f.result()
+    print(f"We achieved about {gbps} gbps over {n} total examples")
