@@ -380,7 +380,6 @@ class BatchGenerator:
         concat_input_dims: bool = False,
         preload_batch: bool = True,
     ):
-
         self.ds = ds
         self._batch_selectors: BatchSchema = BatchSchema(
             ds,
@@ -419,7 +418,6 @@ class BatchGenerator:
         return len(self._batch_selectors.selectors)
 
     def __getitem__(self, idx: int) -> Union[xr.Dataset, xr.DataArray]:
-
         if not isinstance(idx, int):
             raise NotImplementedError(
                 f"{type(self).__name__}.__getitem__ currently requires a single integer key"
@@ -429,7 +427,6 @@ class BatchGenerator:
             idx = list(self._batch_selectors.selectors)[idx]
 
         if idx in self._batch_selectors.selectors:
-
             if self.concat_input_dims:
                 new_dim_suffix = "_input"
                 all_dsets: List = []

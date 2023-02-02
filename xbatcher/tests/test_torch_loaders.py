@@ -32,7 +32,6 @@ def ds_xy():
     ],
 )
 def test_map_dataset(ds_xy, x_var, y_var):
-
     x = ds_xy[x_var]
     y = ds_xy[y_var]
 
@@ -85,7 +84,6 @@ def test_map_dataset(ds_xy, x_var, y_var):
     ],
 )
 def test_map_dataset_with_transform(ds_xy, x_var, y_var):
-
     x = ds_xy[x_var]
     y = ds_xy[y_var]
 
@@ -117,7 +115,6 @@ def test_map_dataset_with_transform(ds_xy, x_var, y_var):
     ],
 )
 def test_iterable_dataset(ds_xy, x_var, y_var):
-
     x = ds_xy[x_var]
     y = ds_xy[y_var]
 

@@ -25,7 +25,6 @@ def ds_xy():
 
 
 def test_custom_dataarray(ds_xy):
-
     x = ds_xy["x"]
     y = ds_xy["y"]
 
@@ -46,7 +45,6 @@ def test_custom_dataarray(ds_xy):
 
 
 def test_custom_dataarray_with_transform(ds_xy):
-
     x = ds_xy["x"]
     y = ds_xy["y"]
 
