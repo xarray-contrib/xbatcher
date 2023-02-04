@@ -3,7 +3,17 @@
 import itertools
 import warnings
 from operator import itemgetter
-from typing import Any, Dict, Hashable, Iterator, List, Optional, Sequence, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Hashable,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Union,
+)
 
 import numpy as np
 import xarray as xr
@@ -379,8 +389,13 @@ class BatchGenerator:
         batch_dims: Dict[Hashable, int] = {},
         concat_input_dims: bool = False,
         preload_batch: bool = True,
+        cache: Optional[Dict[str, Any]] = None,
+        cache_preprocess: Optional[Callable] = None,
     ):
         self.ds = ds
+        self.cache = cache
+        self.cache_preprocess = cache_preprocess
+
         self._batch_selectors: BatchSchema = BatchSchema(
             ds,
             input_dims=input_dims,
@@ -426,6 +441,9 @@ class BatchGenerator:
         if idx < 0:
             idx = list(self._batch_selectors.selectors)[idx]
 
+        if self.cache and self._batch_in_cache(idx):
+            return self._get_cached_batch(idx)
+
         if idx in self._batch_selectors.selectors:
             if self.concat_input_dims:
                 new_dim_suffix = "_input"
@@ -451,14 +469,33 @@ class BatchGenerator:
                     )
                 dsc = xr.concat(all_dsets, dim="input_batch")
                 new_input_dims = [str(dim) + new_dim_suffix for dim in self.input_dims]
-                return _maybe_stack_batch_dims(dsc, new_input_dims)
+                batch = _maybe_stack_batch_dims(dsc, new_input_dims)
             else:
                 batch_ds = self.ds.isel(self._batch_selectors.selectors[idx][0])
                 if self.preload_batch:
                     batch_ds.load()
-                return _maybe_stack_batch_dims(
+                batch = _maybe_stack_batch_dims(
                     batch_ds,
                     list(self.input_dims),
                 )
         else:
             raise IndexError("list index out of range")
+
+        if self.cache is not None and self.cache_preprocess is not None:
+            batch = self.cache_preprocess(batch)
+        if self.cache is not None:
+            self._cache_batch(idx, batch)
+
+        return batch
+
+    def _batch_in_cache(self, idx: int) -> bool:
+        return self.cache is not None and f"{idx}/.zgroup" in self.cache
+
+    def _cache_batch(self, idx: int, batch: Union[xr.Dataset, xr.DataArray]) -> None:
+        batch.to_zarr(self.cache, group=str(idx), mode="a")
+
+    def _get_cached_batch(self, idx: int) -> xr.Dataset:
+        ds = xr.open_zarr(self.cache, group=str(idx))
+        if self.preload_batch:
+            ds = ds.load()
+        return ds
