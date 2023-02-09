@@ -14,6 +14,8 @@
 
 # type: ignore
 
+import datetime
+import os
 import sys
 
 import sphinx_autosummary_accessors
@@ -54,26 +56,13 @@ extensions = [
     "sphinx_copybutton",
 ]
 
-# only execute notebooks without any outputs
-# https://nbsphinx.readthedocs.io/en/0.2.14/never-execute.html
 nbsphinx_execute = "auto"
-
-
-# http://stackoverflow.com/questions/5599254/how-to-use-sphinxs-autodoc-to-document-a-classs-init-self-method
-def skip(app, what, name, obj, skip, options):
-    if name == "__init__":
-        return False
-    return skip
-
-
-def setup(app):
-    app.connect("autodoc-skip-member", skip)
 
 
 autodoc_mock_imports = ["torch", "tensorflow"]
 
 # link to github issues
-extlinks = {"issue": ("https://github.com/xarray-contrib/xbatcher/issues/%s", "GH")}
+extlinks = {"issue": ("https://github.com/xarray-contrib/xbatcher/issues/%s", "#%s")}
 
 # sphinx-copybutton configurations (from https://github.com/pydata/xarray/blob/main/doc/conf.py)
 copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
@@ -97,7 +86,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "xbatcher"
-copyright = "2021, xbatcher developers"
+copyright = f"2016-{datetime.datetime.now().year}, xbatcher developers"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -152,15 +141,48 @@ pygments_style = "sphinx"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 # tml_theme = 'default'
-html_theme = "pangeo_sphinx_book_theme"
+html_theme = "pydata_sphinx_theme"
+html_logo = "_static/logo.svg"
+html_favicon = "_static/logo.svg"
+
+# The following is from the pydata-sphinx-theme settings (https://github.com/pydata/pydata-sphinx-theme/blob/main/docs/conf.py)
+# Define the json_url for our version switcher.
+json_url = "https://xbatcher.readthedocs.io/en/latest/_static/switcher.json"
+
+# Define the version we use for matching in the version switcher.
+version_match = os.environ.get("READTHEDOCS_VERSION")
+# If READTHEDOCS_VERSION doesn't exist, we're not on RTD
+# If it is an integer, we're in a PR build and the version isn't correct.
+if not version_match or version_match.isdigit():
+    # For local development, infer the version to match from the package.
+    release = xbatcher.__version__
+    if "dev" in release or "post" in release or "rc" in release:
+        version_match = "latest"
+        # We want to keep the relative reference if we are in dev mode
+        # but we want the whole url if we are effectively in a released version
+        json_url = "_static/switcher.json"
+    else:
+        version_match = "v" + release
+
+print(f"release: {release}")
+
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    "repository_url": "https://github.com/xarray-contrib/xbatcher",
-    "use_repository_button": True,
-    "use_issues_button": True,
+    "search_bar_position": "sidebar",
+    "github_url": "https://github.com/xarray-contrib/xbatcher",
+    "switcher": {
+        "json_url": json_url,
+        "version_match": version_match,
+    },
+    "logo": {
+        "text": "Xbatcher",
+        "alt_text": "Xbatcher",
+    },
+    "navbar_align": "left",  # [left, content, right] For testing that the navbar items align properly
+    "navbar_center": ["version-switcher", "navbar-nav"],
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -185,7 +207,7 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ['_static']
+html_static_path = ["_static"]
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied

@@ -5,8 +5,19 @@ API reference
 
 This page provides an auto-generated summary of Xbatcher's API.
 
-Dataset.batch and DataArray.batch
-=================================
+Core
+====
+
+.. currentmodule:: xbatcher
+
+.. autosummary::
+   :toctree: generated/
+
+   BatchGenerator
+   BatchSchema
+
+Xbatcher Xarray accessors
+=========================
 
 .. currentmodule:: xarray
 
@@ -17,19 +28,15 @@ Dataset.batch and DataArray.batch
    Dataset.batch.generator
    DataArray.batch.generator
 
-Core
-====
-
-.. autoclass:: xbatcher.BatchGenerator
-   :members:
-
 Dataloaders
 ===========
-.. autoclass:: xbatcher.loaders.torch.MapDataset
-   :members:
 
-.. autoclass:: xbatcher.loaders.torch.IterableDataset
-   :members:
+.. currentmodule:: xbatcher
 
-.. autoclass:: xbatcher.loaders.keras.CustomTFDataset
+.. autosummary::
+   :toctree: generated/
+
+   loaders.torch.MapDataset
+   loaders.torch.IterableDataset
+   loaders.keras.CustomTFDataset
    :members:

@@ -1,7 +1,7 @@
 .. _roadmap:
 
-Development Roadmap
-===================
+Roadmap
+=======
 
 Authors: Joe Hamman and Ryan Abernathey
 Date: February 7, 2019
