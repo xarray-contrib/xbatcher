@@ -45,6 +45,7 @@ dev = [
     "pytest-cov",
     "tensorflow",
     "torch",
+    "xarray-datatree",
 ]
 [project.urls]
 documentation = "https://xbatcher.readthedocs.io/en/latest/"
