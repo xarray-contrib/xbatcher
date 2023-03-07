@@ -16,6 +16,7 @@ dependencies:
   - pytest-cov
   - pytorch
   - tensorflow
+  - xarray-datatree
   - zarr
   # Style checks
   - black

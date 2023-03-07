@@ -30,6 +30,7 @@ dependencies = [
     "xarray",
 ]
 [project.optional-dependencies]
+datatree = ["xarray-datatree"]
 torch = [
     "torch",
 ]
