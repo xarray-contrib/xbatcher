@@ -3,7 +3,11 @@ from importlib.metadata import version as _version
 
 from . import testing  # noqa: F401
 from .accessors import BatchAccessor  # noqa: F401
-from .generators import BatchGenerator, BatchSchema  # noqa: F401
+from .generators import (  # noqa: F401
+    BatchGenerator,
+    BatchSchema,
+    datatree_slice_generator,
+)
 from .util.print_versions import show_versions  # noqa: F401
 
 try:
