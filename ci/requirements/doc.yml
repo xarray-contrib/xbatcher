@@ -15,6 +15,7 @@ dependencies:
   - sphinx-autosummary-accessors
   - sphinx-copybutton
   - xarray
+  - xarray-datatree
   # For examples
   - adlfs
   - ipykernel
