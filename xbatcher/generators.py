@@ -59,6 +59,7 @@ class BatchSchema:
         batch_dims: Optional[Dict[Hashable, int]] = None,
         concat_input_bins: bool = True,
         preload_batch: bool = True,
+        return_partial: bool = False,
     ):
         if input_overlap is None:
             input_overlap = {}
@@ -69,6 +70,7 @@ class BatchSchema:
         self.batch_dims = dict(batch_dims)
         self.concat_input_dims = concat_input_bins
         self.preload_batch = preload_batch
+        self.return_partial = return_partial
         # Store helpful information based on arguments
         self._duplicate_batch_dims: Dict[Hashable, int] = {
             dim: length
@@ -121,6 +123,7 @@ class BatchSchema:
             ds,
             dims=self._all_sliced_dims,
             overlap=self.input_overlap,
+            return_partial=self.return_partial
         )
         return all_slices
 
@@ -262,7 +265,7 @@ class BatchSchema:
         return batch_in_range_per_patch
 
 
-def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> List[slice]:
+def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0, return_partial: bool = False) -> List[slice]:
     # return a list of slices to chop up a single dimension
     if overlap >= slice_size:
         raise ValueError(
@@ -275,6 +278,8 @@ def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> List[sli
         end = start + slice_size
         if end <= dim_size:
             slices.append(slice(start, end))
+        elif return_partial:
+            slices.append(slice(start, dim_size))
     return slices
 
 
@@ -283,6 +288,7 @@ def _iterate_through_dimensions(
     *,
     dims: Dict[Hashable, int],
     overlap: Dict[Hashable, int] = {},
+    return_partial: bool = False,
 ) -> Iterator[Dict[Hashable, slice]]:
     dim_slices = []
     for dim in dims:
@@ -297,7 +303,7 @@ def _iterate_through_dimensions(
                 f"for {dim}"
             )
         dim_slices.append(
-            _gen_slices(dim_size=dim_size, slice_size=slice_size, overlap=slice_overlap)
+            _gen_slices(dim_size=dim_size, slice_size=slice_size, overlap=slice_overlap, return_partial=return_partial)
         )
     for slices in itertools.product(*dim_slices):
         selector = dict(zip(dims, slices))
@@ -364,6 +370,9 @@ class BatchGenerator:
     preload_batch : bool, optional
         If ``True``, each batch will be loaded into memory before reshaping /
         processing, triggering any dask arrays to be computed.
+    return_partial: bool, optional
+        If ``True``, produce batches from edges when dims are not evenly divisible
+        by the input dim shapes
 
     Yields
     ------
@@ -379,6 +388,7 @@ class BatchGenerator:
         batch_dims: Dict[Hashable, int] = {},
         concat_input_dims: bool = False,
         preload_batch: bool = True,
+        return_partial: bool = False,
     ):
         self.ds = ds
         self._batch_selectors: BatchSchema = BatchSchema(
@@ -388,6 +398,7 @@ class BatchGenerator:
             batch_dims=batch_dims,
             concat_input_bins=concat_input_dims,
             preload_batch=preload_batch,
+            return_partial=return_partial,
         )
 
     @property
