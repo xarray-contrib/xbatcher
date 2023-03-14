@@ -54,6 +54,7 @@ extensions = [
     "IPython.sphinxext.ipython_console_highlighting",
     "sphinx_autosummary_accessors",
     "sphinx_copybutton",
+    "sphinx_design",
 ]
 
 nbsphinx_execute = "auto"
