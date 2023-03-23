@@ -16,7 +16,7 @@ Core
    BatchGenerator
    BatchSchema
 
-Xbatcher xarray accessors
+Xbatcher Xarray accessors
 =========================
 
 .. currentmodule:: xarray

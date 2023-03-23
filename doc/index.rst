@@ -1,9 +1,9 @@
 xbatcher: Batch Generation from Xarray Datasets
 ===============================================
 
-Xbatcher is a small library for iterating xarray DataArrays in batches. The
-goal is to make it easy to feed xarray datasets to machine learning libraries
-such as Keras_.
+Xbatcher is a small library for iterating Xarray DataArrays and Datasets in
+batches. The goal is to make it easy to feed Xarray objects to machine learning
+libraries such as Keras_.
 
 .. _Keras: https://keras.io/
 
@@ -51,7 +51,7 @@ Or via PyPI::
 Basic Usage
 -----------
 
-Let's say we have an xarray dataset
+Let's say we have an Xarray Dataset
 
 .. ipython:: python
 
@@ -88,6 +88,6 @@ or via a built-in `Xarray accessor <http://xarray.pydata.org/en/stable/internals
    :caption: Contents:
 
    api
-   demo
+   tutorials-and-presentations
    roadmap
    contributing
