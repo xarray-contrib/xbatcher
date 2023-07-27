@@ -7,6 +7,7 @@ from typing import Any, Dict, Hashable, Iterator, List, Optional, Sequence, Unio
 
 import numpy as np
 import xarray as xr
+from datatree import DataTree
 
 PatchGenerator = Iterator[Dict[Hashable, slice]]
 BatchSelector = List[Dict[Hashable, slice]]
@@ -462,3 +463,73 @@ class BatchGenerator:
                 )
         else:
             raise IndexError("list index out of range")
+
+
+def datatree_slice_generator(
+    data_obj: DataTree,
+    dim_strides: Dict[str, int],
+    ref_node: str,
+    **kwargs,
+) -> DataTree:
+    """
+    Generator for iterating through an Xarray DataTree.
+
+    Parameters
+    ----------
+    data_obj : ``datatree.DataTree``
+        The multi-dimensional xarray data object to iterate over.
+
+    dim_strides : dict
+        A dictionary specifying the size of the stride in each dimension to
+        slice along, e.g. ``{'longitude': 30, 'latitude': 30}``. These are the
+        dimensions the machine library will see.
+
+    ref_node : str
+        The reference node in the xarray DataTree object whose minimum and
+        maximum coordinate bounds will be used to iteratively slice over.
+
+    kwargs : dict
+        Extra keyword arguments to pass into datatree.Datatree.sel
+
+    Yields
+    ------
+    xr_slice : : ``datatree.DataTree``
+        A single slice of a multi-dimensional xarray data object.
+    """
+    # Get the coordinate positions to slice on for each dimension, e.g.
+    # {'y': [(45.0, 25.0), (25.0, 5.0)],
+    #  'x': [(95.0, 115.0), (115.0, 135.0), (135.0, 155.0)]}
+    slice_positions: Dict[str, list] = {}
+    for dim, stride in dim_strides.items():
+        first_coord: np.ndarray = data_obj[ref_node].isel({dim: 0})[dim].data
+        final_coord: np.ndarray = data_obj[ref_node].isel({dim: -1})[dim].data
+        slices: int = int(np.floor((final_coord - first_coord) / stride))
+
+        # Obtain slicing positions. Need to minus and plus half a pixel because
+        # xarray uses centre-based coordinates
+        resolution: float = (final_coord - first_coord) / slices
+        start_positions: np.ndarray = np.linspace(
+            start=first_coord - (resolution / 2),
+            stop=final_coord - (resolution / 2),
+            num=slices + 1,
+        )
+        stop_positions: np.ndarray = np.linspace(
+            start=first_coord + (resolution / 2),
+            stop=final_coord + (resolution / 2),
+            num=slices + 1,
+        )
+        slice_positions[dim] = [tup for tup in zip(start_positions, stop_positions)]
+    assert slice_positions.keys() == dim_strides.keys()
+
+    # Iterate over combinations of slice positions across many dimensions, e.g.
+    # ((45.0, 25.0), (95.0, 115.0))
+    # ((45.0, 25.0), (115.0, 135.0))
+    # ((45.0, 25.0), (135.0, 155.0))
+    # ((25.0, 5.0), (95.0, 115.0))
+    # ((25.0, 5.0), (115.0, 135.0))
+    # ((25.0, 5.0), (135.0, 155.0))
+    for slice_pos in itertools.product(*slice_positions.values()):
+        indexers: Dict[str, slice] = {}
+        for i, dim in enumerate(dim_strides):
+            indexers[dim] = slice(*slice_pos[i])
+        yield data_obj.sel(indexers=indexers, **kwargs)

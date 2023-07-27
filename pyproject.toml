@@ -31,6 +31,7 @@ dependencies = [
     "xarray",
 ]
 [project.optional-dependencies]
+datatree = ["xarray-datatree"]
 torch = [
     "torch",
 ]
@@ -45,6 +46,7 @@ dev = [
     "pytest-cov",
     "tensorflow",
     "torch",
+    "xarray-datatree",
 ]
 [project.urls]
 documentation = "https://xbatcher.readthedocs.io/en/latest/"
@@ -59,7 +61,7 @@ fallback_version = "999"
 
 [tool.isort]
 profile = "black"
-known_third_party = ["numpy", "pandas", "pytest", "sphinx_autosummary_accessors", "torch", "xarray"]
+known_third_party = ["datatree", "numpy", "pandas", "pytest", "sphinx_autosummary_accessors", "torch", "xarray"]
 
 [tool.pytest.ini_options]
 log_cli = true
