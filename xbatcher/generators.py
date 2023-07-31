@@ -374,6 +374,12 @@ class BatchGenerator:
     preload_batch : bool, optional
         If ``True``, each batch will be loaded into memory before reshaping /
         processing, triggering any dask arrays to be computed.
+    cache : dict, optional
+        Dict-like object to cache batches in (e.g., Zarr DirectoryStore). Note:
+        The caching API is experimental and subject to change.
+    cache_preprocess: callable, optional
+        A function to apply to batches prior to caching.
+        Note: The caching API is experimental and subject to change.
 
     Yields
     ------
