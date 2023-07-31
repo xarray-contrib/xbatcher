@@ -202,7 +202,7 @@ class BatchSchema:
         Create an empty batch selector set that can be populated by appending
         patches to each batch.
         """
-        n_batches = np.product(list(self._n_batches_per_dim.values()))
+        n_batches = np.prod(list(self._n_batches_per_dim.values()))
         return {k: [] for k in range(n_batches)}
 
     def _gen_patch_numbers(self, ds: Union[xr.DataArray, xr.Dataset]):

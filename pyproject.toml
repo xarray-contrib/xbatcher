@@ -21,6 +21,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Scientific/Engineering",
 ]
 dynamic = ["version"]
@@ -58,7 +59,7 @@ fallback_version = "999"
 
 [tool.isort]
 profile = "black"
-known_third_party = ["numpy", "pytest", "sphinx_autosummary_accessors", "torch", "xarray"]
+known_third_party = ["numpy", "pandas", "pytest", "sphinx_autosummary_accessors", "torch", "xarray"]
 
 [tool.pytest.ini_options]
 log_cli = true
