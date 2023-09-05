@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'xarray-contrib/xbatcher'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: actions/setup-python@v4.7.0
