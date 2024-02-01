@@ -32,7 +32,6 @@ T_DataArrayOrSet = Union[xr.DataArray, xr.Dataset]
 
 def to_tensor(xr_obj: T_DataArrayOrSet):
     """Convert this DataArray to a torch.Tensor"""
-    print("to_tensor: ")
     if isinstance(xr_obj, xr.Dataset):
         xr_obj = xr_obj.to_array().squeeze(dim="variable")
     return torch.tensor(xr_obj.data)
