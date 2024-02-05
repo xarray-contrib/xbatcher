@@ -183,7 +183,7 @@ def validate_batch_dimensions(
 
     # Check the names and lengths of the dimensions are equal
     TestCase().assertDictEqual(
-        expected_dims, batch.sizes.mapping, msg="Dimension names and/or lengths differ"
+        expected_dims, dict(batch.sizes), msg="Dimension names and/or lengths differ"
     )
     # Check the dimension order is equal
     for var in batch.data_vars:
