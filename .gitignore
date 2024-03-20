@@ -65,3 +65,4 @@ target/
 
 # tests
 .pytest_cache/*
+notebooks/.DS_Store
