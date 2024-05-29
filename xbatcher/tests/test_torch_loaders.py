@@ -5,11 +5,11 @@ import xarray as xr
 torch = pytest.importorskip("torch")
 
 from xbatcher import BatchGenerator
-from xbatcher.loaders.torch import IterableDataset, MapDataset
+from xbatcher.loaders.torch import IterableDataset, MapDataset, to_tensor
 
 
-@pytest.fixture(scope="module")
-def ds_xy():
+@pytest.fixture(scope="module", params=[True, False])
+def ds_xy(request):
     n_samples = 100
     n_features = 5
     ds = xr.Dataset(
@@ -21,6 +21,10 @@ def ds_xy():
             "y": (["sample"], np.random.random(n_samples)),
         },
     )
+
+    if request.param:
+        ds = ds.chunk({"sample": 10})
+
     return ds
 
 
@@ -31,7 +35,7 @@ def ds_xy():
         (["x"], ["y"]),  # xr.Dataset
     ],
 )
-def test_map_dataset(ds_xy, x_var, y_var):
+def test_map_dataset(ds_xy, x_var, y_var) -> None:
     x = ds_xy[x_var]
     y = ds_xy[y_var]
 
@@ -73,7 +77,7 @@ def test_map_dataset(ds_xy, x_var, y_var):
     gen_array = (
         x_gen[-1].to_array().squeeze() if hasattr(x_gen[-1], "to_array") else x_gen[-1]
     )
-    np.testing.assert_array_equal(gen_array, x_batch)
+    np.testing.assert_array_equal(gen_array, x_batch)  # type: ignore
 
 
 @pytest.mark.parametrize(
@@ -83,7 +87,7 @@ def test_map_dataset(ds_xy, x_var, y_var):
         (["x"], ["y"]),  # xr.Dataset
     ],
 )
-def test_map_dataset_with_transform(ds_xy, x_var, y_var):
+def test_map_dataset_with_transform(ds_xy, x_var, y_var) -> None:
     x = ds_xy[x_var]
     y = ds_xy[y_var]
 
@@ -91,10 +95,10 @@ def test_map_dataset_with_transform(ds_xy, x_var, y_var):
     y_gen = BatchGenerator(y, {"sample": 10})
 
     def x_transform(batch):
-        return batch * 0 + 1
+        return to_tensor(batch * 0 + 1)
 
     def y_transform(batch):
-        return batch * 0 - 1
+        return to_tensor(batch * 0 - 1)
 
     dataset = MapDataset(
         x_gen, y_gen, transform=x_transform, target_transform=y_transform
