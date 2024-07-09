@@ -58,11 +58,16 @@ def test_constructor_dataarray():
 
 
 @pytest.mark.parametrize("input_size", [5, 6])
-def test_generator_length(sample_ds_1d, input_size):
+@pytest.mark.parametrize("return_partial", [True, False])
+def test_generator_length(sample_ds_1d, input_size, return_partial):
     """ "
     Test the length of the batch generator.
     """
-    bg = BatchGenerator(sample_ds_1d, input_dims={"x": input_size})
+    bg = BatchGenerator(
+        sample_ds_1d,
+        input_dims={"x": input_size},
+        return_partial=return_partial
+    )
     validate_generator_length(bg)
 
 
