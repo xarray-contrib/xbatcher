@@ -211,6 +211,8 @@ def _get_nbatches_from_input_dims(generator: BatchGenerator) -> int:
     s : int
         Number of batches expected given ``input_dims`` and ``input_overlap``.
     """
+    # Add 0.5 if the generator is returning partial batches to account for
+    # the final batch that will be smaller than the rest.
     final_batch_counts = 0.5 if generator._batch_selectors.return_partial else 0
     nbatches_from_input_dims = np.prod(
         [
@@ -223,8 +225,11 @@ def _get_nbatches_from_input_dims(generator: BatchGenerator) -> int:
     if generator.input_overlap:
         nbatches_from_input_overlap = np.prod(
             [
-                int((generator.ds.sizes[dim] - overlap)
-                    / (generator.input_dims[dim] - overlap) + final_batch_counts)
+                int(
+                    (generator.ds.sizes[dim] - overlap)
+                    / (generator.input_dims[dim] - overlap)
+                    + final_batch_counts
+                )
                 for dim, overlap in generator.input_overlap.items()
             ]
         )
