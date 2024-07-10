@@ -172,7 +172,6 @@ print(f"release: {release}")
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    "search_bar_position": "sidebar",
     "github_url": "https://github.com/xarray-contrib/xbatcher",
     "switcher": {
         "json_url": json_url,
