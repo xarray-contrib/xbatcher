@@ -211,9 +211,12 @@ def _get_nbatches_from_input_dims(generator: BatchGenerator) -> int:
     s : int
         Number of batches expected given ``input_dims`` and ``input_overlap``.
     """
+    # Add 0.5 if the generator is returning partial batches to account for
+    # the final batch that will be smaller than the rest.
+    final_batch_counts = 0.5 if generator._batch_selectors.return_partial else 0
     nbatches_from_input_dims = np.prod(
         [
-            generator.ds.sizes[dim] // length
+            int(generator.ds.sizes[dim] / length + final_batch_counts)
             for dim, length in generator.input_dims.items()
             if generator.input_overlap.get(dim) is None
             and generator.batch_dims.get(dim) is None
@@ -222,8 +225,11 @@ def _get_nbatches_from_input_dims(generator: BatchGenerator) -> int:
     if generator.input_overlap:
         nbatches_from_input_overlap = np.prod(
             [
-                (generator.ds.sizes[dim] - overlap)
-                // (generator.input_dims[dim] - overlap)
+                int(
+                    (generator.ds.sizes[dim] - overlap)
+                    / (generator.input_dims[dim] - overlap)
+                    + final_batch_counts
+                )
                 for dim, overlap in generator.input_overlap.items()
             ]
         )
@@ -242,17 +248,22 @@ def validate_generator_length(generator: BatchGenerator) -> None:
     generator : xbatcher.BatchGenerator
         The batch generator object.
     """
+
     non_input_batch_dims = _get_non_input_batch_dims(generator)
     duplicate_batch_dims = _get_duplicate_batch_dims(generator)
+
+    # Add 0.5 if the generator is returning partial batches to account for
+    # the final batch that will be smaller than the rest.
+    final_batch_counts = 0.5 if generator._batch_selectors.return_partial else 0
     nbatches_from_unique_batch_dims = np.prod(
         [
-            generator.ds.sizes[dim] // length
+            int(generator.ds.sizes[dim] / length + final_batch_counts)
             for dim, length in non_input_batch_dims.items()
         ]
     )
     nbatches_from_duplicate_batch_dims = np.prod(
         [
-            generator.ds.sizes[dim] // length
+            int(generator.ds.sizes[dim] / length + final_batch_counts)
             for dim, length in duplicate_batch_dims.items()
         ]
     )
