@@ -1,5 +1,7 @@
-from importlib.metadata import PackageNotFoundError as _PackageNotFoundError
-from importlib.metadata import version as _version
+from importlib.metadata import (
+    PackageNotFoundError as _PackageNotFoundError,
+    version as _version,
+)
 
 from . import testing  # noqa: F401
 from .accessors import BatchAccessor  # noqa: F401
@@ -10,4 +12,4 @@ try:
     __version__ = _version(__name__)
 except _PackageNotFoundError:
     # package is not installed
-    __version__ = "unknown"
+    __version__ = 'unknown'

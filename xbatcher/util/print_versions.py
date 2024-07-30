@@ -26,44 +26,44 @@ def show_versions(file=sys.stdout):
             else:
                 module = importlib.import_module(modname)
 
-            return getattr(module, "__version__", "installed")
+            return getattr(module, '__version__', 'installed')
         except ImportError:
             return None
 
     sys_info = {
-        "python": sys.version.replace("\n", " "),
-        "executable": sys.executable,
-        "machine": platform.platform(),
+        'python': sys.version.replace('\n', ' '),
+        'executable': sys.executable,
+        'machine': platform.platform(),
     }
 
     deps = [
         # Required
-        "dask",
-        "numpy",
-        "xarray",
+        'dask',
+        'numpy',
+        'xarray',
         # Optional
-        "torch",
+        'torch',
         # Setup/test
-        "pip",
-        "conda",
-        "pytest",
+        'pip',
+        'conda',
+        'pytest',
         # Misc.
-        "IPython",
-        "sphinx",
+        'IPython',
+        'sphinx',
     ]
     __version__ = f'v{importlib.metadata.version("xbatcher")}'
 
-    print("xbatcher information:", file=file)
-    print(f"  version: {__version__}", file=file)
+    print('xbatcher information:', file=file)
+    print(f'  version: {__version__}', file=file)
 
-    print("System information:", file=file)
+    print('System information:', file=file)
     for key, val in sys_info.items():
-        print(f"  {key}: {val}", file=file)
+        print(f'  {key}: {val}', file=file)
 
-    print("Dependency information:", file=file)
+    print('Dependency information:', file=file)
     for modname in deps:
-        print(f"  {modname}: {_get_module_version(modname)}", file=file)
+        print(f'  {modname}: {_get_module_version(modname)}', file=file)
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     show_versions()
