@@ -273,11 +273,11 @@ class BatchSchema:
             The JSON representation of the BatchSchema
         """
         out_dict = {}
-        out_dict["input_dims"] = self.input_dims
-        out_dict["input_overlap"] = self.input_overlap
-        out_dict["batch_dims"] = self.batch_dims
-        out_dict["concat_input_dims"] = self.input_dims
-        out_dict["preload_batch"] = self.preload_batch
+        out_dict['input_dims'] = self.input_dims
+        out_dict['input_overlap'] = self.input_overlap
+        out_dict['batch_dims'] = self.batch_dims
+        out_dict['concat_input_dims'] = self.input_dims
+        out_dict['preload_batch'] = self.preload_batch
         batch_selector_dict = {}
         for i in self.selectors.keys():
             batch_selector_dict[i] = self.selectors[i]
@@ -286,11 +286,11 @@ class BatchSchema:
                 member_keys = [x for x in member.keys()]
                 for member_key in member_keys:
                     out_member_dict[member_key] = {
-                        "start": member[member_key].start,
-                        "stop": member[member_key].stop,
-                        "step": member[member_key].step,
+                        'start': member[member_key].start,
+                        'stop': member[member_key].stop,
+                        'step': member[member_key].step,
                     }
-        out_dict["selector"] = out_member_dict
+        out_dict['selector'] = out_member_dict
         return json.dumps(out_dict)
 
     def to_file(self, out_file_name: str):
@@ -303,7 +303,7 @@ class BatchSchema:
             The path to the json file to write to.
         """
         out_json = self.to_json()
-        out_file = open(out_file_name, mode="w")
+        out_file = open(out_file_name, mode='w')
         out_file.write(out_json)
         out_file.close()
 

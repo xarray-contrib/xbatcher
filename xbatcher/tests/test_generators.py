@@ -362,19 +362,21 @@ def test_input_overlap_exceptions(sample_ds_1d):
         assert len(e) == 1
 
 
-@pytest.mark.parametrize("input_size", [5, 10])
+@pytest.mark.parametrize('input_size', [5, 10])
 def test_to_json(sample_ds_3d, input_size):
     x_input_size = 20
     bg = BatchSchema(
         sample_ds_3d,
-        input_dims={"time": input_size, "x": x_input_size},
+        input_dims={'time': input_size, 'x': x_input_size},
     )
-    out_file = tempfile.NamedTemporaryFile(mode="w+b")
+    out_file = tempfile.NamedTemporaryFile(mode='w+b')
     bg.to_file(out_file.name)
     in_dict = json.load(out_file)
-    assert in_dict["input_dims"]["time"] == input_size
-    assert in_dict["input_dims"]["x"] == x_input_size
+    assert in_dict['input_dims']['time'] == input_size
+    assert in_dict['input_dims']['x'] == x_input_size
     out_file.close()
+
+
 @pytest.mark.parametrize('preload', [True, False])
 def test_batcher_cached_getitem(sample_ds_1d, preload) -> None:
     pytest.importorskip('zarr')
