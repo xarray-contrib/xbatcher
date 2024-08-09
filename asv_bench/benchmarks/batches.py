@@ -17,12 +17,12 @@ class Base:
     def setup(self):
         self.ds = xr.Dataset(
             {
-                "var1": (("x", "y", "t"), randn_xyt),
+                'var1': (('x', 'y', 't'), randn_xyt),
             },
             coords={
-                "x": np.arange(nx),
-                "y": np.linspace(0, 1, ny),
-                "t": pd.date_range("1970-01-01", periods=nt, freq="D"),
+                'x': np.arange(nx),
+                'y': np.linspace(0, 1, ny),
+                't': pd.date_range('1970-01-01', periods=nt, freq='D'),
             },
         )
 
@@ -34,8 +34,8 @@ class NoPreload(Base):
 
     def setup(self):
         super().setup()
-        ds_dask = self.ds.chunk({"t": 2})
-        self.bg = BatchGenerator(ds_dask, input_dims={"t": 2}, preload_batch=False)
+        ds_dask = self.ds.chunk({'t': 2})
+        self.bg = BatchGenerator(ds_dask, input_dims={'t': 2}, preload_batch=False)
 
     def time_next_batch(self):
         """
@@ -51,7 +51,7 @@ class OneInputDim(Base):
 
     def setup(self):
         super().setup()
-        self.bg = BatchGenerator(self.ds, input_dims={"x": 10})
+        self.bg = BatchGenerator(self.ds, input_dims={'x': 10})
 
     def time_next_batch(self):
         """
@@ -67,7 +67,7 @@ class AllInputDim(Base):
 
     def setup(self):
         super().setup()
-        self.bg = BatchGenerator(self.ds, input_dims={"x": 10, "y": 10, "t": 5})
+        self.bg = BatchGenerator(self.ds, input_dims={'x': 10, 'y': 10, 't': 5})
 
     def time_next_batch(self):
         """
@@ -84,7 +84,7 @@ class InputDimInputOverlap(Base):
     def setup(self):
         super().setup()
         self.bg = BatchGenerator(
-            self.ds, input_dims={"x": 10, "y": 10}, input_overlap={"x": 5, "y": 5}
+            self.ds, input_dims={'x': 10, 'y': 10}, input_overlap={'x': 5, 'y': 5}
         )
 
     def time_next_batch(self):
@@ -102,7 +102,7 @@ class InputDimConcat(Base):
     def setup(self):
         super().setup()
         self.bg = BatchGenerator(
-            self.ds, input_dims={"x": 10, "y": 10}, concat_input_dims=True
+            self.ds, input_dims={'x': 10, 'y': 10}, concat_input_dims=True
         )
 
     def time_next_batch(self):
@@ -120,7 +120,7 @@ class InputDimBatchDim(Base):
     def setup(self):
         super().setup()
         self.bg = BatchGenerator(
-            self.ds, input_dims={"x": 10, "y": 10}, batch_dims={"t": 2}
+            self.ds, input_dims={'x': 10, 'y': 10}, batch_dims={'t': 2}
         )
 
     def time_next_batch(self):
@@ -139,8 +139,8 @@ class InputDimBatchDimConcat(Base):
         super().setup()
         self.bg = BatchGenerator(
             self.ds,
-            input_dims={"x": 5, "y": 5},
-            batch_dims={"x": 10, "y": 10},
+            input_dims={'x': 5, 'y': 5},
+            batch_dims={'x': 10, 'y': 10},
             concat_input_dims=True,
         )
 
@@ -160,8 +160,8 @@ class InputDimInputOverlapConcat(Base):
         super().setup()
         self.bg = BatchGenerator(
             self.ds,
-            input_dims={"x": 10, "y": 10},
-            input_overlap={"x": 5, "y": 5},
+            input_dims={'x': 10, 'y': 10},
+            input_overlap={'x': 5, 'y': 5},
             concat_input_dims=True,
         )
 

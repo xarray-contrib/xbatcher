@@ -18,16 +18,16 @@ class TorchLoader:
     def setup(self, *args, **kwargs):
         self.ds = xr.Dataset(
             {
-                "var1": (("x", "y"), randn_xy),
-                "var2": (("y"), randn_y),
+                'var1': (('x', 'y'), randn_xy),
+                'var2': (('y'), randn_y),
             },
             coords={
-                "x": np.arange(nx),
-                "y": np.linspace(0, 1, ny),
+                'x': np.arange(nx),
+                'y': np.linspace(0, 1, ny),
             },
         )
-        self.x_gen = BatchGenerator(self.ds["var1"], {"y": 10})
-        self.y_gen = BatchGenerator(self.ds["var2"], {"y": 10})
+        self.x_gen = BatchGenerator(self.ds['var1'], {'y': 10})
+        self.y_gen = BatchGenerator(self.ds['var2'], {'y': 10})
 
     def time_map_dataset(self):
         """

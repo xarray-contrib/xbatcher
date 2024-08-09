@@ -17,18 +17,18 @@ class Accessor:
     def setup(self, *args, **kwargs):
         self.ds = xr.Dataset(
             {
-                "var1": (("x", "y", "t"), randn_xyt),
+                'var1': (('x', 'y', 't'), randn_xyt),
             },
             coords={
-                "x": np.arange(nx),
-                "y": np.linspace(0, 1, ny),
-                "t": pd.date_range("1970-01-01", periods=nt, freq="D"),
+                'x': np.arange(nx),
+                'y': np.linspace(0, 1, ny),
+                't': pd.date_range('1970-01-01', periods=nt, freq='D'),
             },
         )
 
     @parameterized(
-        ["input_dims"],
-        ([{"x": 10}, {"x": 10, "y": 5}, {"x": 10, "y": 5, "t": 2}],),
+        ['input_dims'],
+        ([{'x': 10}, {'x': 10, 'y': 5}, {'x': 10, 'y': 5, 't': 2}],),
     )
     def time_input_dims(self, input_dims):
         """
