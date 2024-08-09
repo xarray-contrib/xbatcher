@@ -1,9 +1,9 @@
-name: xbatcher-docs-pydata
+name: xbatcher-docs
 channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - python=3.8
+  - python=3.9
   - dask
   - pydata-sphinx-theme
   - ipython
@@ -14,6 +14,7 @@ dependencies:
   - sphinx<6
   - sphinx-autosummary-accessors
   - sphinx-copybutton
+  - sphinx-design
   - xarray
   # For examples
   - adlfs

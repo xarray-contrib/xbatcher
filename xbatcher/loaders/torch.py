@@ -1,11 +1,11 @@
-from typing import Any, Callable, Optional, Tuple
+from typing import Any, Callable, Optional
 
 try:
     import torch
 except ImportError as exc:
     raise ImportError(
-        "The Xbatcher PyTorch Dataset API depends on PyTorch. Please "
-        "install PyTorch to proceed."
+        'The Xbatcher PyTorch Dataset API depends on PyTorch. Please '
+        'install PyTorch to proceed.'
     ) from exc
 
 # Notes:
@@ -47,14 +47,14 @@ class MapDataset(torch.utils.data.Dataset):
     def __len__(self) -> int:
         return len(self.X_generator)
 
-    def __getitem__(self, idx) -> Tuple[Any, Any]:
+    def __getitem__(self, idx) -> tuple[Any, Any]:
         if torch.is_tensor(idx):
             idx = idx.tolist()
             if len(idx) == 1:
                 idx = idx[0]
             else:
                 raise NotImplementedError(
-                    f"{type(self).__name__}.__getitem__ currently requires a single integer key"
+                    f'{type(self).__name__}.__getitem__ currently requires a single integer key'
                 )
 
         X_batch = self.X_generator[idx].torch.to_tensor()

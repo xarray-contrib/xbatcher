@@ -3,15 +3,16 @@
 import itertools
 import json
 import warnings
+from collections.abc import Hashable, Iterator, Sequence
 from operator import itemgetter
-from typing import Any, Dict, Hashable, Iterator, List, Optional, Sequence, Union
+from typing import Any, Callable, Optional, Union
 
 import numpy as np
 import xarray as xr
 
-PatchGenerator = Iterator[Dict[Hashable, slice]]
-BatchSelector = List[Dict[Hashable, slice]]
-BatchSelectorSet = Dict[int, BatchSelector]
+PatchGenerator = Iterator[dict[Hashable, slice]]
+BatchSelector = list[dict[Hashable, slice]]
+BatchSelectorSet = dict[int, BatchSelector]
 
 
 class BatchSchema:
@@ -55,9 +56,9 @@ class BatchSchema:
     def __init__(
         self,
         ds: Union[xr.Dataset, xr.DataArray],
-        input_dims: Dict[Hashable, int],
-        input_overlap: Optional[Dict[Hashable, int]] = None,
-        batch_dims: Optional[Dict[Hashable, int]] = None,
+        input_dims: dict[Hashable, int],
+        input_overlap: Optional[dict[Hashable, int]] = None,
+        batch_dims: Optional[dict[Hashable, int]] = None,
         concat_input_bins: bool = True,
         preload_batch: bool = True,
     ):
@@ -71,21 +72,21 @@ class BatchSchema:
         self.concat_input_dims = concat_input_bins
         self.preload_batch = preload_batch
         # Store helpful information based on arguments
-        self._duplicate_batch_dims: Dict[Hashable, int] = {
+        self._duplicate_batch_dims: dict[Hashable, int] = {
             dim: length
             for dim, length in self.batch_dims.items()
             if self.input_dims.get(dim) is not None
         }
-        self._unique_batch_dims: Dict[Hashable, int] = {
+        self._unique_batch_dims: dict[Hashable, int] = {
             dim: length
             for dim, length in self.batch_dims.items()
             if self.input_dims.get(dim) is None
         }
-        self._input_stride: Dict[Hashable, int] = {
+        self._input_stride: dict[Hashable, int] = {
             dim: length - self.input_overlap.get(dim, 0)
             for dim, length in self.input_dims.items()
         }
-        self._all_sliced_dims: Dict[Hashable, int] = dict(
+        self._all_sliced_dims: dict[Hashable, int] = dict(
             **self._unique_batch_dims, **self.input_dims
         )
         self.selectors: BatchSelectorSet = self._gen_batch_selectors(ds)
@@ -113,9 +114,9 @@ class BatchSchema:
         """
         if self._duplicate_batch_dims and not self.concat_input_dims:
             warnings.warn(
-                "The following dimensions were included in both ``input_dims`` "
-                "and ``batch_dims``. Since ``concat_input_dims`` is ``False``, "
-                f"these dimensions will not impact batch generation: {self._duplicate_batch_dims}"
+                'The following dimensions were included in both ``input_dims`` '
+                'and ``batch_dims``. Since ``concat_input_dims`` is ``False``, '
+                f'these dimensions will not impact batch generation: {self._duplicate_batch_dims}'
             )
         # Generate the slices by iterating over batch_dims and input_dims
         all_slices = _iterate_through_dimensions(
@@ -134,7 +135,7 @@ class BatchSchema:
         # Check that patches are only combined with concat_input_dims
         if not self.concat_input_dims:
             raise AssertionError(
-                "Patches should only be combined into batches when ``concat_input_dims`` is ``True``"
+                'Patches should only be combined into batches when ``concat_input_dims`` is ``True``'
             )
         if not self.batch_dims:
             return self._combine_patches_into_one_batch(patch_selectors)
@@ -193,7 +194,7 @@ class BatchSchema:
         Create an empty batch selector set that can be populated by appending
         patches to each batch.
         """
-        n_batches = np.product(list(self._n_batches_per_dim.values()))
+        n_batches = np.prod(list(self._n_batches_per_dim.values()))
         return {k: [] for k in range(n_batches)}
 
     def _gen_patch_numbers(self, ds: Union[xr.DataArray, xr.Dataset]):
@@ -201,11 +202,11 @@ class BatchSchema:
         Calculate the number of patches per dimension and the number of patches
         in each batch per dimension.
         """
-        self._n_patches_per_batch: Dict[Hashable, int] = {
+        self._n_patches_per_batch: dict[Hashable, int] = {
             dim: int(np.ceil(length / self._input_stride.get(dim, length)))
             for dim, length in self.batch_dims.items()
         }
-        self._n_patches_per_dim: Dict[Hashable, int] = {
+        self._n_patches_per_dim: dict[Hashable, int] = {
             dim: int(
                 (ds.sizes[dim] - self.input_overlap.get(dim, 0))
                 // (length - self.input_overlap.get(dim, 0))
@@ -217,7 +218,7 @@ class BatchSchema:
         """
         Calculate the number of batches per dimension
         """
-        self._n_batches_per_dim: Dict[Hashable, int] = {
+        self._n_batches_per_dim: dict[Hashable, int] = {
             dim: int(ds.sizes[dim] // self.batch_dims.get(dim, ds.sizes[dim]))
             for dim in self._all_sliced_dims.keys()
         }
@@ -226,7 +227,7 @@ class BatchSchema:
         """
         Calculate the batch multi-index for each patch
         """
-        batch_id_per_dim: Dict[Hashable, Any] = {
+        batch_id_per_dim: dict[Hashable, Any] = {
             dim: np.floor(
                 np.arange(0, n_patches)
                 / self._n_patches_per_batch.get(dim, n_patches + 1)
@@ -245,7 +246,7 @@ class BatchSchema:
         return np.ravel_multi_index(
             multi_index=batch_multi_index,
             dims=tuple(self._n_batches_per_dim.values()),
-            mode="clip",
+            mode='clip',
         )
 
     def _get_batch_in_range_per_batch(self, batch_multi_index):
@@ -307,12 +308,12 @@ class BatchSchema:
         out_file.close()
 
 
-def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> List[slice]:
+def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> list[slice]:
     # return a list of slices to chop up a single dimension
     if overlap >= slice_size:
         raise ValueError(
-            "input overlap must be less than the input sample length, but "
-            f"the input sample length is {slice_size} and the overlap is {overlap}"
+            'input overlap must be less than the input sample length, but '
+            f'the input sample length is {slice_size} and the overlap is {overlap}'
         )
     slices = []
     stride = slice_size - overlap
@@ -326,9 +327,9 @@ def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> List[sli
 def _iterate_through_dimensions(
     ds: Union[xr.Dataset, xr.DataArray],
     *,
-    dims: Dict[Hashable, int],
-    overlap: Dict[Hashable, int] = {},
-) -> Iterator[Dict[Hashable, slice]]:
+    dims: dict[Hashable, int],
+    overlap: dict[Hashable, int] = {},
+) -> Iterator[dict[Hashable, slice]]:
     dim_slices = []
     for dim in dims:
         dim_size = ds.sizes[dim]
@@ -336,10 +337,10 @@ def _iterate_through_dimensions(
         slice_overlap = overlap.get(dim, 0)
         if slice_size > dim_size:
             raise ValueError(
-                "input sample length must be less than or equal to the "
-                f"dimension length, but the sample length of {slice_size} "
-                f"is greater than the dimension length of {dim_size} "
-                f"for {dim}"
+                'input sample length must be less than or equal to the '
+                f'dimension length, but the sample length of {slice_size} '
+                f'is greater than the dimension length of {dim_size} '
+                f'for {dim}'
             )
         dim_slices.append(
             _gen_slices(dim_size=dim_size, slice_size=slice_size, overlap=slice_overlap)
@@ -351,14 +352,14 @@ def _iterate_through_dimensions(
 
 def _drop_input_dims(
     ds: Union[xr.Dataset, xr.DataArray],
-    input_dims: Dict[Hashable, int],
-    suffix: str = "_input",
+    input_dims: dict[Hashable, int],
+    suffix: str = '_input',
 ) -> Union[xr.Dataset, xr.DataArray]:
     # remove input_dims coordinates from datasets, rename the dimensions
     # then put intput_dims back in as coordinates
     out = ds.copy()
     for dim in input_dims.keys():
-        newdim = f"{dim}{suffix}"
+        newdim = f'{dim}{suffix}'
         out = out.rename({dim: newdim})
         # extra steps needed if there is a coordinate
         if newdim in out:
@@ -376,7 +377,7 @@ def _maybe_stack_batch_dims(
         return ds
     ds_stack = ds.stack(sample=batch_dims)
     # ensure correct order
-    dim_order = ("sample",) + tuple(input_dims)
+    dim_order = ('sample',) + tuple(input_dims)
     return ds_stack.transpose(*dim_order)
 
 
@@ -409,6 +410,12 @@ class BatchGenerator:
     preload_batch : bool, optional
         If ``True``, each batch will be loaded into memory before reshaping /
         processing, triggering any dask arrays to be computed.
+    cache : dict, optional
+        Dict-like object to cache batches in (e.g., Zarr DirectoryStore). Note:
+        The caching API is experimental and subject to change.
+    cache_preprocess: callable, optional
+        A function to apply to batches prior to caching.
+        Note: The caching API is experimental and subject to change.
 
     Yields
     ------
@@ -419,14 +426,18 @@ class BatchGenerator:
     def __init__(
         self,
         ds: Union[xr.Dataset, xr.DataArray],
-        input_dims: Dict[Hashable, int],
-        input_overlap: Dict[Hashable, int] = {},
-        batch_dims: Dict[Hashable, int] = {},
+        input_dims: dict[Hashable, int],
+        input_overlap: dict[Hashable, int] = {},
+        batch_dims: dict[Hashable, int] = {},
         concat_input_dims: bool = False,
         preload_batch: bool = True,
+        cache: Optional[dict[str, Any]] = None,
+        cache_preprocess: Optional[Callable] = None,
     ):
-
         self.ds = ds
+        self.cache = cache
+        self.cache_preprocess = cache_preprocess
+
         self._batch_selectors: BatchSchema = BatchSchema(
             ds,
             input_dims=input_dims,
@@ -464,20 +475,21 @@ class BatchGenerator:
         return len(self._batch_selectors.selectors)
 
     def __getitem__(self, idx: int) -> Union[xr.Dataset, xr.DataArray]:
-
         if not isinstance(idx, int):
             raise NotImplementedError(
-                f"{type(self).__name__}.__getitem__ currently requires a single integer key"
+                f'{type(self).__name__}.__getitem__ currently requires a single integer key'
             )
 
         if idx < 0:
             idx = list(self._batch_selectors.selectors)[idx]
 
-        if idx in self._batch_selectors.selectors:
+        if self.cache and self._batch_in_cache(idx):
+            return self._get_cached_batch(idx)
 
+        if idx in self._batch_selectors.selectors:
             if self.concat_input_dims:
-                new_dim_suffix = "_input"
-                all_dsets: List = []
+                new_dim_suffix = '_input'
+                all_dsets: list = []
                 batch_selector = {}
                 for dim in self._batch_selectors.batch_dims.keys():
                     starts = [
@@ -497,16 +509,35 @@ class BatchGenerator:
                             suffix=new_dim_suffix,
                         )
                     )
-                dsc = xr.concat(all_dsets, dim="input_batch")
+                dsc = xr.concat(all_dsets, dim='input_batch')
                 new_input_dims = [str(dim) + new_dim_suffix for dim in self.input_dims]
-                return _maybe_stack_batch_dims(dsc, new_input_dims)
+                batch = _maybe_stack_batch_dims(dsc, new_input_dims)
             else:
                 batch_ds = self.ds.isel(self._batch_selectors.selectors[idx][0])
                 if self.preload_batch:
                     batch_ds.load()
-                return _maybe_stack_batch_dims(
+                batch = _maybe_stack_batch_dims(
                     batch_ds,
                     list(self.input_dims),
                 )
         else:
-            raise IndexError("list index out of range")
+            raise IndexError('list index out of range')
+
+        if self.cache is not None and self.cache_preprocess is not None:
+            batch = self.cache_preprocess(batch)
+        if self.cache is not None:
+            self._cache_batch(idx, batch)
+
+        return batch
+
+    def _batch_in_cache(self, idx: int) -> bool:
+        return self.cache is not None and f'{idx}/.zgroup' in self.cache
+
+    def _cache_batch(self, idx: int, batch: Union[xr.Dataset, xr.DataArray]) -> None:
+        batch.to_zarr(self.cache, group=str(idx), mode='a')
+
+    def _get_cached_batch(self, idx: int) -> xr.Dataset:
+        ds = xr.open_zarr(self.cache, group=str(idx))
+        if self.preload_batch:
+            ds = ds.load()
+        return ds

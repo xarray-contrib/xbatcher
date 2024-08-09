@@ -1,11 +1,11 @@
-from typing import Any, Callable, Optional, Tuple
+from typing import Any, Callable, Optional
 
 try:
     import tensorflow as tf
 except ImportError as exc:
     raise ImportError(
-        "The Xbatcher TensorFlow Dataset API depends on TensorFlow. Please "
-        "install TensorFlow to proceed."
+        'The Xbatcher TensorFlow Dataset API depends on TensorFlow. Please '
+        'install TensorFlow to proceed.'
     ) from exc
 
 # Notes:
@@ -44,7 +44,7 @@ class CustomTFDataset(tf.keras.utils.Sequence):
     def __len__(self) -> int:
         return len(self.X_generator)
 
-    def __getitem__(self, idx: int) -> Tuple[Any, Any]:
+    def __getitem__(self, idx: int) -> tuple[Any, Any]:
         X_batch = tf.convert_to_tensor(self.X_generator[idx].data)
         y_batch = tf.convert_to_tensor(self.y_generator[idx].data)
 
