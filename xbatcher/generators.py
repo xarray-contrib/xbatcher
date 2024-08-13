@@ -1,6 +1,7 @@
 """Classes for iterating through xarray datarrays / datasets in batches."""
 
 import itertools
+import json
 import warnings
 from collections.abc import Hashable, Iterator, Sequence
 from operator import itemgetter
@@ -261,6 +262,49 @@ class BatchSchema:
         batch_id_maximum = batch_id_maximum[:, np.newaxis]
         batch_in_range_per_patch = np.all(batch_multi_index < batch_id_maximum, axis=0)
         return batch_in_range_per_patch
+
+    def to_json(self):
+        """
+        Dump the BatchSchema properties to a JSON file.
+
+        Returns
+        ----------
+        out_json: str
+            The JSON representation of the BatchSchema
+        """
+        out_dict = {}
+        out_dict['input_dims'] = self.input_dims
+        out_dict['input_overlap'] = self.input_overlap
+        out_dict['batch_dims'] = self.batch_dims
+        out_dict['concat_input_dims'] = self.input_dims
+        out_dict['preload_batch'] = self.preload_batch
+        batch_selector_dict = {}
+        for i in self.selectors.keys():
+            batch_selector_dict[i] = self.selectors[i]
+            for member in batch_selector_dict[i]:
+                out_member_dict = {}
+                member_keys = [x for x in member.keys()]
+                for member_key in member_keys:
+                    out_member_dict[member_key] = {
+                        'start': member[member_key].start,
+                        'stop': member[member_key].stop,
+                        'step': member[member_key].step,
+                    }
+        out_dict['selector'] = out_member_dict
+        return json.dumps(out_dict)
+
+    def to_file(self, out_file_name: str):
+        """
+        Dumps the JSON representation of the BatchSchema object to a file.
+
+        Parameters
+        ----------
+        out_file_name: str
+            The path to the json file to write to.
+        """
+        out_json = self.to_json()
+        with open(out_file_name, mode='w') as out_file:
+            out_file.write(out_json)
 
 
 def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> list[slice]:
