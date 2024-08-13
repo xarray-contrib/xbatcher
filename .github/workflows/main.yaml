@@ -12,13 +12,18 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: ${{ matrix.python-version }}-build
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+      fail-fast: false
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
@@ -40,7 +45,7 @@ jobs:
           pytest --verbose --cov=. --cov-report=xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4.5.0
-        if: ${{ matrix.python-version }} == 3.9
+        if: ${{ matrix.python-version }} == 3.10
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
@@ -50,7 +55,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+      fail-fast: false
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
