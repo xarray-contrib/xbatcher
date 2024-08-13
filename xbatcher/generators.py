@@ -303,9 +303,8 @@ class BatchSchema:
             The path to the json file to write to.
         """
         out_json = self.to_json()
-        out_file = open(out_file_name, mode='w')
-        out_file.write(out_json)
-        out_file.close()
+        with open(out_file_name, mode='w') as out_file:
+            out_file.write(out_json)
 
 
 def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> list[slice]:
