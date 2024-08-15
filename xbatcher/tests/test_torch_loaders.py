@@ -1,3 +1,5 @@
+from importlib import reload
+
 import numpy as np
 import pytest
 import xarray as xr
@@ -10,7 +12,6 @@ torch = pytest.importorskip('torch')
 
 def test_import_torch_failure(monkeypatch):
     import sys
-    from importlib import reload
 
     import xbatcher.loaders
 
@@ -25,10 +26,12 @@ def test_import_torch_failure(monkeypatch):
 def test_import_dask_failure(monkeypatch):
     import sys
 
-    monkeypatch.setitem(sys.modules, 'dask', None)
-    import xbatcher.loaders.torch
+    import xbatcher.loaders
 
-    xbatcher.loaders.torch.dask is None
+    monkeypatch.setitem(sys.modules, 'dask', None)
+    reload(xbatcher.loaders.torch)
+
+    assert xbatcher.loaders.torch.dask is None
 
 
 @pytest.fixture(scope='module', params=[True, False])
