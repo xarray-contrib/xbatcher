@@ -1,6 +1,3 @@
-import sys
-from unittest import mock
-
 import numpy as np
 import pytest
 import xarray as xr
@@ -11,18 +8,27 @@ from xbatcher.loaders.torch import IterableDataset, MapDataset, to_tensor
 torch = pytest.importorskip('torch')
 
 
-def test_import_torch_failure():
-    with mock.patch.dict(sys.modules, {'torch': None}):
-        with pytest.raises(ImportError) as excinfo:
-            import xbatcher.loaders.torch  # noqa: F401
-        assert 'install PyTorch to proceed' in str(excinfo.value)
+def test_import_torch_failure(monkeypatch):
+    import sys
+    from importlib import reload
+
+    import xbatcher.loaders
+
+    monkeypatch.setitem(sys.modules, 'torch', None)
+
+    with pytest.raises(ImportError) as excinfo:
+        reload(xbatcher.loaders.torch)
+
+    assert 'install PyTorch to proceed' in str(excinfo.value)
 
 
-def test_import_dask_failure():
-    with mock.patch.dict(sys.modules, {'dask': None}):
-        import xbatcher.loaders.torch  # noqa: F401
+def test_import_dask_failure(monkeypatch):
+    import sys
 
-        assert 'dask' not in sys.modules
+    monkeypatch.setitem(sys.modules, 'dask', None)
+    import xbatcher.loaders.torch
+
+    xbatcher.loaders.torch.dask is None
 
 
 @pytest.fixture(scope='module', params=[True, False])
