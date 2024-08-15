@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # xbatcher documentation build configuration file, created by
 # sphinx-quickstart on Sat Aug 29 00:18:20 2015.
@@ -28,9 +27,9 @@ import xbatcher
 # sys.path.insert(0, os.path.abspath('.'))
 # sys.path.insert(os.path.abspath('..'))
 
-print("python exec:", sys.executable)
-print("sys.path:", sys.path)
-print("xbatcher.version:", xbatcher.__version__)
+print('python exec:', sys.executable)
+print('sys.path:', sys.path)
+print('xbatcher.version:', xbatcher.__version__)
 
 
 # -- General configuration ------------------------------------------------
@@ -42,31 +41,31 @@ print("xbatcher.version:", xbatcher.__version__)
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx.ext.mathjax",
-    "sphinx.ext.autodoc",
-    "sphinx.ext.autosummary",
-    "sphinx.ext.extlinks",
-    "sphinx.ext.viewcode",
-    "sphinx.ext.intersphinx",
-    "numpydoc",
-    "nbsphinx",
-    "IPython.sphinxext.ipython_directive",
-    "IPython.sphinxext.ipython_console_highlighting",
-    "sphinx_autosummary_accessors",
-    "sphinx_copybutton",
-    "sphinx_design",
+    'sphinx.ext.mathjax',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.extlinks',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.intersphinx',
+    'numpydoc',
+    'nbsphinx',
+    'IPython.sphinxext.ipython_directive',
+    'IPython.sphinxext.ipython_console_highlighting',
+    'sphinx_autosummary_accessors',
+    'sphinx_copybutton',
+    'sphinx_design',
 ]
 
-nbsphinx_execute = "auto"
+nbsphinx_execute = 'auto'
 
 
-autodoc_mock_imports = ["torch", "tensorflow"]
+autodoc_mock_imports = ['torch', 'tensorflow']
 
 # link to github issues
-extlinks = {"issue": ("https://github.com/xarray-contrib/xbatcher/issues/%s", "#%s")}
+extlinks = {'issue': ('https://github.com/xarray-contrib/xbatcher/issues/%s', '#%s')}
 
 # sphinx-copybutton configurations (from https://github.com/pydata/xarray/blob/main/doc/conf.py)
-copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
+copybutton_prompt_text = r'>>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: '
 copybutton_prompt_is_regexp = True
 
 autosummary_generate = True
@@ -74,20 +73,20 @@ numpydoc_class_members_toctree = False
 numpydoc_show_class_members = False
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates", sphinx_autosummary_accessors.templates_path]
+templates_path = ['_templates', sphinx_autosummary_accessors.templates_path]
 
 # The suffix of source filenames.
-source_suffix = ".rst"
+source_suffix = '.rst'
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = "index"
+master_doc = 'index'
 
 # General information about the project.
-project = "xbatcher"
-copyright = f"2016-{datetime.datetime.now().year}, xbatcher developers"
+project = 'xbatcher'
+copyright = f'2016-{datetime.datetime.now().year}, xbatcher developers'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -110,7 +109,7 @@ release = xbatcher.__version__
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ["_build", "**.ipynb_checkpoints"]
+exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -128,7 +127,7 @@ exclude_patterns = ["_build", "**.ipynb_checkpoints"]
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = "sphinx"
+pygments_style = 'sphinx'
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -142,48 +141,47 @@ pygments_style = "sphinx"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 # tml_theme = 'default'
-html_theme = "pydata_sphinx_theme"
-html_logo = "_static/logo.svg"
-html_favicon = "_static/logo.svg"
+html_theme = 'pydata_sphinx_theme'
+html_logo = '_static/logo.svg'
+html_favicon = '_static/logo.svg'
 
 # The following is from the pydata-sphinx-theme settings (https://github.com/pydata/pydata-sphinx-theme/blob/main/docs/conf.py)
 # Define the json_url for our version switcher.
-json_url = "https://xbatcher.readthedocs.io/en/latest/_static/switcher.json"
+json_url = 'https://xbatcher.readthedocs.io/en/latest/_static/switcher.json'
 
 # Define the version we use for matching in the version switcher.
-version_match = os.environ.get("READTHEDOCS_VERSION")
+version_match = os.environ.get('READTHEDOCS_VERSION')
 # If READTHEDOCS_VERSION doesn't exist, we're not on RTD
 # If it is an integer, we're in a PR build and the version isn't correct.
 if not version_match or version_match.isdigit():
     # For local development, infer the version to match from the package.
     release = xbatcher.__version__
-    if "dev" in release or "post" in release or "rc" in release:
-        version_match = "latest"
+    if 'dev' in release or 'post' in release or 'rc' in release:
+        version_match = 'latest'
         # We want to keep the relative reference if we are in dev mode
         # but we want the whole url if we are effectively in a released version
-        json_url = "_static/switcher.json"
+        json_url = '_static/switcher.json'
     else:
-        version_match = "v" + release
+        version_match = 'v' + release
 
-print(f"release: {release}")
+print(f'release: {release}')
 
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    "search_bar_position": "sidebar",
-    "github_url": "https://github.com/xarray-contrib/xbatcher",
-    "switcher": {
-        "json_url": json_url,
-        "version_match": version_match,
+    'github_url': 'https://github.com/xarray-contrib/xbatcher',
+    'switcher': {
+        'json_url': json_url,
+        'version_match': version_match,
     },
-    "logo": {
-        "text": "Xbatcher",
-        "alt_text": "Xbatcher",
+    'logo': {
+        'text': 'Xbatcher',
+        'alt_text': 'Xbatcher',
     },
-    "navbar_align": "left",  # [left, content, right] For testing that the navbar items align properly
-    "navbar_center": ["version-switcher", "navbar-nav"],
+    'navbar_align': 'left',  # [left, content, right] For testing that the navbar items align properly
+    'navbar_center': ['version-switcher', 'navbar-nav'],
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -208,7 +206,7 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+html_static_path = ['_static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -257,7 +255,7 @@ html_static_path = ["_static"]
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "xbatcherdoc"
+htmlhelp_basename = 'xbatcherdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -276,11 +274,11 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (
-        "index",
-        "xbatcher.tex",
-        "xbatcher Documentation",
-        "xbatcher developers",
-        "manual",
+        'index',
+        'xbatcher.tex',
+        'xbatcher Documentation',
+        'xbatcher developers',
+        'manual',
     ),
 ]
 
@@ -311,10 +309,10 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     (
-        "index",
-        "xbatcher",
-        "xbatcher Documentation",
-        ["xbatcher developers"],
+        'index',
+        'xbatcher',
+        'xbatcher Documentation',
+        ['xbatcher developers'],
         1,
     )
 ]
@@ -330,13 +328,13 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (
-        "index",
-        "xbatcher",
-        "xbatcher Documentation",
-        "xbatcher developers",
-        "xbatcher",
-        "One line description of project.",
-        "Miscellaneous",
+        'index',
+        'xbatcher',
+        'xbatcher Documentation',
+        'xbatcher developers',
+        'xbatcher',
+        'One line description of project.',
+        'Miscellaneous',
     ),
 ]
 
@@ -355,6 +353,6 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3/", None),
-    "xarray": ("http://xarray.pydata.org/en/stable/", None),
+    'python': ('https://docs.python.org/3/', None),
+    'xarray': ('http://xarray.pydata.org/en/stable/', None),
 }

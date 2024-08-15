@@ -13,4 +13,4 @@ def test_show_versions() -> None:
     """
     f = io.StringIO()
     xbatcher.show_versions(file=f)
-    assert "xbatcher information" in f.getvalue()
+    assert 'xbatcher information' in f.getvalue()

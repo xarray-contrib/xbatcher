@@ -3,13 +3,14 @@ from typing import Callable, Optional, Tuple, Union
 import xarray as xr
 
 from xbatcher import BatchGenerator
+from typing import Any, Callable, Optional
 
 try:
     import torch
 except ImportError as exc:
     raise ImportError(
-        "The Xbatcher PyTorch Dataset API depends on PyTorch. Please "
-        "install PyTorch to proceed."
+        'The Xbatcher PyTorch Dataset API depends on PyTorch. Please '
+        'install PyTorch to proceed.'
     ) from exc
 
 try:
@@ -72,7 +73,7 @@ class MapDataset(torch.utils.data.Dataset):
                 idx = idx[0]
             else:
                 raise NotImplementedError(
-                    f"{type(self).__name__}.__getitem__ currently requires a single integer key"
+                    f'{type(self).__name__}.__getitem__ currently requires a single integer key'
                 )
 
         # generate batch (or batches)

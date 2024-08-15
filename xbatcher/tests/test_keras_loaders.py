@@ -2,34 +2,34 @@ import numpy as np
 import pytest
 import xarray as xr
 
-tf = pytest.importorskip("tensorflow")
-
 from xbatcher import BatchGenerator
 from xbatcher.loaders.keras import CustomTFDataset
 
+tf = pytest.importorskip('tensorflow')
 
-@pytest.fixture(scope="module")
+
+@pytest.fixture(scope='module')
 def ds_xy():
     n_samples = 100
     n_features = 5
     ds = xr.Dataset(
         {
-            "x": (
-                ["sample", "feature"],
+            'x': (
+                ['sample', 'feature'],
                 np.random.random((n_samples, n_features)),
             ),
-            "y": (["sample"], np.random.random(n_samples)),
+            'y': (['sample'], np.random.random(n_samples)),
         },
     )
     return ds
 
 
 def test_custom_dataarray(ds_xy):
-    x = ds_xy["x"]
-    y = ds_xy["y"]
+    x = ds_xy['x']
+    y = ds_xy['y']
 
-    x_gen = BatchGenerator(x, {"sample": 10})
-    y_gen = BatchGenerator(y, {"sample": 10})
+    x_gen = BatchGenerator(x, {'sample': 10})
+    y_gen = BatchGenerator(y, {'sample': 10})
 
     dataset = CustomTFDataset(x_gen, y_gen)
 
@@ -45,11 +45,11 @@ def test_custom_dataarray(ds_xy):
 
 
 def test_custom_dataarray_with_transform(ds_xy):
-    x = ds_xy["x"]
-    y = ds_xy["y"]
+    x = ds_xy['x']
+    y = ds_xy['y']
 
-    x_gen = BatchGenerator(x, {"sample": 10})
-    y_gen = BatchGenerator(y, {"sample": 10})
+    x_gen = BatchGenerator(x, {'sample': 10})
+    y_gen = BatchGenerator(y, {'sample': 10})
 
     def x_transform(batch):
         return batch * 0 + 1
