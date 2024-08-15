@@ -54,6 +54,47 @@ def ds_xy(request):
     return ds
 
 
+@pytest.mark.parametrize('x_var', ['x', ['x']])
+def test_map_dataset_without_y(ds_xy, x_var) -> None:
+    x = ds_xy[x_var]
+
+    x_gen = BatchGenerator(x, {'sample': 10})
+
+    dataset = MapDataset(x_gen)
+
+    # test __getitem__
+    x_batch = dataset[0]
+    assert x_batch.shape == (10, 5)  # type: ignore[union-attr]
+    assert isinstance(x_batch, torch.Tensor)
+
+    idx = torch.tensor([0])
+    x_batch = dataset[idx]
+    assert x_batch.shape == (10, 5)
+    assert isinstance(x_batch, torch.Tensor)
+
+    with pytest.raises(NotImplementedError):
+        idx = torch.tensor([0, 1])
+        x_batch = dataset[idx]
+
+    # test __len__
+    assert len(dataset) == len(x_gen)
+
+    # test integration with torch DataLoader
+    loader = torch.utils.data.DataLoader(dataset, batch_size=None)
+
+    for x_batch in loader:
+        assert x_batch.shape == (10, 5)  # type: ignore[union-attr]
+        assert isinstance(x_batch, torch.Tensor)
+
+    # Check that array shape of last item in generator is same as the batch image
+    assert tuple(x_gen[-1].sizes.values()) == x_batch.shape  # type: ignore[union-attr]
+    # Check that array values from last item in generator and batch are the same
+    gen_array = (
+        x_gen[-1].to_array().squeeze() if hasattr(x_gen[-1], 'to_array') else x_gen[-1]
+    )
+    np.testing.assert_array_equal(gen_array, x_batch)  # type: ignore
+
+
 @pytest.mark.parametrize(
     ('x_var', 'y_var'),
     [
