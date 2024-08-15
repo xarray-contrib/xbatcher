@@ -1,5 +1,4 @@
 from collections.abc import Hashable
-from typing import Union
 from unittest import TestCase
 
 import numpy as np
@@ -170,7 +169,7 @@ def get_batch_dimensions(generator: BatchGenerator) -> dict[Hashable, int]:
 
 
 def validate_batch_dimensions(
-    *, expected_dims: dict[Hashable, int], batch: Union[xr.Dataset, xr.DataArray]
+    *, expected_dims: dict[Hashable, int], batch: xr.Dataset | xr.DataArray
 ) -> None:
     """
     Raises an AssertionError if the shape and dimensions of a batch do not
