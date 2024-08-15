@@ -3,9 +3,9 @@
 import itertools
 import json
 import warnings
-from collections.abc import Hashable, Iterator, Sequence
+from collections.abc import Callable, Hashable, Iterator, Sequence
 from operator import itemgetter
-from typing import Any, Callable, Optional, Union
+from typing import Any
 
 import numpy as np
 import xarray as xr
@@ -55,10 +55,10 @@ class BatchSchema:
 
     def __init__(
         self,
-        ds: Union[xr.Dataset, xr.DataArray],
+        ds: xr.Dataset | xr.DataArray,
         input_dims: dict[Hashable, int],
-        input_overlap: Optional[dict[Hashable, int]] = None,
-        batch_dims: Optional[dict[Hashable, int]] = None,
+        input_overlap: dict[Hashable, int] | None = None,
+        batch_dims: dict[Hashable, int] | None = None,
         concat_input_bins: bool = True,
         preload_batch: bool = True,
     ):
@@ -91,9 +91,7 @@ class BatchSchema:
         )
         self.selectors: BatchSelectorSet = self._gen_batch_selectors(ds)
 
-    def _gen_batch_selectors(
-        self, ds: Union[xr.DataArray, xr.Dataset]
-    ) -> BatchSelectorSet:
+    def _gen_batch_selectors(self, ds: xr.DataArray | xr.Dataset) -> BatchSelectorSet:
         """
         Create batch selectors dict, which can be used to create a batch
         from an Xarray data object.
@@ -106,9 +104,7 @@ class BatchSchema:
         else:  # Each patch gets its own batch
             return {ind: [value] for ind, value in enumerate(patch_selectors)}
 
-    def _gen_patch_selectors(
-        self, ds: Union[xr.DataArray, xr.Dataset]
-    ) -> PatchGenerator:
+    def _gen_patch_selectors(self, ds: xr.DataArray | xr.Dataset) -> PatchGenerator:
         """
         Create an iterator that can be used to index an Xarray Dataset/DataArray.
         """
@@ -127,7 +123,7 @@ class BatchSchema:
         return all_slices
 
     def _combine_patches_into_batch(
-        self, ds: Union[xr.DataArray, xr.Dataset], patch_selectors: PatchGenerator
+        self, ds: xr.DataArray | xr.Dataset, patch_selectors: PatchGenerator
     ) -> BatchSelectorSet:
         """
         Combine the patch selectors to form a batch
@@ -169,7 +165,7 @@ class BatchSchema:
         return dict(enumerate(batch_selectors))
 
     def _combine_patches_grouped_by_input_and_batch_dims(
-        self, ds: Union[xr.DataArray, xr.Dataset], patch_selectors: PatchGenerator
+        self, ds: xr.DataArray | xr.Dataset, patch_selectors: PatchGenerator
     ) -> BatchSelectorSet:
         """
         Combine patches with multiple slices along ``batch_dims`` grouped into
@@ -197,7 +193,7 @@ class BatchSchema:
         n_batches = np.prod(list(self._n_batches_per_dim.values()))
         return {k: [] for k in range(n_batches)}
 
-    def _gen_patch_numbers(self, ds: Union[xr.DataArray, xr.Dataset]):
+    def _gen_patch_numbers(self, ds: xr.DataArray | xr.Dataset):
         """
         Calculate the number of patches per dimension and the number of patches
         in each batch per dimension.
@@ -214,7 +210,7 @@ class BatchSchema:
             for dim, length in self._all_sliced_dims.items()
         }
 
-    def _gen_batch_numbers(self, ds: Union[xr.DataArray, xr.Dataset]):
+    def _gen_batch_numbers(self, ds: xr.DataArray | xr.Dataset):
         """
         Calculate the number of batches per dimension
         """
@@ -324,7 +320,7 @@ def _gen_slices(*, dim_size: int, slice_size: int, overlap: int = 0) -> list[sli
 
 
 def _iterate_through_dimensions(
-    ds: Union[xr.Dataset, xr.DataArray],
+    ds: xr.Dataset | xr.DataArray,
     *,
     dims: dict[Hashable, int],
     overlap: dict[Hashable, int] = {},
@@ -350,10 +346,10 @@ def _iterate_through_dimensions(
 
 
 def _drop_input_dims(
-    ds: Union[xr.Dataset, xr.DataArray],
+    ds: xr.Dataset | xr.DataArray,
     input_dims: dict[Hashable, int],
     suffix: str = '_input',
-) -> Union[xr.Dataset, xr.DataArray]:
+) -> xr.Dataset | xr.DataArray:
     # remove input_dims coordinates from datasets, rename the dimensions
     # then put intput_dims back in as coordinates
     out = ds.copy()
@@ -368,9 +364,9 @@ def _drop_input_dims(
 
 
 def _maybe_stack_batch_dims(
-    ds: Union[xr.Dataset, xr.DataArray],
+    ds: xr.Dataset | xr.DataArray,
     input_dims: Sequence[Hashable],
-) -> Union[xr.Dataset, xr.DataArray]:
+) -> xr.Dataset | xr.DataArray:
     batch_dims = [d for d in ds.sizes if d not in input_dims]
     if len(batch_dims) < 2:
         return ds
@@ -424,14 +420,14 @@ class BatchGenerator:
 
     def __init__(
         self,
-        ds: Union[xr.Dataset, xr.DataArray],
+        ds: xr.Dataset | xr.DataArray,
         input_dims: dict[Hashable, int],
         input_overlap: dict[Hashable, int] = {},
         batch_dims: dict[Hashable, int] = {},
         concat_input_dims: bool = False,
         preload_batch: bool = True,
-        cache: Optional[dict[str, Any]] = None,
-        cache_preprocess: Optional[Callable] = None,
+        cache: dict[str, Any] | None = None,
+        cache_preprocess: Callable | None = None,
     ):
         self.ds = ds
         self.cache = cache
@@ -466,14 +462,14 @@ class BatchGenerator:
     def preload_batch(self):
         return self._batch_selectors.preload_batch
 
-    def __iter__(self) -> Iterator[Union[xr.DataArray, xr.Dataset]]:
+    def __iter__(self) -> Iterator[xr.DataArray | xr.Dataset]:
         for idx in self._batch_selectors.selectors:
             yield self[idx]
 
     def __len__(self) -> int:
         return len(self._batch_selectors.selectors)
 
-    def __getitem__(self, idx: int) -> Union[xr.Dataset, xr.DataArray]:
+    def __getitem__(self, idx: int) -> xr.Dataset | xr.DataArray:
         if not isinstance(idx, int):
             raise NotImplementedError(
                 f'{type(self).__name__}.__getitem__ currently requires a single integer key'
@@ -532,7 +528,7 @@ class BatchGenerator:
     def _batch_in_cache(self, idx: int) -> bool:
         return self.cache is not None and f'{idx}/.zgroup' in self.cache
 
-    def _cache_batch(self, idx: int, batch: Union[xr.Dataset, xr.DataArray]) -> None:
+    def _cache_batch(self, idx: int, batch: xr.Dataset | xr.DataArray) -> None:
         batch.to_zarr(self.cache, group=str(idx), mode='a')
 
     def _get_cached_batch(self, idx: int) -> xr.Dataset:

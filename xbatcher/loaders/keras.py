@@ -1,4 +1,5 @@
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 try:
     import tensorflow as tf
@@ -21,8 +22,8 @@ class CustomTFDataset(tf.keras.utils.Sequence):
         X_generator,
         y_generator,
         *,
-        transform: Optional[Callable] = None,
-        target_transform: Optional[Callable] = None,
+        transform: Callable | None = None,
+        target_transform: Callable | None = None,
     ) -> None:
         """
         Keras Dataset adapter for Xbatcher

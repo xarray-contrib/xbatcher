@@ -5,6 +5,8 @@ from typing import Callable, Optional, Union
 import xarray as xr
 
 from xbatcher import BatchGenerator
+from collections.abc import Callable
+from typing import Any
 
 try:
     import torch
@@ -42,10 +44,10 @@ def to_tensor(xr_obj: T_DataArrayOrSet):
 class MapDataset(torch.utils.data.Dataset):
     def __init__(
         self,
-        X_generator: BatchGenerator,
-        y_generator: Optional[BatchGenerator] = None,
-        transform: Callable[[T_DataArrayOrSet], torch.Tensor] = to_tensor,
-        target_transform: Callable[[T_DataArrayOrSet], torch.Tensor] = to_tensor,
+        X_generator,
+        y_generator,
+        transform: Callable | None = None,
+        target_transform: Callable | None = None,
     ) -> None:
         """
         PyTorch Dataset adapter for Xbatcher
