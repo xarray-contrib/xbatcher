@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from typing import Callable, Optional, Union
+from collections.abc import Callable
 
 import xarray as xr
 
 from xbatcher import BatchGenerator
-from collections.abc import Callable
-from typing import Any
 
 try:
     import torch
@@ -21,7 +19,7 @@ try:
 except ImportError:
     dask = None
 
-T_DataArrayOrSet = Union[xr.DataArray, xr.Dataset]
+T_DataArrayOrSet = xr.DataArray | xr.Dataset
 
 # Notes:
 # This module includes two PyTorch datasets.
@@ -44,10 +42,10 @@ def to_tensor(xr_obj: T_DataArrayOrSet):
 class MapDataset(torch.utils.data.Dataset):
     def __init__(
         self,
-        X_generator,
-        y_generator,
-        transform: Callable | None = None,
-        target_transform: Callable | None = None,
+        X_generator: BatchGenerator,
+        y_generator: BatchGenerator | None = None,
+        transform: Callable[[T_DataArrayOrSet], torch.Tensor] = to_tensor,
+        target_transform: Callable[[T_DataArrayOrSet], torch.Tensor] = to_tensor,
     ) -> None:
         """
         PyTorch Dataset adapter for Xbatcher
@@ -67,9 +65,7 @@ class MapDataset(torch.utils.data.Dataset):
     def __len__(self) -> int:
         return len(self.X_generator)
 
-    def __getitem__(
-        self, idx
-    ) -> Union[tuple[torch.Tensor, torch.Tensor], torch.Tensor]:
+    def __getitem__(self, idx) -> tuple[torch.Tensor, torch.Tensor] | torch.Tensor:
         if torch.is_tensor(idx):
             idx = idx.tolist()
             if len(idx) == 1:

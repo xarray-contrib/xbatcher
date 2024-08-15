@@ -32,7 +32,6 @@ repos:
         additional_dependencies: [
             # Type stubs
             types-setuptools,
-            types-pkg_resources,
             # Dependencies that are typed
             numpy,
             xarray,
