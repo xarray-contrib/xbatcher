@@ -8,7 +8,7 @@ from xbatcher.loaders.torch import IterableDataset, MapDataset, to_tensor
 torch = pytest.importorskip('torch')
 
 
-@pytest.fixture(scope="module", params=[True, False])
+@pytest.fixture(scope='module', params=[True, False])
 def ds_xy(request):
     n_samples = 100
     n_features = 5
@@ -23,7 +23,7 @@ def ds_xy(request):
     )
 
     if request.param:
-        ds = ds.chunk({"sample": 10})
+        ds = ds.chunk({'sample': 10})
 
     return ds
 
