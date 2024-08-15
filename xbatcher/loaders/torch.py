@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from types import ModuleType
 
 import xarray as xr
 
@@ -17,7 +18,7 @@ except ImportError as exc:
 try:
     import dask
 except ImportError:
-    dask = None
+    dask: ModuleType | None = None  # type: ignore[no-redef]
 
 T_DataArrayOrSet = xr.DataArray | xr.Dataset
 
@@ -32,11 +33,13 @@ T_DataArrayOrSet = xr.DataArray | xr.Dataset
 #  - need to test with additional dataset parameters (e.g. transforms)
 
 
-def to_tensor(xr_obj: T_DataArrayOrSet):
-    """Convert this DataArray to a torch.Tensor"""
+def to_tensor(xr_obj: T_DataArrayOrSet) -> torch.Tensor:
+    """Convert this DataArray or Dataset to a torch.Tensor"""
     if isinstance(xr_obj, xr.Dataset):
         xr_obj = xr_obj.to_array().squeeze(dim='variable')
-    return torch.tensor(xr_obj.data)
+    if isinstance(xr_obj, xr.DataArray):
+        xr_obj = xr_obj.data
+    return torch.tensor(xr_obj)
 
 
 class MapDataset(torch.utils.data.Dataset):
@@ -91,17 +94,16 @@ class MapDataset(torch.utils.data.Dataset):
             y_batch = y_batch.load()
 
         # apply transformation(s)
-        X_batch = self.transform(X_batch)
+        X_batch_tensor = self.transform(X_batch)
         if y_batch is not None:
-            y_batch = self.target_transform(y_batch)
+            y_batch_tensor = self.target_transform(y_batch)
 
-        assert isinstance(X_batch, torch.Tensor), self.transform
+        assert isinstance(X_batch_tensor, torch.Tensor), self.transform
 
-        if y_batch is not None:
-            assert isinstance(y_batch, torch.Tensor)
-            return X_batch, y_batch
-        else:
-            return X_batch
+        if y_batch is None:
+            return X_batch_tensor
+        assert isinstance(y_batch_tensor, torch.Tensor)
+        return X_batch_tensor, y_batch_tensor
 
 
 class IterableDataset(torch.utils.data.IterableDataset):
