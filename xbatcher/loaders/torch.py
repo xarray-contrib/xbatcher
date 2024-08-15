@@ -1,4 +1,6 @@
-from typing import Callable, Optional, Tuple, Union
+from __future__ import annotations
+
+from typing import Callable, Optional, Union
 
 import xarray as xr
 
@@ -65,7 +67,7 @@ class MapDataset(torch.utils.data.Dataset):
 
     def __getitem__(
         self, idx
-    ) -> Union[Tuple[torch.Tensor, torch.Tensor], torch.Tensor]:
+    ) -> Union[tuple[torch.Tensor, torch.Tensor], torch.Tensor]:
         if torch.is_tensor(idx):
             idx = idx.tolist()
             if len(idx) == 1:
