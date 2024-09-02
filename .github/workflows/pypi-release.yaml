@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5.1.1
+      - uses: actions/setup-python@v5.2.0
         name: Install Python
         with:
           python-version: 3.11
@@ -62,7 +62,7 @@ jobs:
     needs: build-artifacts
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-python@v5.1.1
+      - uses: actions/setup-python@v5.2.0
         name: Install Python
         with:
           python-version: 3.11
@@ -80,7 +80,7 @@ jobs:
           python -m pip install dist/xbatcher*.whl
           python -m xbatcher.util.print_versions
       - name: Publish package to TestPyPI
-        uses: pypa/gh-action-pypi-publish@v1.9.0
+        uses: pypa/gh-action-pypi-publish@v1.10.0
         with:
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
           repository-url: https://test.pypi.org/legacy/
@@ -96,7 +96,7 @@ jobs:
           name: releases
           path: dist
       - name: Publish package to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.9.0
+        uses: pypa/gh-action-pypi-publish@v1.10.0
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
           # verbose: true
