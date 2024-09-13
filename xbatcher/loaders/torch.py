@@ -88,9 +88,6 @@ class MapDataset(torch.utils.data.Dataset):
         if dask is not None:
             X_batch, y_batch = dask.compute(X_batch, y_batch)
 
-        if y_batch is not None:
-            y_batch = y_batch.load()
-
         # apply transformation(s)
         X_batch_tensor = self.transform(X_batch)
         if y_batch is not None:
