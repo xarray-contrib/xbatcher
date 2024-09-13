@@ -88,8 +88,6 @@ class MapDataset(torch.utils.data.Dataset):
         if dask is not None:
             X_batch, y_batch = dask.compute(X_batch, y_batch)
 
-        # Q: is ds.load() a no-op if dask compute loaded data into memory?
-        X_batch = X_batch.load()
         if y_batch is not None:
             y_batch = y_batch.load()
 
