@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Jones
+    given-names: Max
+    orcid: https://orcid.org/0000-0002-1825-0097
+  - family-names: Abernathey
+    given-names: Ryan
+    orcid: https://orcid.org/0000-0003-2475-7469
+  - family-names: Hamman
+    given-names: Joseph
+    orcid: https://orcid.org/0000-0002-3320-9152
+  - family-names: Banihirwe
+    given-names: Anderson
+    orcid: https://orcid.org/0000-0002-6310-7646
+  - family-names: Ji
+    given-names: Wei
+    orcid: https://orcid.org/0000-0002-6310-7646
+identifiers:
+  - type: doi
+    value:
+    description: Zenodo DOI
+repository-code: "https://github.com/xarray-contrib/xbatcher"
+abstract: >-
+  Xbatcher is a small library for iterating Xarray DataArrays and Datasets in
+  batches. The goal is to make it easy to feed Xarray objects to machine
+  learning libraries such as PyTorch or TensorFlow.
+
+keywords:
+  - Xarray
+  - Machine Learning
+  - Deep Learning
+  - PyTorch
+  - TensorFlow
+  - Dask
+version: 0.4.0
+date-released: 2024-09-17
