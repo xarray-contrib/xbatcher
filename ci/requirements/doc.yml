@@ -20,9 +20,12 @@ dependencies:
   - adlfs
   - ipykernel
   - nbsphinx
+  - netcdf4
+  - pooch
   - zarr
   # Editable xbatcher installation
   - pip
+
   - pip:
       # relative to this file. Needs to be editable to be accepted.
       - -e ../..

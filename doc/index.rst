@@ -88,6 +88,7 @@ or via a built-in `Xarray accessor <http://xarray.pydata.org/en/stable/internals
    :caption: Contents:
 
    api
+   user-guide/index
    tutorials-and-presentations
    roadmap
    contributing
