@@ -1,7 +1,7 @@
 xbatcher: Batch Generation from Xarray Datasets
 ===============================================
 
-|Build Status| |codecov| |docs| |pypi| |conda-forge| |license|
+|Build Status| |codecov| |docs| |pypi| |conda-forge| |license| |zenodo|
 
 
 Xbatcher is a small library for iterating Xarray DataArrays and Datasets in
@@ -32,6 +32,9 @@ info.
 .. |license| image:: https://img.shields.io/github/license/xarray-contrib/xbatcher.svg
    :target: https://github.com/xarray-contrib/xbatcher
    :alt: license
+.. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.13776824.svg
+   :target: https://doi.org/10.5281/zenodo.13776824
+   :alt: zenodo
 
 Installation
 ------------
