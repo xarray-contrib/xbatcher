@@ -1,7 +1,7 @@
 .. _contributing:
 
 ******************
-Contributing guide
+Contributing Guide
 ******************
 
 .. note::

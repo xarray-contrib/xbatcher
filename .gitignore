@@ -66,3 +66,4 @@ target/
 # tests
 .pytest_cache/*
 .mypy_cache/
+.ipynb_checkpoints/
