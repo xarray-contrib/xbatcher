@@ -6,3 +6,4 @@ User Guide
    :caption: Contents:
 
    caching
+   training-a-neural-network-with-Pytorch-and-xbatcher
