@@ -9,7 +9,7 @@ dependencies:
   - numpy
   - xarray
   # Dev dependencies
-  - adlfs
+  - s3fs
   - asv
   - pre-commit
   - pytest

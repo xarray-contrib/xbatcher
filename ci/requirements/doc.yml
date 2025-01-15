@@ -17,7 +17,7 @@ dependencies:
   - sphinx-design
   - xarray
   # For examples
-  - adlfs
+  - s3fs
   - ipykernel
   - nbsphinx
   - netcdf4

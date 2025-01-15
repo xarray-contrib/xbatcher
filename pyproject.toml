@@ -27,11 +27,11 @@
     requires-python = ">=3.10"
 [project.optional-dependencies]
     dev = [
-        "adlfs",
         "asv",
         "coverage",
         "pytest",
         "pytest-cov",
+        "s3fs",
         "tensorflow",
         "torch",
         "zarr<3.0",
