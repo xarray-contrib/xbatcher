@@ -1,140 +1,134 @@
 [build-system]
-requires = [
-    "setuptools>=64",
-    "setuptools-scm[toml]>=6.2"
-]
-build-backend = "setuptools.build_meta"
+    build-backend = "setuptools.build_meta"
+    requires      = ["setuptools-scm[toml]>=6.2", "setuptools>=64"]
 
 [project]
-name = "xbatcher"
-description = "Batch generation from Xarray objects"
-readme = "README.rst"
-license = {text = "Apache"}
-authors = [{name = "xbatcher Developers", email = "rpa@ldeo.columbia.edu"}]
-requires-python = ">=3.10"
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "License :: OSI Approved :: Apache Software License",
-    "Operating System :: OS Independent",
-    "Intended Audience :: Science/Research",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Topic :: Scientific/Engineering",
-]
-dynamic = ["version"]
-dependencies = [
-    "dask",
-    "numpy",
-    "xarray",
-]
+    authors = [
+        { name = "xbatcher Developers", email = "rpa@ldeo.columbia.edu" },
+    ]
+    classifiers = [
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python",
+        "Topic :: Scientific/Engineering",
+    ]
+    dependencies = ["dask", "numpy", "xarray"]
+    description = "Batch generation from Xarray objects"
+    dynamic = ["version"]
+    license = { text = "Apache" }
+    name = "xbatcher"
+    readme = "README.rst"
+    requires-python = ">=3.10"
 [project.optional-dependencies]
-torch = [
-    "torch",
-]
-tensorflow = [
-    "tensorflow",
-]
-dev = [
-    "adlfs",
-    "asv",
-    "coverage",
-    "pytest",
-    "pytest-cov",
-    "tensorflow",
-    "torch",
-    "zarr",
-]
+    dev = [
+        "adlfs",
+        "asv",
+        "coverage",
+        "pytest",
+        "pytest-cov",
+        "tensorflow",
+        "torch",
+        "zarr<3.0",
+    ]
+    tensorflow = ["tensorflow"]
+    torch = ["torch"]
 [project.urls]
-documentation = "https://xbatcher.readthedocs.io/en/latest/"
-repository = "https://github.com/xarray-contrib/xbatcher"
+    documentation = "https://xbatcher.readthedocs.io/en/latest/"
+    repository    = "https://github.com/xarray-contrib/xbatcher"
 
 [tool.setuptools.packages.find]
-include = ["xbatcher*"]
+    include = ["xbatcher*"]
 
 [tool.setuptools_scm]
-local_scheme = "node-and-date"
-fallback_version = "999"
-
-
+    fallback_version = "999"
+    local_scheme     = "node-and-date"
 
 [tool.ruff]
-target-version = "py310"
-extend-include = ["*.ipynb"]
+    extend-include = ["*.ipynb"]
+    target-version = "py310"
 
-
-builtins = ["ellipsis"]
-# Exclude a variety of commonly ignored directories.
-exclude = [
-    ".bzr",
-    ".direnv",
-    ".eggs",
-    ".git",
-    ".git-rewrite",
-    ".hg",
-    ".ipynb_checkpoints",
-    ".mypy_cache",
-    ".nox",
-    ".pants.d",
-    ".pyenv",
-    ".pytest_cache",
-    ".pytype",
-    ".ruff_cache",
-    ".svn",
-    ".tox",
-    ".venv",
-    ".vscode",
-    "__pypackages__",
-    "_build",
-    "buck-out",
-    "build",
-    "dist",
-    "node_modules",
-    "site-packages",
-    "venv",
-]
+    builtins = ["ellipsis"]
+    # Exclude a variety of commonly ignored directories.
+    exclude = [
+        ".bzr",
+        ".direnv",
+        ".eggs",
+        ".git",
+        ".git-rewrite",
+        ".hg",
+        ".ipynb_checkpoints",
+        ".mypy_cache",
+        ".nox",
+        ".pants.d",
+        ".pyenv",
+        ".pytest_cache",
+        ".pytype",
+        ".ruff_cache",
+        ".svn",
+        ".tox",
+        ".venv",
+        ".vscode",
+        "__pypackages__",
+        "_build",
+        "buck-out",
+        "build",
+        "dist",
+        "node_modules",
+        "site-packages",
+        "venv",
+    ]
 [tool.ruff.lint]
-per-file-ignores = {}
-ignore = [
-    "E721", # Comparing types instead of isinstance
-    "E741", # Ambiguous variable names
-    "E501", # Conflicts with ruff format
-]
-select = [
-    # Pyflakes
-    "F",
-    # Pycodestyle
-    "E",
-    "W",
-    # isort
-    "I",
-    # Pyupgrade
-    "UP",
-]
-
+    ignore = [
+        "E501", # Conflicts with ruff format
+        "E721", # Comparing types instead of isinstance
+        "E741", # Ambiguous variable names
+    ]
+    per-file-ignores = {}
+    select = [
+        # Pyflakes
+        "F",
+        # Pycodestyle
+        "E",
+        "W",
+        # isort
+        "I",
+        # Pyupgrade
+        "UP",
+    ]
 
 [tool.ruff.lint.mccabe]
-max-complexity = 18
+    max-complexity = 18
 
 [tool.ruff.lint.isort]
-known-first-party = ["xbatcher"]
-known-third-party = ["numpy", "pandas", "pytest", "sphinx_autosummary_accessors", "torch", "xarray"]
+    known-first-party = ["xbatcher"]
+    known-third-party = [
+        "numpy",
+        "pandas",
+        "pytest",
+        "sphinx_autosummary_accessors",
+        "torch",
+        "xarray",
+    ]
 
-combine-as-imports = true
+    combine-as-imports = true
 
 [tool.ruff.format]
-quote-style = "single"
-docstring-code-format = true
+    docstring-code-format = true
+    quote-style           = "single"
 
 [tool.ruff.lint.pydocstyle]
-convention = "numpy"
+    convention = "numpy"
 
 [tool.ruff.lint.pyupgrade]
-# Preserve types, even if a file imports `from __future__ import annotations`.
-keep-runtime-typing = true
+    # Preserve types, even if a file imports `from __future__ import annotations`.
+    keep-runtime-typing = true
 
 [tool.pytest.ini_options]
-log_cli = true
-log_level = "INFO"
+    log_cli   = true
+    log_level = "INFO"
