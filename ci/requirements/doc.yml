@@ -23,6 +23,7 @@ dependencies:
   - netcdf4
   - pooch
   - zarr
+  - torch
   # Editable xbatcher installation
   - pip
 
