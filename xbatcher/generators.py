@@ -268,24 +268,26 @@ class BatchSchema:
         out_json: str
             The JSON representation of the BatchSchema
         """
-        out_dict = {}
-        out_dict['input_dims'] = self.input_dims
-        out_dict['input_overlap'] = self.input_overlap
-        out_dict['batch_dims'] = self.batch_dims
-        out_dict['concat_input_dims'] = self.input_dims
-        out_dict['preload_batch'] = self.preload_batch
+        out_dict = {
+            'input_dims': self.input_dims,
+            'input_overlap': self.input_overlap,
+            'batch_dims': self.batch_dims,
+            'concat_input_dims': self.input_dims,
+            'preload_batch': self.preload_batch,
+        }
         batch_selector_dict = {}
         for i in self.selectors.keys():
             batch_selector_dict[i] = self.selectors[i]
             for member in batch_selector_dict[i]:
-                out_member_dict = {}
-                member_keys = [x for x in member.keys()]
-                for member_key in member_keys:
-                    out_member_dict[member_key] = {
+                member_keys = list(member.keys())
+                out_member_dict = {
+                    member_key: {
                         'start': member[member_key].start,
                         'stop': member[member_key].stop,
                         'step': member[member_key].step,
                     }
+                    for member_key in member_keys
+                }
         out_dict['selector'] = out_member_dict
         return json.dumps(out_dict)
 
@@ -323,12 +325,13 @@ def _iterate_through_dimensions(
     ds: xr.Dataset | xr.DataArray,
     *,
     dims: dict[Hashable, int],
-    overlap: dict[Hashable, int] = {},
+    overlap: dict[Hashable, int] | None = None,
 ) -> Iterator[dict[Hashable, slice]]:
+    if overlap is None:
+        overlap = {}
     dim_slices = []
-    for dim in dims:
+    for dim, slice_size in dims.items():
         dim_size = ds.sizes[dim]
-        slice_size = dims[dim]
         slice_overlap = overlap.get(dim, 0)
         if slice_size > dim_size:
             raise ValueError(
@@ -353,7 +356,7 @@ def _drop_input_dims(
     # remove input_dims coordinates from datasets, rename the dimensions
     # then put intput_dims back in as coordinates
     out = ds.copy()
-    for dim in input_dims.keys():
+    for dim in input_dims:
         newdim = f'{dim}{suffix}'
         out = out.rename({dim: newdim})
         # extra steps needed if there is a coordinate
@@ -422,13 +425,17 @@ class BatchGenerator:
         self,
         ds: xr.Dataset | xr.DataArray,
         input_dims: dict[Hashable, int],
-        input_overlap: dict[Hashable, int] = {},
-        batch_dims: dict[Hashable, int] = {},
+        input_overlap: dict[Hashable, int] | None = None,
+        batch_dims: dict[Hashable, int] | None = None,
         concat_input_dims: bool = False,
         preload_batch: bool = True,
         cache: dict[str, Any] | None = None,
         cache_preprocess: Callable | None = None,
     ):
+        if input_overlap is None:
+            input_overlap = {}
+        if batch_dims is None:
+            batch_dims = {}
         self.ds = ds
         self.cache = cache
         self.cache_preprocess = cache_preprocess
@@ -481,43 +488,40 @@ class BatchGenerator:
         if self.cache and self._batch_in_cache(idx):
             return self._get_cached_batch(idx)
 
-        if idx in self._batch_selectors.selectors:
-            if self.concat_input_dims:
-                new_dim_suffix = '_input'
-                all_dsets: list = []
-                batch_selector = {}
-                for dim in self._batch_selectors.batch_dims.keys():
-                    starts = [
-                        x[dim].start for x in self._batch_selectors.selectors[idx]
-                    ]
-                    stops = [x[dim].stop for x in self._batch_selectors.selectors[idx]]
-                    batch_selector[dim] = slice(min(starts), max(stops))
-                batch_ds = self.ds.isel(batch_selector)
-                if self.preload_batch:
-                    batch_ds.load()
-                for selector in self._batch_selectors.selectors[idx]:
-                    patch_ds = self.ds.isel(selector)
-                    all_dsets.append(
-                        _drop_input_dims(
-                            patch_ds,
-                            self.input_dims,
-                            suffix=new_dim_suffix,
-                        )
-                    )
-                dsc = xr.concat(all_dsets, dim='input_batch')
-                new_input_dims = [str(dim) + new_dim_suffix for dim in self.input_dims]
-                batch = _maybe_stack_batch_dims(dsc, new_input_dims)
-            else:
-                batch_ds = self.ds.isel(self._batch_selectors.selectors[idx][0])
-                if self.preload_batch:
-                    batch_ds.load()
-                batch = _maybe_stack_batch_dims(
-                    batch_ds,
-                    list(self.input_dims),
-                )
-        else:
+        if idx not in self._batch_selectors.selectors:
             raise IndexError('list index out of range')
 
+        if self.concat_input_dims:
+            new_dim_suffix = '_input'
+            all_dsets: list = []
+            batch_selector = {}
+            for dim in self._batch_selectors.batch_dims.keys():
+                starts = [x[dim].start for x in self._batch_selectors.selectors[idx]]
+                stops = [x[dim].stop for x in self._batch_selectors.selectors[idx]]
+                batch_selector[dim] = slice(min(starts), max(stops))
+            batch_ds = self.ds.isel(batch_selector)
+            if self.preload_batch:
+                batch_ds.load()
+            for selector in self._batch_selectors.selectors[idx]:
+                patch_ds = self.ds.isel(selector)
+                all_dsets.append(
+                    _drop_input_dims(
+                        patch_ds,
+                        self.input_dims,
+                        suffix=new_dim_suffix,
+                    )
+                )
+            dsc = xr.concat(all_dsets, dim='input_batch')
+            new_input_dims = [str(dim) + new_dim_suffix for dim in self.input_dims]
+            batch = _maybe_stack_batch_dims(dsc, new_input_dims)
+        else:
+            batch_ds = self.ds.isel(self._batch_selectors.selectors[idx][0])
+            if self.preload_batch:
+                batch_ds.load()
+            batch = _maybe_stack_batch_dims(
+                batch_ds,
+                list(self.input_dims),
+            )
         if self.cache is not None and self.cache_preprocess is not None:
             batch = self.cache_preprocess(batch)
         if self.cache is not None:
