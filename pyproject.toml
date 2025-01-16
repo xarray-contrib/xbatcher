@@ -34,7 +34,7 @@
         "s3fs",
         "tensorflow",
         "torch",
-        "zarr<3.0",
+        "zarr<4.0",
     ]
     tensorflow = ["tensorflow"]
     torch = ["torch"]
