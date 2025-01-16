@@ -7,3 +7,4 @@ User Guide
 
    caching
    training-a-neural-network-with-Pytorch-and-xbatcher
+   training-a-neural-network-with-keras-and-xbatcher

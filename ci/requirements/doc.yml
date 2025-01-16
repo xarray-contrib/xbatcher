@@ -24,6 +24,8 @@ dependencies:
   - pooch
   - zarr
   - pytorch
+  - keras
+  - tensorflow
   # Editable xbatcher installation
   - pip
 
