@@ -224,12 +224,7 @@ def test_batch_3d_1d_input(sample_ds_3d, input_size):
     'concat',
     [
         True,
-        pytest.param(
-            False,
-            marks=pytest.mark.xfail(
-                reason='Bug described in https://github.com/xarray-contrib/xbatcher/issues/126'
-            ),
-        ),
+        False,
     ],
 )
 def test_batch_3d_1d_input_batch_dims(sample_ds_3d, concat):
