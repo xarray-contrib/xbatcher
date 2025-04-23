@@ -10,8 +10,9 @@ from typing import Any
 import numpy as np
 import xarray as xr
 
-PatchGenerator = Iterator[dict[Hashable, slice]]
-BatchSelector = list[dict[Hashable, slice]]
+Selector = dict[Hashable, slice]
+PatchGenerator = Iterator[Selector]
+BatchSelector = list[Selector]
 BatchSelectorSet = dict[int, BatchSelector]
 
 
@@ -414,6 +415,18 @@ class BatchGenerator:
     cache_preprocess: callable, optional
         A function to apply to batches prior to caching.
         Note: The caching API is experimental and subject to change.
+    filter_fn: callable, optional
+        Function that determines whether a batch is removed. This function should
+        take a ``Dataset`` or ``DataArray`` as its first argument, a Selector
+        object as its second argument, and return ``True`` for batches that should be
+        kept.
+    resample_fn: callable, optional
+        Function that determines the relative importance of this batch for
+        resampling. This function should have the same signature as ``filter_fn``,
+        but return a float.
+    resample_n: int
+        Number of batches to keep after resampling. Must be larger than zero and
+        less than the number of batches available after filtering.
 
     Yields
     ------
@@ -431,6 +444,9 @@ class BatchGenerator:
         preload_batch: bool = True,
         cache: dict[str, Any] | None = None,
         cache_preprocess: Callable | None = None,
+        filter_fn: Callable[..., bool] | None = None,
+        resample_fn: Callable[..., float] | None = None,
+        resample_n: int | None = None,
     ):
         if input_overlap is None:
             input_overlap = {}
@@ -439,6 +455,9 @@ class BatchGenerator:
         self.ds = ds
         self.cache = cache
         self.cache_preprocess = cache_preprocess
+        self.filter_fn = filter_fn
+        self.resample_fn = resample_fn
+        self.resample_n = resample_n
 
         self._batch_selectors: BatchSchema = BatchSchema(
             ds,
@@ -448,6 +467,52 @@ class BatchGenerator:
             concat_input_bins=concat_input_dims,
             preload_batch=preload_batch,
         )
+
+        # Extract the list of selectors for filtering/resampling. Both steps
+        # can only remove batches, so if this list gets shorter we know
+        # we have to re-enumerate the selectors property.
+        if self._batch_selectors.concat_input_dims:
+            batches = [s for s in self._batch_selectors.selectors[0]]
+        else:
+            batches = [s[0] for s in self._batch_selectors.selectors.values()]
+
+        n_initial_batches = len(batches)
+
+        if self.filter_fn is not None:
+            batches = [b for b in batches if self.filter_fn(self.ds, b)]
+            if len(batches) == 0:
+                warnings.warn('Filtering resulted in no batches.')
+
+        if self.resample_fn is not None:
+            assert (
+                self.resample_n is not None
+            ), 'resample_n must be provided to resample batches.'
+            assert len(batches) >= self.resample_n, (
+                f'Cannot sample {self.resample_n} slices from this dataset '
+                f'when there are {len(batches)} available.'
+            )
+
+            weight = np.array([self.resample_fn(self.ds, s) for s in batches])
+            assert np.any(
+                weight > 0
+            ), 'Sample weight vector does not have any positive values.'
+            weight = weight / np.sum(weight)
+
+            batches_to_keep = np.random.choice(
+                len(batches), self.resample_n, replace=False, p=weight
+            )
+
+            batches = [batches[i] for i in batches_to_keep]
+
+        # Re-enumerate the list of batches only if filtering or resampling
+        # occurred.
+        if len(batches) < n_initial_batches:
+            if self._batch_selectors.concat_input_dims:
+                self._batch_selectors.selectors = {0: [b for b in batches]}
+            else:
+                self._batch_selectors.selectors = {
+                    i: [b] for i, b in enumerate(batches)
+                }
 
     @property
     def input_dims(self):
