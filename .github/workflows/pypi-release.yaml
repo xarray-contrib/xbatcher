@@ -16,10 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'xarray-contrib/xbatcher'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5.4.0
+      - uses: actions/setup-python@v5.6.0
         name: Install Python
         with:
           python-version: 3.11
@@ -62,11 +62,11 @@ jobs:
     needs: build-artifacts
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-python@v5.4.0
+      - uses: actions/setup-python@v5.6.0
         name: Install Python
         with:
           python-version: 3.11
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: releases
           path: dist
@@ -91,7 +91,7 @@ jobs:
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: releases
           path: dist
