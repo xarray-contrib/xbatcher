@@ -25,13 +25,17 @@ jobs:
         python-version: ["3.10", "3.11", "3.12"]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+
       - name: Setup Python
-        uses: actions/setup-python@v5.6.0
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
-      - uses: actions/cache@v4
+
+      - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/dev-requirements.txt') }}
@@ -40,11 +44,13 @@ jobs:
       - run: |
           python -m pip install -e .[dev]
           python -m pip list
+
       - name: Running Tests
         run: |
           pytest --verbose --cov=. --cov-report=xml
+
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5.5.0
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
         if: ${{ matrix.python-version }} == 3.10
         with:
           file: ./coverage.xml
@@ -58,18 +64,22 @@ jobs:
         python-version: ["3.10", "3.11", "3.12"]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
       - name: Setup Python
-        uses: actions/setup-python@v5.6.0
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
+
       - run: |
           python -m pip install -e .[dev]
           python -m pip install --upgrade \
                 git+https://github.com/dask/dask \
                 git+https://github.com/pydata/xarray
           python -m pip list
+
       - name: Running Tests
         run: |
           py.test --verbose --cov=.
