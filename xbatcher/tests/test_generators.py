@@ -96,7 +96,7 @@ def test_batch_1d(sample_ds_1d, input_size):
     validate_generator_length(bg)
     expected_dims = get_batch_dimensions(bg)
     for n, ds_batch in enumerate(bg):
-        assert ds_batch.dims['x'] == input_size
+        assert ds_batch.sizes['x'] == input_size
         expected_slice = slice(input_size * n, input_size * (n + 1))
         ds_batch_expected = sample_ds_1d.isel(x=expected_slice)
         xr.testing.assert_identical(ds_batch_expected, ds_batch)
@@ -146,7 +146,7 @@ def test_batch_1d_no_coordinate(sample_ds_1d, input_size):
     validate_generator_length(bg)
     expected_dims = get_batch_dimensions(bg)
     for n, ds_batch in enumerate(bg):
-        assert ds_batch.dims['x'] == input_size
+        assert ds_batch.sizes['x'] == input_size
         expected_slice = slice(input_size * n, input_size * (n + 1))
         ds_batch_expected = ds_dropped.isel(x=expected_slice)
         xr.testing.assert_identical(ds_batch_expected, ds_batch)
@@ -187,7 +187,7 @@ def test_batch_1d_overlap(sample_ds_1d, input_overlap):
     expected_dims = get_batch_dimensions(bg)
     stride = input_size - input_overlap
     for n, ds_batch in enumerate(bg):
-        assert ds_batch.dims['x'] == input_size
+        assert ds_batch.sizes['x'] == input_size
         expected_slice = slice(stride * n, stride * n + input_size)
         ds_batch_expected = sample_ds_1d.isel(x=expected_slice)
         xr.testing.assert_identical(ds_batch_expected, ds_batch)
@@ -204,11 +204,11 @@ def test_batch_3d_1d_input(sample_ds_3d, input_size):
     validate_generator_length(bg)
     expected_dims = get_batch_dimensions(bg)
     for n, ds_batch in enumerate(bg):
-        assert ds_batch.dims['x'] == input_size
+        assert ds_batch.sizes['x'] == input_size
         # time and y should be collapsed into batch dimension
         assert (
-            ds_batch.dims['sample']
-            == sample_ds_3d.dims['y'] * sample_ds_3d.dims['time']
+            ds_batch.sizes['sample']
+            == sample_ds_3d.sizes['y'] * sample_ds_3d.sizes['time']
         )
         expected_slice = slice(input_size * n, input_size * (n + 1))
         ds_batch_expected = (
@@ -265,6 +265,23 @@ def test_batch_3d_1d_input_batch_concat_duplicate_dim(sample_ds_3d):
         validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
 
 
+def test_batch_3d_uneven_batch_input_dim(sample_ds_3d):
+    """
+    Test batch generation when a batch dimension is not a multiple of the
+    corresponding input dimension.
+    """
+    bg = BatchGenerator(
+        sample_ds_3d,
+        input_dims={'x': 5, 'y': 10},
+        batch_dims={'x': 11, 'y': 21},
+        concat_input_dims=True,
+    )
+    validate_generator_length(bg)
+    expected_dims = get_batch_dimensions(bg)
+    for ds_batch in bg:
+        validate_batch_dimensions(expected_dims=expected_dims, batch=ds_batch)
+
+
 @pytest.mark.parametrize('input_size', [5, 10])
 def test_batch_3d_2d_input(sample_ds_3d, input_size):
     """
@@ -279,8 +296,8 @@ def test_batch_3d_2d_input(sample_ds_3d, input_size):
         yn, xn = np.unravel_index(
             n,
             (
-                (sample_ds_3d.dims['y'] // input_size),
-                (sample_ds_3d.dims['x'] // x_input_size),
+                (sample_ds_3d.sizes['y'] // input_size),
+                (sample_ds_3d.sizes['x'] // x_input_size),
             ),
         )
         expected_xslice = slice(x_input_size * xn, x_input_size * (xn + 1))

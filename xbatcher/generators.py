@@ -89,6 +89,7 @@ class BatchSchema:
         self._all_sliced_dims: dict[Hashable, int] = dict(
             **self._unique_batch_dims, **self.input_dims
         )
+
         self.selectors: BatchSelectorSet = self._gen_batch_selectors(ds)
 
     def _gen_batch_selectors(self, ds: xr.DataArray | xr.Dataset) -> BatchSelectorSet:
@@ -215,7 +216,10 @@ class BatchSchema:
         Calculate the number of batches per dimension
         """
         self._n_batches_per_dim: dict[Hashable, int] = {
-            dim: int(ds.sizes[dim] // self.batch_dims.get(dim, ds.sizes[dim]))
+            dim: int(
+                self._n_patches_per_dim[dim]
+                // self._n_patches_per_batch.get(dim, ds.sizes[dim])
+            )
             for dim in self._all_sliced_dims.keys()
         }
 

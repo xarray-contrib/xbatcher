@@ -101,11 +101,7 @@ def _get_sample_length(
     """
     if generator.concat_input_dims:
         batch_concat_dims = [
-            (
-                generator.batch_dims.get(dim) // length
-                if generator.batch_dims.get(dim)
-                else generator.ds.sizes.get(dim) // length
-            )
+            np.ceil(generator.batch_dims.get(dim, generator.ds.sizes[dim]) / length)
             for dim, length in generator.input_dims.items()
         ]
     else:
@@ -252,7 +248,8 @@ def validate_generator_length(generator: BatchGenerator) -> None:
     )
     nbatches_from_duplicate_batch_dims = np.prod(
         [
-            generator.ds.sizes[dim] // length
+            generator.ds.sizes[dim]
+            // (generator.input_dims[dim] * np.ceil(length / generator.input_dims[dim]))
             for dim, length in duplicate_batch_dims.items()
         ]
     )
