@@ -25,6 +25,14 @@ Tutorials
        +++
        Xbatcher demonstration
 
+    .. grid-item-card::
+       :text-align: center
+       :link: https://projectpythia.org/xbatcher-deep-learning/
+
+       Xbatcher for Deep Learning (Project Pythia Cookbook)
+       +++
+       Keenan Ganz and Nabin Kalauni
+
 Presentations
 -------------
 
@@ -39,3 +47,14 @@ Presentations
 
     +++
     Max Jones, Joe Hamman, and Wei Ji Leong
+
+
+.. card:: Tensors and Back Again: Xbatcher for Filtering, Resampling, and Assembling Deep Learning Model Output
+
+    Pangeo Showcase, October 8, 2025
+    ^^^
+
+    | Presentation details and discussion: `Pangeo Discourse <https://discourse.pangeo.io/t/pangeo-showcase-tensors-and-back-again-xbatcher-for-filtering-resampling-and-assembling-deep-learning-model-output-october-8-2025-at-4-pm-et/5422>`_
+
+    +++
+    Keenan Ganz
